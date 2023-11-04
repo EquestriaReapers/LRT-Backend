@@ -3,22 +3,17 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { DataSourceConfig } from './config/datasource'
+import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3307,
-      username: 'user',
-      password: 'root',
-      database: 'db_ucab_linkedin',
-      autoLoadEntities : true,
-      synchronize: true,
-    }),
     ConfigModule.forRoot({
-      envFilePath: '.env.development' || '.env.production' || '.env.development.local',
+      isGlobal: true,
+      envFilePath: `.${process.env.NODE_ENV.trim()}.env`
     }),
+    TypeOrmModule.forRoot({ ...DataSourceConfig}),
+    ProjectsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

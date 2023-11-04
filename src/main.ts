@@ -4,15 +4,24 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { json } from 'express';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
+import * as morgan from 'morgan';
+import { CORS } from './constants';
 
 async function bootstrap() {
-  const PORT = process.env.PORT || 3000;
-
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, { cors: true }); // Cors para que se pueda acceder desde cualquier lado
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const configService = app.get<ConfigService>(ConfigService);
   
+  const PORT = configService.get('DB_PORT')|| 3000;
+
+
   app.use(json({ limit: '500mb' })); // Tamaño máximo de los datos (60mb)
 
+
   app.setGlobalPrefix("api/v1");
+
+  app.use(morgan('dev'));
+  app.enableCors(CORS);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -28,9 +37,11 @@ async function bootstrap() {
   .setDescription('Esta es la api de UCAB Linkedin')
   .build();
 
-const document = SwaggerModule.createDocument(app, config); // Documentación
-SwaggerModule.setup('api', app, document); // Documentación
+  const document = SwaggerModule.createDocument(app, config); // Documentación
+  SwaggerModule.setup('api', app, document); // Documentación
 
   await app.listen(PORT);
+  console.log(`Application running on: ${await app.getUrl()}`);
+
 }
 bootstrap();
