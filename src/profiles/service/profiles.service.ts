@@ -1,16 +1,12 @@
 import { Injectable, NotFoundException, Param } from '@nestjs/common';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { Profile } from '../entities/profile.entity';
-import { User } from 'src/users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class ProfilesService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
 
@@ -25,7 +21,7 @@ export class ProfilesService {
   async findOne(@Param('id') id: number) {
     const profile = await this.profileRepository.findOne({ where: { userId: id }, relations: ['user'] });
       if (!profile) {
-        throw new NotFoundException('user not found')
+        throw new NotFoundException('profile not found')
       }
       
       return profile;
@@ -52,7 +48,7 @@ async update(id: number, updateProfileDto: UpdateProfileDto, file: Express.Multe
     // const user = await this.userRepository.softRemove({id});
 
     if (!profile) {
-      throw new NotFoundException('user not found')
+      throw new NotFoundException('profile not found')
     }
 
     return profile;
