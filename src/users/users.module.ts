@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DbValidatorsModule } from '@youba/nestjs-dbvalidator';
 import { User } from './entities/user.entity';
 import { ConfigService } from '@nestjs/config';
+import { Profile } from 'src/profiles/entities/profile.entity';
 
 const configService = new ConfigService();
 
@@ -18,7 +19,7 @@ const configService = new ConfigService();
       password: configService.get('DB_PASSWORD'),
       database: configService.get('DB_NAME'),
     }),
-    TypeOrmModule.forFeature([User])
+    TypeOrmModule.forFeature([User, Profile])
   ],
   controllers: [UsersController],
   providers: [UsersService],

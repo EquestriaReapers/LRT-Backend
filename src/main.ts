@@ -7,6 +7,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import * as morgan from 'morgan';
 import { CORS } from './constants';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -29,11 +30,17 @@ async function bootstrap() {
     })
   );
 
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), { // Ruta de las imagenes
+    prefix: '/uploads/',
+  });
+
+
   const config = new DocumentBuilder() // Documentación
   //.addBearerAuth()
   .setTitle('UCAB PERFIL')
   .setDescription('Esta es la api de UCAB PERFIL')
   .addTag('users')
+  .addTag('profile')
   .build();
 
   const document = SwaggerModule.createDocument(app, config); // Documentación

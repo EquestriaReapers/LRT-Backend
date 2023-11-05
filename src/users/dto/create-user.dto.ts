@@ -5,6 +5,8 @@ import { isUniqueDb } from "@youba/nestjs-dbvalidator";
 import { Transform } from "class-transformer";
 
 export class CreateUserDto {
+
+        
     @ApiProperty({ example: 'John', required: true })
     @IsNotEmpty()
     @IsString()
