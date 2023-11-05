@@ -4,7 +4,6 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { DataSourceConfig } from './config/datasource'
-import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [
@@ -13,7 +12,6 @@ import { ProjectsModule } from './projects/projects.module';
       envFilePath: `.${process.env.NODE_ENV.trim()}.env`
     }),
     TypeOrmModule.forRoot({ ...DataSourceConfig}),
-    ProjectsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
