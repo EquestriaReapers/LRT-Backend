@@ -15,9 +15,9 @@ export const DataSourceConfig: DataSourceOptions = {
     username: configService.get('DB_USER'),
     password: configService.get('DB_PASSWORD'),
     database: configService.get('DB_NAME'),
-    entities: [__dirname + '/../**/**/*.entity{.ts,.js}'],
-    migrations: [__dirname + '/../migrations/*{.ts,.js}'],
-    synchronize: false,
+    entities: ['dist/**/*.entity.js'],
+    migrations: ['dist/../migrations/*{.ts,.js}'],
+    synchronize: true,
     migrationsRun: true,
     logging: false,
 }

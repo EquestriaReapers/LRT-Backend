@@ -14,9 +14,7 @@ async function bootstrap() {
   
   const PORT = configService.get('DB_PORT')|| 3000;
 
-
   app.use(json({ limit: '500mb' })); // Tamaño máximo de los datos (60mb)
-
 
   app.setGlobalPrefix("api/v1");
 
@@ -33,8 +31,8 @@ async function bootstrap() {
 
   const config = new DocumentBuilder() // Documentación
   //.addBearerAuth()
-  .setTitle('UCAB Linkedin')
-  .setDescription('Esta es la api de UCAB Linkedin')
+  .setTitle('UCAB PERFIL')
+  .setDescription('Esta es la api de UCAB PERFIL')
   .build();
 
   const document = SwaggerModule.createDocument(app, config); // Documentación
