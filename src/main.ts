@@ -33,6 +33,7 @@ async function bootstrap() {
   //.addBearerAuth()
   .setTitle('UCAB PERFIL')
   .setDescription('Esta es la api de UCAB PERFIL')
+  .addTag('users')
   .build();
 
   const document = SwaggerModule.createDocument(app, config); // Documentación
