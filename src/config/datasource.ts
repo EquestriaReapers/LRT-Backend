@@ -22,4 +22,11 @@ export const DataSourceConfig: DataSourceOptions = {
     logging: false,
 }
 
+export const envData = {
+    jwtSecret: configService.get('JWT_SECRET'),
+    database_url: configService.get('DATABASE_URL'),
+    port: configService.get('PORT'),
+    host : configService.get('DB_HOST'),
+}
+
 export const AppOS = new DataSource(DataSourceConfig)

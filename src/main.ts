@@ -39,6 +39,7 @@ async function bootstrap() {
   //.addBearerAuth()
   .setTitle('UCAB PERFIL')
   .setDescription('Esta es la api de UCAB PERFIL')
+  .addBearerAuth()
   .addTag('users')
   .addTag('profile')
   .build();
