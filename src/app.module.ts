@@ -8,6 +8,7 @@ import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
 import { ProfilesModule } from './profiles/profiles.module';
 import { ServeStaticModule } from '@nestjs/serve-static/dist/serve-static.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ServeStaticModule } from '@nestjs/serve-static/dist/serve-static.module
     TypeOrmModule.forRoot({ ...DataSourceConfig}),
     UsersModule,
     ProfilesModule,
+    AuthModule,
   ],
   controllers: [AppController, UsersController],
   providers: [AppService],
