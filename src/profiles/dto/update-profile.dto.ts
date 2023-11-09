@@ -1,6 +1,8 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
 import { CreateProfileDTO } from './create-profile.dto';
+import { isUniqueDb } from '@youba/nestjs-dbvalidator';
+import { Transform } from 'class-transformer';
 
 export class UpdateProfileDto extends PartialType(CreateProfileDTO){
     @ApiProperty({ example: 'Muy proactivo', required: true })
@@ -11,4 +13,7 @@ export class UpdateProfileDto extends PartialType(CreateProfileDTO){
     @ApiProperty({type:"file"})
     file: Express.Multer.File;
 
+    @ApiProperty()
+    @IsOptional()
+    name: string;
 }
