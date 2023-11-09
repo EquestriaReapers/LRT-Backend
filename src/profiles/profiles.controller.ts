@@ -8,7 +8,7 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { UserRole } from 'src/constants';
 import { ActiveUser } from 'src/common/decorator/active-user-decorator';
 import { UserActiveInterface } from 'src/common/interface/user-active-interface';
-
+import { AddSkillDto } from './dto/add-skill.dto';
 @ApiTags('profile')
 @Controller('profiles')
 export class ProfilesController {
@@ -52,6 +52,19 @@ export class ProfilesController {
   update(@Param('id') id: number, @Body() updateProfileDto: UpdateProfileDto, @UploadedFile() file: Express.Multer.File) {
     return this.profilesService.update(+id, updateProfileDto, file);
   }
+
+  @Auth(UserRole.GRADUATE)
+  @Post('/my-profile/add-skill')
+  addAnimeToList(@Body() addSkillDto: AddSkillDto, @ActiveUser() user: UserActiveInterface) {
+    return this.profilesService.addSkillProfile(addSkillDto.skillId, user);
+  }
+
+  @Auth(UserRole.GRADUATE)
+  @Post('/my-profile/remove-skill')
+  removeSkillProfile(@Body() addSkillDto: AddSkillDto, @ActiveUser() user: UserActiveInterface) {
+    return this.profilesService.removeSkillProfile(addSkillDto.skillId, user);
+  }
+
 
   @Auth(UserRole.ADMIN)
   @Delete(':id')
