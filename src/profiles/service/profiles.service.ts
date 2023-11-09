@@ -115,12 +115,22 @@ async update(id: number, updateProfileDto: UpdateProfileDto, file: Express.Multe
   const profile = await this.profileRepository.update(
     id,
   {
-    ...updateProfileDto,
+    description: updateProfileDto.description,
     image: imagePath
   });
   
   if (profile.affected === 0) {
     throw new NotFoundException('profile not found')
+  }
+
+  const userUpdated = await this.userRepository.update(
+    id,
+  {
+    name: updateProfileDto.name,
+  });
+
+  if (userUpdated.affected === 0 ) {
+    throw new NotFoundException('user not found')
   }
 
   return profile
