@@ -4,6 +4,9 @@ import { Profile } from '../entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserActiveInterface } from 'src/common/interface/user-active-interface';
+import { Skill } from 'src/skills/entities/skill.entity';
+import { AddSkillDto } from '../dto/add-skill.dto';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class ProfilesService {
@@ -11,6 +14,11 @@ export class ProfilesService {
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
 
+    @InjectRepository(Skill)
+    private readonly skillRepository: Repository<Skill>,
+
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
   ) {}
   
   async findAll() {

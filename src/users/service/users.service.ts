@@ -16,14 +16,14 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-      const user = this.userRepository.create(createUserDto);
+      const user = await this.userRepository.create(createUserDto);
 
       await this.userRepository.save(user);
 
       const getUser = await this.userRepository.findOne({ where: { email: createUserDto.email } });
 
 
-      const perfil = this.profileRepository.create({userId: +getUser.id, description: "default", image: "default"});
+      const perfil = await this.profileRepository.create({userId: +getUser.id, description: "default", image: "default"});
       await this.profileRepository.save(perfil);
 
       const response = {

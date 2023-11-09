@@ -1,3 +1,4 @@
+import { Skill } from "src/skills/entities/skill.entity";
 import { User } from "src/users/entities/user.entity";
 import {
     BeforeInsert,
@@ -5,6 +6,8 @@ import {
     DeleteDateColumn,
     Entity,
     JoinColumn,
+    JoinTable,
+    ManyToMany,
     OneToOne,
     PrimaryColumn,
   } from "typeorm";
@@ -24,4 +27,11 @@ export class Profile {
 
     @Column()
     image: string;
+
+    @ManyToMany(() => Skill, (skill) => skill.profiles)
+    @JoinTable()
+    skills: Skill[];
+
+    @DeleteDateColumn()
+    deletedAt: Date;
 }

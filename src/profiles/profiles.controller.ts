@@ -8,6 +8,7 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { UserRole } from 'src/constants';
 import { ActiveUser } from 'src/common/decorator/active-user-decorator';
 import { UserActiveInterface } from 'src/common/interface/user-active-interface';
+import { AddSkillDto } from './dto/add-skill.dto';
 
 @ApiTags('profile')
 @Controller('profiles')
