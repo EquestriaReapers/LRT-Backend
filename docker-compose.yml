@@ -12,7 +12,22 @@ services:
     volumes:
       - ./mysql:/var/lib/mysql
     ports:
-      - "3307:3306" 
+      - "3307:3306"
+
+  #api:
+  #  image: nestjs-app
+  #  container_name: api
+  #  restart: always
+  #  ports:
+  #  - "3000:3000"
+  #  depends_on:
+  #  - mysql
+  #  env_file:
+  #    - .env
+  #  environment:
+  #    - DB_HOST=mysql_db1
+  #  command: npm run start:dev
+
     
   phpmyadmin:
     image: phpmyadmin
