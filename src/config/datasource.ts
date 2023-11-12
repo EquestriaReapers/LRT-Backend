@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 ConfigModule.forRoot({
     isGlobal: true,
-    envFilePath: `.${process.env.NODE_ENV.trim()}.env`,
+    envFilePath: [`.env`, `${process.env.NODE_ENV}.env`],
 });
 
 const configService = new ConfigService();
