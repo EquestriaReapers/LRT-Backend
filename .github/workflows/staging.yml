@@ -18,8 +18,9 @@ jobs:
             cd /var/www 
             if [ ! -d "LRT-Backend" ]; then
               git clone git@github.com:HopeAero/LRT-Backend.git
+              CD LRT-Backend
               npm install
-              npm run build
+              npm run build    
               echo 'Repository cloned successfully to digital ocean'
             else
               cd LRT-Backend
