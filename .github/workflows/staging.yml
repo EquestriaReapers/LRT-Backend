@@ -19,13 +19,20 @@ jobs:
             if [ ! -d "LRT-Backend" ]; then
               git clone git@github.com:HopeAero/LRT-Backend.git
               CD LRT-Backend
+              git pull
+              git checkout staging
+              git pull
               npm install
-              npm run build    
+              npm run build
+              pm2 restart ucab-profile    
               echo 'Repository cloned successfully to digital ocean'
             else
               cd LRT-Backend
               git pull
+              git checkout staging
+              git pull
               npm install
               npm run build
+              pm2 restart ucab-profile
               echo 'Repository already exists previously, pulling changes'
             fi
