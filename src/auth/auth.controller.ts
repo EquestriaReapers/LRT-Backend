@@ -33,8 +33,8 @@ export class AuthController {
         return await this.authService.sendEmailVerification(email);
     }
 
-    @ApiResponse({ status: 200, description: 'Successfully verified email' })
-    @ApiResponse({ status: 403, description: 'Invalid token' })
+    @ApiResponse({ status: 200, description: 'Correo verificado con exito' })
+    @ApiResponse({ status: 403, description: 'Token invalido' })
     @Get('email/verify/:token')
     async verifyEmail(
         @Param('token') token: string,
@@ -42,7 +42,13 @@ export class AuthController {
     ) {
         const verified = await this.authService.verifyEmail(token);
     if (verified) {
-            response.send('Email verified');
+            return response.status(200).json({
+                message: 'Correo verificado con exito'
+            })
+        } else {
+            return response.status(403).json({
+                message: 'Token invalido',
+            });
         }
     }
   

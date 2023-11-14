@@ -12,6 +12,9 @@ import { JwtPayload } from '../interface/jwt-payload.interface';
 import 'dotenv/config';
 import { JwtPayloadService } from 'src/common/service/jwt.payload.service';
 import { transporter } from 'src/constants';
+import * as handlebars from 'handlebars';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class AuthService {
@@ -53,7 +56,7 @@ export class AuthService {
         
         const user = await this.usersService.findByEmailWithPassword(email);
         if (!user) {
-            throw new UnauthorizedException('email is wrong');
+            throw new UnauthorizedException('Correo incorrecto');
         }
 
         const isPasswordValid = await bcryptjs.compare(password, user.password);
@@ -63,7 +66,7 @@ export class AuthService {
         }
 
         if (!isPasswordValid) {
-            throw new UnauthorizedException('password is wrong');
+            throw new UnauthorizedException('Contraseña incorrecta');
         }
 
         const payload = { email: user.email, id: user.id, role: user.role };
@@ -123,7 +126,7 @@ export class AuthService {
                 });
 
                 await this.emailVerification.delete({ emailToken: token });
-                return true;
+                return !!userFromDb;
             }
         } else {
             throw new HttpException('Token invalido', HttpStatus.FORBIDDEN);
@@ -132,8 +135,18 @@ export class AuthService {
 
       async sendEmailVerification(email: string) {
         const repository = await this.emailVerification.findOne({
-          where : { email: email },
+            where : { email: email },
         });
+
+        const __dirname = path.resolve();
+        const filePath = path.join(__dirname, 'src', 'auth', 'template', 'template.html');
+        const source = fs.readFileSync(filePath, 'utf-8').toString();
+        const template = handlebars.compile(source);
+        const replacements = {
+            verificationLink: `${process.env.DATABASE_URL}/api/v1/auth/email/verify/${repository.emailToken}`,
+          };
+
+        const htmlToSend = template(replacements);
     
         if (repository && repository.emailToken) {
           const mailOptions = {
@@ -141,13 +154,12 @@ export class AuthService {
             to: email,
             subject: 'Verify Email',
             text: 'Verify Email',
-            html: `Hi! <br><br> Thanks for your registration<br><br>
-              <a href='${process.env.DATABASE_URL}/auth/email/verify/${repository.emailToken}'>Click here to activate your account</a>`,
+            html: htmlToSend,
           };
     
           return await this.sendEmail(mailOptions);
         } else {
-          throw new HttpException('User not found', HttpStatus.FORBIDDEN);
+          throw new HttpException('Usuario no encontrado', HttpStatus.FORBIDDEN);
         }
       }
     
@@ -162,7 +174,7 @@ export class AuthService {
               return reject(error);
             }
             Logger.log(`Send message: ${info.messageId}`, 'sendEmailVerification');
-            resolve({ message: 'Successfully send email' });
+            resolve({ message: 'Correo enviado con exito' });
           });
         });
       }
