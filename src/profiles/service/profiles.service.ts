@@ -30,7 +30,7 @@ export class ProfilesService {
   async findOne(@Param('id') id: number) {
     const profile = await this.profileRepository.findOne({ where: { userId: id }, relations: ['user', 'skills'] });
       if (!profile) {
-        throw new NotFoundException('profile not found')
+        throw new NotFoundException('Perfil no encontrado')
       }
       
       return profile;
@@ -47,17 +47,20 @@ async updateMyProfile (updateProfileDto: UpdateProfileDto, file: Express.Multer.
   );
   
   if (profile.affected === 0) {
-    throw new NotFoundException('profile not found')
+    throw new NotFoundException('Perfil no se encuentra')
   }
 
-  const userUpdated = await this.userRepository.update(
-    user.id,
-  {
-    name: updateProfileDto.name,
-  });
+  if (updateProfileDto.name) {
+    const userUpdated = await this.userRepository.update(
+      user.id,
+      {
+        name: updateProfileDto.name,
+      }
+    );
 
-  if (userUpdated.affected === 0) {
-    throw new NotFoundException('user not found')
+    if (userUpdated.affected === 0) {
+      throw new NotFoundException('Usuario no se encuentra')
+    }
   }
 
   return profile
@@ -68,7 +71,7 @@ async addSkillProfile(skillId: number, user: UserActiveInterface) {
   const skill = await this.skillRepository.findOne({ where: { id: skillId }});
 
   if (!profile || !skill) {
-    throw new NotFoundException('Profile or skill not found');
+    throw new NotFoundException('Perfil o habilidades no se encuentra');
   }
 
   // Asegúrate de que la propiedad "anime" de la lista sea un array antes de agregar el anime
@@ -90,13 +93,13 @@ async removeSkillProfile(skillId: number, user: UserActiveInterface) {
   });
 
   if (!profile) {
-    throw new NotFoundException('List not found');
+    throw new NotFoundException('Perfil no se encuentra');
   }
 
   const skill = await this.skillRepository.findOneBy({ id: skillId });
 
   if (!skill) {
-    throw new NotFoundException('Skill not found');
+    throw new NotFoundException('Habilidad no se encuentra');
   }
 
   // Ahora, realiza la lógica para eliminar el anime de la lista
@@ -114,23 +117,27 @@ async update(id: number, updateProfileDto: UpdateProfileDto, file: Express.Multe
   let imagePath = file ? process.env.DATABASE_URL + file.path.replace("\\", "/") : "default";
   const profile = await this.profileRepository.update(
     id,
-  {
-    description: updateProfileDto.description,
-    image: imagePath
-  });
-  
+    {
+      description: updateProfileDto.description,
+      image: imagePath
+    }
+  );
+
   if (profile.affected === 0) {
-    throw new NotFoundException('profile not found')
+    throw new NotFoundException('Perfil no se encuentra');
   }
 
-  const userUpdated = await this.userRepository.update(
-    id,
-  {
-    name: updateProfileDto.name,
-  });
+  if (updateProfileDto.name) {
+    const userUpdateResult = await this.userRepository.update(
+      id,
+      {
+        name: updateProfileDto.name,
+      }
+    );
 
-  if (userUpdated.affected === 0 ) {
-    throw new NotFoundException('user not found')
+    if (userUpdateResult.affected === 0) {
+      throw new NotFoundException('Usuario no se encuentra');
+    }
   }
 
   return profile
@@ -141,7 +148,7 @@ async update(id: number, updateProfileDto: UpdateProfileDto, file: Express.Multe
     // const user = await this.userRepository.softRemove({id});
 
     if (!profile) {
-      throw new NotFoundException('profile not found')
+      throw new NotFoundException('Perfil no se encuentra')
     }
 
     return profile;
