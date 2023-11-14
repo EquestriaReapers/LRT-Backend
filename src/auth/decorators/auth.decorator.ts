@@ -10,6 +10,6 @@ export function Auth(roles: UserRole) {
     Roles(roles),
     UseGuards(AuthGuard, RolesGuard),
     ApiBearerAuth(),
-    ApiUnauthorizedResponse({ description: 'Unauthorized' }),
+    ApiUnauthorizedResponse({ description: 'No autorizado' }),
   );
 }
