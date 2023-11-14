@@ -34,7 +34,7 @@ export class AuthService {
         const user = await this.usersService.findOneByEmail(email);
 
         if (user) {
-            throw new BadRequestException('User already exists');
+            throw new BadRequestException('Usuario ya existe');
         }
 
         await this.usersService.create({
