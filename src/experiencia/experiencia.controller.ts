@@ -6,6 +6,7 @@ import { ExperienciaService } from './service/experiencia.service';
 import { UpdateExperienciaDTO } from './dto/update-experiencia.dto';
 import { UserActiveInterface } from 'src/common/interface/user-active-interface';
 import { ActiveUser } from 'src/common/decorator/active-user-decorator';
+import { CreateExperienciaDTO } from './dto/create-experiencia.dto';
 
 @ApiTags('experiencia')
 @Controller('experiencias')
@@ -24,6 +25,19 @@ export class ExperienciaController {
   findOne(@Param('id') id: string) {
     return this.experienciaService.findOne(+id);
   }
+
+  @Auth(UserRole.GRADUATE)
+  @Post('/my-profile')
+  createMyExperiencia(@Body() createExperienciaDTO: CreateExperienciaDTO, @ActiveUser() user: UserActiveInterface) {
+    return this.experienciaService.createMyExperiencia(createExperienciaDTO, user);
+  }
+
+  @Auth(UserRole.ADMIN)
+  @Post()
+  create(@Body() createExperienciaDTO: CreateExperienciaDTO) {
+    return this.experienciaService.create(createExperienciaDTO);
+  }
+
 
 
   @Auth(UserRole.GRADUATE)

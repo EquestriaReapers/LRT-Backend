@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { Experiencia } from '../entities/experiencia.entity';
 import { UpdateExperienciaDTO } from '../dto/update-experiencia.dto';
 import { UserActiveInterface } from 'src/common/interface/user-active-interface';
+import { CreateExperienciaDTO } from '../dto/create-experiencia.dto';
 
 
 @Injectable()
@@ -30,6 +31,21 @@ export class ExperienciaService {
 
     return experiencia;
   }
+
+  async create(createExperienciaDTO: CreateExperienciaDTO) {
+    const experiencia = this.experienciaRepository.create(createExperienciaDTO);
+    await this.experienciaRepository.save(experiencia);
+
+    return experiencia;
+  }
+
+  async createMyExperiencia(createExperienciaDTO: CreateExperienciaDTO, user: UserActiveInterface) {
+    const experiencia = this.experienciaRepository.create({ ...createExperienciaDTO, profileId: user.id });
+    await this.experienciaRepository.save(experiencia);
+
+    return experiencia;
+  }
+
 
   async updateMyExperiencia(updateExperienciaDto: UpdateExperienciaDTO, user: UserActiveInterface) {
     const experiencia = await this.experienciaRepository.update(

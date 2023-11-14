@@ -42,6 +42,7 @@ async function bootstrap() {
   .addBearerAuth()
   .addTag('users')
   .addTag('profile')
+  .addTag('experiencia')
   .build();
 
   const document = SwaggerModule.createDocument(app, config); // Documentación

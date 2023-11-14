@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { ProfilesModule } from './profiles/profiles.module';
 import { ServeStaticModule } from '@nestjs/serve-static/dist/serve-static.module';
 import { AuthModule } from './auth/auth.module';
+import { ExperienciaModule } from './experiencia/experiencia.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AuthModule } from './auth/auth.module';
     UsersModule,
     ProfilesModule,
     AuthModule,
+    ExperienciaModule
   ],
   controllers: [AppController, UsersController],
   providers: [AppService],
