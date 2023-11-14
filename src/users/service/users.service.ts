@@ -5,6 +5,8 @@ import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
 import { Profile } from 'src/profiles/entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcryptjs from 'bcryptjs';
+import { JwtPayloadService } from 'src/common/service/jwt.payload.service';
 export class UsersService {
   constructor(
     @InjectRepository(User)
@@ -13,10 +15,14 @@ export class UsersService {
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
 
+    private readonly jwtPayloadService: JwtPayloadService,
+
   ) {}
 
   async create(createUserDto: CreateUserDto) {
       const user = await this.userRepository.create(createUserDto);
+
+      createUserDto.password = await bcryptjs.hash(createUserDto.password, 10);
 
       await this.userRepository.save(user);
 
@@ -26,9 +32,12 @@ export class UsersService {
       const perfil = await this.profileRepository.create({userId: +getUser.id, description: "default", image: "default"});
       await this.profileRepository.save(perfil);
 
+      const token = await this.jwtPayloadService.createJwtPayload(user);
+
       const response = {
         ...getUser,
-        perfil
+        perfil,
+        token
       }
 
       return response;

@@ -4,6 +4,9 @@ import { AuthController } from './auth.controller';
 import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { envData } from 'src/config/datasource';
+import { EmailVerificationEntity } from './entities/emailverification.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtPayloadService } from 'src/common/service/jwt.payload.service';
 
 @Module({
   imports: [
@@ -13,8 +16,10 @@ import { envData } from 'src/config/datasource';
       secret: envData.jwtSecret,
       signOptions: { expiresIn: '31d' },
     }),
+    TypeOrmModule.forFeature([EmailVerificationEntity]),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, JwtPayloadService],
+  exports: [AuthService],
 })
 export class AuthModule {}

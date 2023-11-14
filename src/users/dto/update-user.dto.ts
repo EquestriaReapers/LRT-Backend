@@ -23,6 +23,11 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     @Transform(({ value }) => value.trim())
     password: string;
 
+    @ApiProperty({ example: true })
+    @IsOptional()
+    verified: boolean;
+
+
     @ApiProperty({ example: "admin|graduate" })
     @IsEnum(UserRole, { message: 'Invalid role' })
     @IsOptional()
