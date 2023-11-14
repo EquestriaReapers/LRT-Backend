@@ -24,7 +24,8 @@ jobs:
               git pull
               npm install
               npm run build
-              pm2 restart ucab-profile    
+              pm2 restart ucab-profile
+              pm2 save   
               echo 'Repository cloned successfully to digital ocean'
             else
               cd LRT-Backend
@@ -34,5 +35,6 @@ jobs:
               npm install
               npm run build
               pm2 restart ucab-profile
+              pm2 save
               echo 'Repository already exists previously, pulling changes'
             fi
