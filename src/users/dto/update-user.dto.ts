@@ -8,26 +8,27 @@ import { Transform } from 'class-transformer';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
     @ApiProperty({ example: 'John' })
-    @IsNotEmpty()
     @IsOptional()
     name: string;
 
     @ApiProperty({ example: 'ronaldo@gmail.com' })
-    @IsNotEmpty()
     @isUniqueDb({table : 'user', column: 'email', message: 'Email already exists'})
     @IsEmail()
     @IsOptional()
     email: string;
 
     @ApiProperty({ example: '123456' })
-    @IsNotEmpty()
     @MinLength(6)
     @IsOptional()
     @Transform(({ value }) => value.trim())
     password: string;
 
+    @ApiProperty({ example: true })
+    @IsOptional()
+    verified: boolean;
+
+
     @ApiProperty({ example: "admin|graduate" })
-    @IsNotEmpty()
     @IsEnum(UserRole, { message: 'Invalid role' })
     @IsOptional()
     role: UserRole;

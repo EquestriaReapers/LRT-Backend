@@ -21,6 +21,9 @@ export class User {
     @Column({ nullable: false, select: false })
     password: string;
 
+    @Column()
+    verified: boolean = false;
+
     @Column({
         type: "enum",
         enum: UserRole,

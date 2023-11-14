@@ -6,6 +6,7 @@ import { DbValidatorsModule } from '@youba/nestjs-dbvalidator';
 import { User } from './entities/user.entity';
 import { ConfigService } from '@nestjs/config';
 import { Profile } from 'src/profiles/entities/profile.entity';
+import { JwtPayloadService } from 'src/common/service/jwt.payload.service';
 
 const configService = new ConfigService();
 
@@ -22,7 +23,7 @@ const configService = new ConfigService();
     TypeOrmModule.forFeature([User, Profile])
   ],
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, JwtPayloadService],
   exports: [TypeOrmModule, UsersService]
 })
 export class UsersModule {}
