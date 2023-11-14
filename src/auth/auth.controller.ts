@@ -11,15 +11,14 @@ export class AuthController {
 
   @Post('register')
     async register(@Body() registerDto: RegisterDto) {
-        const response = this.authService.register(registerDto);
+        const response = await this.authService.register(registerDto);
         await this.authService.createEmailToken(registerDto.email);
-        const state = await this.sendEmailVerification(registerDto.email);
+        const emailVerificationResponse = await this.sendEmailVerification(registerDto.email);
 
         return {
             ...response,
-            ...state,
-        }
-
+            emailVerification: emailVerificationResponse
+        };
     }
 
     @Post('login')
@@ -43,7 +42,6 @@ export class AuthController {
     ) {
         const verified = await this.authService.verifyEmail(token);
     if (verified) {
-            response.redirect('http://localhost:3000');
             response.send('Email verified');
         }
     }
