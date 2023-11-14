@@ -4,9 +4,9 @@ import { ProfilesController } from './profiles.controller';
 import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports : [UsersModule],
+  imports: [UsersModule],
   controllers: [ProfilesController],
   providers: [ProfilesService],
   exports: [ProfilesService]
 })
-export class ProfilesModule {}
+export class ProfilesModule { }

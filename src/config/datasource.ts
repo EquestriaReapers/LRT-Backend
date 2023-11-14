@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 ConfigModule.forRoot({
     isGlobal: true,
-    envFilePath: `.${process.env.NODE_ENV.trim()}.env`,
+    envFilePath: [`.env`, `${process.env.NODE_ENV}.env`],
 });
 
 const configService = new ConfigService();
@@ -11,7 +11,7 @@ const configService = new ConfigService();
 export const DataSourceConfig: DataSourceOptions = {
     type: 'mysql',
     host: configService.get('DB_HOST'),
-    port : configService.get('PORT'),
+    port: configService.get('PORT'),
     username: configService.get('DB_USER'),
     password: configService.get('DB_PASSWORD'),
     database: configService.get('DB_NAME'),
@@ -26,7 +26,7 @@ export const envData = {
     jwtSecret: configService.get('JWT_SECRET'),
     database_url: configService.get('DATABASE_URL'),
     port: configService.get('PORT'),
-    host : configService.get('DB_HOST'),
+    host: configService.get('DB_HOST'),
 }
 
 export const AppOS = new DataSource(DataSourceConfig)
