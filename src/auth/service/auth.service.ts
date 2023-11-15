@@ -61,7 +61,7 @@ export class AuthService {
 
         const isPasswordValid = await bcryptjs.compare(password, user.password);
 
-        if (user.verified === false) {
+        if (!user.verified) {
             throw new UnauthorizedException('Correo no verificado');
         }
 
