@@ -1,12 +1,12 @@
-import { Experiencia } from "src/experiencia/entities/experiencia.entity";
+import { Experience } from "src/experience/entities/experience.entity";
 import { User } from "src/users/entities/user.entity";
 import {
-  BeforeInsert,
   Column,
-  DeleteDateColumn,
   Entity,
   JoinColumn,
+  ManyToMany,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryColumn,
 } from "typeorm";
@@ -27,6 +27,6 @@ export class Profile {
   @Column()
   image: string;
 
-  @ManyToOne(() => Experiencia, experiencia => experiencia.profile)
-  experiencia: Experiencia;
+  @OneToMany(() => Experience, experience => experience.userId)
+  experience: Experience[];
 }

@@ -1,25 +1,25 @@
 import { Profile } from "src/profiles/entities/profile.entity";
 import {
-  BeforeInsert,
   Column,
-  DeleteDateColumn,
   Entity,
   JoinColumn,
+  ManyToMany,
+  ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryColumn,
 } from "typeorm";
 
 @Entity()
-export class Experiencia {
+export class Experience {
 
   @PrimaryColumn()
-  profileId: number;
-  @OneToMany(() => Profile, profile => profile.experiencia)
-  profile: Profile[];
+  userId: number;
+  @OneToMany(() => Profile, profile => profile.experience)
+  @JoinColumn({ name: "userId" })
+  profile: Profile;
 
   @Column()
-  urlProyecto: string;
+  urlProyecto: string;  
 
   @Column()
   cargo: string;
