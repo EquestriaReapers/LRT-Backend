@@ -7,6 +7,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import * as morgan from 'morgan';
 import { join } from 'path';
+import { CORS } from './constants';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -19,11 +20,7 @@ async function bootstrap() {
   app.setGlobalPrefix("api/v1");
 
   app.use(morgan('dev'));
-  app.enableCors({
-    allowedHeaders: '*',
-    origin: '*',
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  });
+  app.enableCors(CORS);
 
   app.useGlobalPipes(
     new ValidationPipe({
