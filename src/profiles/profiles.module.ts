@@ -12,4 +12,4 @@ import { Skill } from 'src/skills/entities/skill.entity';
   providers: [ProfilesService],
   exports: [ProfilesService]
 })
-export class ProfilesModule {}
+export class ProfilesModule { }

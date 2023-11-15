@@ -10,6 +10,8 @@ import { ProfilesModule } from './profiles/profiles.module';
 import { ServeStaticModule } from '@nestjs/serve-static/dist/serve-static.module';
 import { AuthModule } from './auth/auth.module';
 import { SkillsModule } from './skills/skills.module';
+import { ExperienceModule } from './experience/experience.module';
+
 
 @Module({
   imports: [
@@ -20,13 +22,14 @@ import { SkillsModule } from './skills/skills.module';
       isGlobal: true,
       envFilePath: [`.env`, `${process.env.NODE_ENV}.env`],
     }),
-    TypeOrmModule.forRoot({ ...DataSourceConfig}),
+    TypeOrmModule.forRoot({ ...DataSourceConfig }),
     UsersModule,
     ProfilesModule,
     AuthModule,
     SkillsModule,
+    ExperienceModule
   ],
   controllers: [AppController, UsersController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
