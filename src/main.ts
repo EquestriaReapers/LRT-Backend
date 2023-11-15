@@ -6,7 +6,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import * as morgan from 'morgan';
-import { CORS } from './constants';
 import { join } from 'path';
 
 async function bootstrap() {
@@ -20,7 +19,11 @@ async function bootstrap() {
   app.setGlobalPrefix("api/v1");
 
   app.use(morgan('dev'));
-  app.enableCors(CORS);
+  app.enableCors({
+    allowedHeaders: '*',
+    origin: '*',
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
