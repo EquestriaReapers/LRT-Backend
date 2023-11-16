@@ -17,11 +17,15 @@ export class ExperienceService {
   ) { }
 
   async findAll() {
-    return await this.experienceRepository.find();
+    return await this.experienceRepository.find({
+      relations: {
+        profile: true
+      }
+    });
   }
 
   async findOne(@Param('id') id: number) {
-    const experiencia = await this.experienceRepository.findOne({ where: { id: id }});
+    const experiencia = await this.experienceRepository.findOne({ where: { id: id }, relations: ['profile']});
     if (!experiencia) {
       throw new NotFoundException('Experiencia no encontrada')
     }
