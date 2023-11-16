@@ -16,7 +16,7 @@ import { ServeStaticModule } from '@nestjs/serve-static/dist/serve-static.module
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.${process.env.NODE_ENV.trim()}.env`
+      envFilePath: [`.env`, `${process.env.NODE_ENV}.env`],
     }),
     TypeOrmModule.forRoot({ ...DataSourceConfig}),
     UsersModule,
