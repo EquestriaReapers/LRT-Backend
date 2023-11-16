@@ -1,9 +1,12 @@
 import { Experience } from "src/experience/entities/experience.entity";
 import { User } from "src/users/entities/user.entity";
+import { Skill } from "src/skills/entities/skill.entity";
 import {
   Column,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -29,4 +32,11 @@ export class Profile {
 
   @OneToMany(() => Experience, experience => experience.userId)
   experience: Experience[];
+
+  @ManyToMany(() => Skill, (skill) => skill.profiles)
+  @JoinTable()
+  skills: Skill[];
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

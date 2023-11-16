@@ -43,6 +43,7 @@ async function bootstrap() {
   .addTag('users')
   .addTag('profile')
   .addTag('experiencia')
+  .addTag('skill')
   .build();
 
   const document = SwaggerModule.createDocument(app, config); // Documentación

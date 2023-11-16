@@ -20,7 +20,7 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-      const user = this.userRepository.create(createUserDto);
+      const user = await this.userRepository.create(createUserDto);
 
       createUserDto.password = await bcryptjs.hash(createUserDto.password, 10);
 
@@ -29,7 +29,7 @@ export class UsersService {
       const getUser = await this.userRepository.findOne({ where: { email: createUserDto.email } });
 
 
-      const perfil = this.profileRepository.create({userId: +getUser.id, description: "default", image: "default"});
+      const perfil = await this.profileRepository.create({userId: +getUser.id, description: "default", image: "default"});
       await this.profileRepository.save(perfil);
 
       const token = await this.jwtPayloadService.createJwtPayload(user);
