@@ -13,7 +13,7 @@ import { UserActiveInterface } from 'src/common/interface/user-active-interface'
 export class ExperienceController {
   constructor(private readonly experienceService: ExperienceService) {}
 
-  @Auth(UserRole.ADMIN)
+  @Auth(UserRole.GRADUATE)
   @Get()
   findAll() {
     return this.experienceService.findAll();
@@ -43,12 +43,10 @@ export class ExperienceController {
     return this.experienceService.create(createExperienceDto);
   }
 
-
-
   @Auth(UserRole.GRADUATE)
-  @Patch('/my-experience')
-  updateMyExperiencia(@Body() updateExperienceDto: UpdateExperienceDto, @ActiveUser() user: UserActiveInterface) {
-    return this.experienceService.updateMyExperiencia(updateExperienceDto, user);
+  @Patch('/my-experience/:id')
+  updateMyExperiencia(@Param('id') id: number, @Body() updateExperienceDto: UpdateExperienceDto, @ActiveUser() user: UserActiveInterface) {
+    return this.experienceService.updateMyExperiencia(id, updateExperienceDto, user);
   }
 
   @Auth(UserRole.ADMIN)
@@ -57,7 +55,7 @@ export class ExperienceController {
     return this.experienceService.update(+id, updateExperienceDto);
   }
 
-  @Auth(UserRole.GRADUATE)
+  @Auth(UserRole.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.experienceService.remove(+id);

@@ -17,13 +17,11 @@ export class ExperienceService {
   ) { }
 
   async findAll() {
-    return await this.experienceRepository.find({
-      relations: ['profile']
-    });
+    return await this.experienceRepository.find();
   }
 
   async findOne(@Param('id') id: number) {
-    const experiencia = await this.experienceRepository.findOne({ where: { userId: id }, relations: ['profile'] });
+    const experiencia = await this.experienceRepository.findOne({ where: { id: id }});
     if (!experiencia) {
       throw new NotFoundException('Experiencia no encontrada')
     }
@@ -32,7 +30,7 @@ export class ExperienceService {
   }
 
   async findAllMy(user: UserActiveInterface) {
-    return await this.experienceRepository.find({ where: { userId: user.id }, relations: ['profile'] });
+    return await this.experienceRepository.find({ where: { profileId: user.id }});
   }
 
   async create(createExperienceDto: CreateExperienceDto) {
@@ -43,26 +41,24 @@ export class ExperienceService {
   }
 
   async createMyExperiencia(createExperienceDto: CreateExperienceDto, user: UserActiveInterface) {
-    const experiencia = this.experienceRepository.create({ ...createExperienceDto, userId: user.id });
+    const experiencia = this.experienceRepository.create({ ...createExperienceDto, profileId : user.id});
     await this.experienceRepository.save(experiencia);
 
     return experiencia;
   }
 
 
-  async updateMyExperiencia(updateExperienciaDto: UpdateExperienceDto, user: UserActiveInterface) {
+  async updateMyExperiencia(id: number, updateExperienciaDto: UpdateExperienceDto, user: UserActiveInterface) {
     const experiencia = await this.experienceRepository.update(
-      user.id,
-      {
-        ...updateExperienciaDto,
-
-      });
+      { profileId: user.id, id },
+      updateExperienciaDto
+    );
 
     if (experiencia.affected === 0) {
       throw new NotFoundException('Experiencia no encontrada')
     }
 
-    return experiencia
+    return experiencia;
   }
 
   async update(id: number, updateExperienciaDto: UpdateExperienceDto) {

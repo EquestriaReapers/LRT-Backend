@@ -1,6 +1,6 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { CreateExperienceDto } from './create-experience.dto';
-import { IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateExperienceDto extends PartialType(CreateExperienceDto) {
     @ApiProperty()
@@ -22,6 +22,11 @@ export class UpdateExperienceDto extends PartialType(CreateExperienceDto) {
     @IsString()
     @IsOptional()
     nombreProyecto: string;
+
+    @ApiProperty()
+    @IsNumber()
+    @IsOptional()
+    profileId: number;  
   
     @ApiProperty({ type: "file" })
     file: Express.Multer.File;

@@ -42,7 +42,7 @@ async function bootstrap() {
   .addBearerAuth()
   .addTag('users')
   .addTag('profile')
-  .addTag('experiencia')
+  .addTag('experience')
   .addTag('skill')
   .build();
 

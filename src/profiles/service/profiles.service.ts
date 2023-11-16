@@ -23,12 +23,12 @@ export class ProfilesService {
   
   async findAll() {
     return await this.profileRepository.find({
-      relations: ['user', 'skills', 'experience']
+      relations: ['user', 'skills']
     });
   }
 
   async findOne(@Param('id') id: number) {
-    const profile = await this.profileRepository.findOne({ where: { userId: id }, relations: ['user', 'skills', 'experience'] });
+    const profile = await this.profileRepository.findOne({ where: { userId: id }, relations: ['user', 'skills'] });
       if (!profile) {
         throw new NotFoundException('Perfil no se encuentra')
       }
