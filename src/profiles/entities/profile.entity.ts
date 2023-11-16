@@ -29,7 +29,7 @@ export class Profile {
   @Column()
   image: string;
 
-  @OneToMany(() => Experience, experience => experience.userId)
+  @OneToMany(() => Experience, experience => experience.profile)
   experience: Experience[];
 
 
