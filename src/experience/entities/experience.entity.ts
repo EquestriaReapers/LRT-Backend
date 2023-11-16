@@ -7,15 +7,19 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from "typeorm";
 
 @Entity()
 export class Experience {
 
-  @PrimaryColumn()
-  userId: number;
+  @PrimaryGeneratedColumn('increment')
+  id : number;
+
+  @Column()
+  profileId: number;
   @OneToMany(() => Profile, profile => profile.experience)
-  @JoinColumn({ name: "userId" })
+  @JoinColumn({ name: "profileId" })
   profile: Profile;
 
   @Column()

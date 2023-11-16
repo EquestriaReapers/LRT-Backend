@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateExperienceDto {
     @ApiProperty()
@@ -21,7 +21,12 @@ export class CreateExperienceDto {
     @IsNotEmpty()
     @IsString()
     nombreProyecto: string;
-  
+
+    @ApiProperty()
+    @IsNumber()
+    @IsOptional()
+    profileId: number;
+
     @ApiProperty({ type: "file" })
     file: Express.Multer.File;
 }

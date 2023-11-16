@@ -11,13 +11,18 @@ import {
   OneToMany,
   OneToOne,
   PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from "typeorm";
 
 @Entity()
 export class Profile {
 
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn('increment')
+  id: number;
+
+  @Column()
   userId: number;
+
   @OneToOne(() => User, { "cascade": true })
   @JoinColumn({ name: "userId" })  // This matches @PrimaryColumn name
   user: User;
