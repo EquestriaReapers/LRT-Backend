@@ -18,7 +18,8 @@ export class Experience {
 
   @Column()
   profileId: number;
-  @OneToMany(() => Profile, profile => profile.experience)
+  
+  @ManyToOne(() => Profile, profile => profile.experience)
   @JoinColumn({ name: "profileId" })
   profile: Profile;
 
