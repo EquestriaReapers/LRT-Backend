@@ -33,7 +33,6 @@ export class Profile {
   experience: Experience[];
 
 
-
   @ManyToMany(() => Skill, (skill) => skill.profiles)
   @JoinTable()
   skills: Skill[];
