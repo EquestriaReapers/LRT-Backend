@@ -22,7 +22,7 @@ export class ProfilesService {
   async findOne(@Param('id') id: number) {
     const profile = await this.profileRepository.findOne({ where: { userId: id }, relations: ['user'] });
       if (!profile) {
-        throw new NotFoundException('profile not found')
+        throw new NotFoundException('Perfil no se encuentra')
       }
       
       return profile;
@@ -38,7 +38,7 @@ async updateMyProfile (updateProfileDto: UpdateProfileDto, file: Express.Multer.
   });
   
   if (profile.affected === 0) {
-    throw new NotFoundException('profile not found')
+    throw new NotFoundException('Perfil no se encuentra')
   }
 
   return profile
@@ -54,7 +54,7 @@ async update(id: number, updateProfileDto: UpdateProfileDto, file: Express.Multe
   });
   
   if (profile.affected === 0) {
-    throw new NotFoundException('profile not found')
+    throw new NotFoundException('Perfil no se encuentra')
   }
 
   return profile
@@ -65,7 +65,7 @@ async update(id: number, updateProfileDto: UpdateProfileDto, file: Express.Multe
     // const user = await this.userRepository.softRemove({id});
 
     if (!profile) {
-      throw new NotFoundException('profile not found')
+      throw new NotFoundException('Perfil no se encuentra')
     }
 
     return profile;

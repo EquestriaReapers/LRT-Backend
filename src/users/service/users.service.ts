@@ -51,7 +51,7 @@ export class UsersService {
       const user = await this.userRepository.findOneBy({id});
 
         if (!user) {
-          throw new NotFoundException('user not found')
+          throw new NotFoundException('Usuario no se encuentra')
         }
         
         return user;
@@ -72,7 +72,7 @@ export class UsersService {
       const user = await this.userRepository.update({id}, updateUserDto);
 
       if (user.affected === 0) {
-        throw new NotFoundException('user not found')
+        throw new NotFoundException('Usuario no se encuentra')
       }
 
       return user;
@@ -83,7 +83,7 @@ export class UsersService {
       // const user = await this.userRepository.softRemove({id});
 
       if (!user) {
-        throw new NotFoundException('user not found')
+        throw new NotFoundException('Usuario no se encuentra')
       }
 
       return user;
