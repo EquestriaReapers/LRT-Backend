@@ -32,8 +32,8 @@ export class Profile {
   @Column()
   description: string;
 
-  @Column()
-  image: string;
+  //@Column()
+  //image: string;
 
   @OneToMany(() => Experience, experience => experience.profile)
   experience: Experience[];

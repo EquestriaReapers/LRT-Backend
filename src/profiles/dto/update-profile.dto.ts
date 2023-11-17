@@ -10,9 +10,6 @@ export class UpdateProfileDto extends PartialType(CreateProfileDTO){
     @IsOptional()
     description: string;
 
-    @ApiProperty({type:"file"})
-    file: Express.Multer.File;
-
     @ApiProperty()
     @IsOptional()
     name: string;

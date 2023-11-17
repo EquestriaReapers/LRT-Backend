@@ -8,6 +8,4 @@ export class CreateProfileDTO {
     @IsString()
     description: string;
 
-    @ApiProperty({type:"file"})
-    file: Express.Multer.File;
 }

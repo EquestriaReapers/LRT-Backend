@@ -58,13 +58,11 @@ export class ProfilesService {
       return profile;
 }
 
-async updateMyProfile (updateProfileDto: UpdateProfileDto, file: Express.Multer.File, user: UserActiveInterface) {
-  let imagePath = file ? process.env.DATABASE_URL + file.path.replace("\\", "/") : "default";
+async updateMyProfile (updateProfileDto: UpdateProfileDto, user: UserActiveInterface) {
   const profile = await this.profileRepository.update(
     user.id,
     {
       description: updateProfileDto.description,
-      image: imagePath
     }
   );
   
@@ -135,13 +133,11 @@ async removeSkillProfile(skillId: number, user: UserActiveInterface) {
 
 }
 
-async update(id: number, updateProfileDto: UpdateProfileDto, file: Express.Multer.File) {
-  let imagePath = file ? process.env.DATABASE_URL + file.path.replace("\\", "/") : "default";
+async update(id: number, updateProfileDto: UpdateProfileDto) {
   const profile = await this.profileRepository.update(
     id,
     {
       description: updateProfileDto.description,
-      image: imagePath
     }
   );
 

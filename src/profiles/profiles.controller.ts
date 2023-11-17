@@ -27,30 +27,17 @@ export class ProfilesController {
     return this.profilesService.findOne(+id);
   }
   
-  @UseInterceptors(
-    FileInterceptor(
-      'file',
-      {
-        storage : diskStorage({
-            destination : './uploads/profiles',
-            filename : (req, file, cb) => {
-              cb(null, file.originalname);
-            }
-        })
-      }
-    )
-  )
 
   @Auth(UserRole.GRADUATE)
   @Patch('/my-profile')
-  updateMyProfile(@Body() updateProfileDto: UpdateProfileDto, @UploadedFile() file: Express.Multer.File,  @ActiveUser() user: UserActiveInterface) {
-    return this.profilesService.updateMyProfile(updateProfileDto, file, user);
+  updateMyProfile(@Body() updateProfileDto: UpdateProfileDto,  @ActiveUser() user: UserActiveInterface) {
+    return this.profilesService.updateMyProfile(updateProfileDto, user);
   }
 
   @Auth(UserRole.ADMIN)
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updateProfileDto: UpdateProfileDto, @UploadedFile() file: Express.Multer.File) {
-    return this.profilesService.update(+id, updateProfileDto, file);
+  update(@Param('id') id: number, @Body() updateProfileDto: UpdateProfileDto) {
+    return this.profilesService.update(+id, updateProfileDto);
   }
 
   @Auth(UserRole.GRADUATE)

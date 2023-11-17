@@ -11,7 +11,7 @@ import { ApiTags } from '@nestjs/swagger';
 export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
 
-  @Auth(UserRole.ADMIN)
+  @Auth(UserRole.GRADUATE)
   @Post()
   create(@Body() createSkillDto: CreateSkillDto) {
     return this.skillsService.create(createSkillDto);
