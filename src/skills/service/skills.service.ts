@@ -7,10 +7,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class SkillsService {
-
   constructor(
     @InjectRepository(Skill)
-    private readonly skillsRepository: Repository<Skill>
+    private readonly skillsRepository: Repository<Skill>,
   ) {}
 
   async create(createSkillDto: CreateSkillDto) {
@@ -25,16 +24,16 @@ export class SkillsService {
   }
 
   async findOne(id: number) {
-    const skill = await this.skillsRepository.findOneBy({id});
+    const skill = await this.skillsRepository.findOneBy({ id });
     return skill;
   }
 
   async update(id: number, updateSkillDto: UpdateSkillDto) {
-    const skill = await this.skillsRepository.update({id}, updateSkillDto);
+    const skill = await this.skillsRepository.update({ id }, updateSkillDto);
     return skill;
   }
 
   async remove(id: number) {
-    const skill = await this.skillsRepository.delete({id});
+    const skill = await this.skillsRepository.delete({ id });
   }
 }

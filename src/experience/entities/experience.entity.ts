@@ -1,4 +1,4 @@
-import { Profile } from "src/profiles/entities/profile.entity";
+import { Profile } from 'src/profiles/entities/profile.entity';
 import {
   Column,
   Entity,
@@ -8,23 +8,22 @@ import {
   OneToMany,
   PrimaryColumn,
   PrimaryGeneratedColumn,
-} from "typeorm";
+} from 'typeorm';
 
 @Entity()
 export class Experience {
-
   @PrimaryGeneratedColumn('increment')
-  id : number;
+  id: number;
 
   @Column()
   profileId: number;
-  
-  @ManyToOne(() => Profile, profile => profile.experience)
-  @JoinColumn({ name: "profileId" })
+
+  @ManyToOne(() => Profile, (profile) => profile.experience)
+  @JoinColumn({ name: 'profileId' })
   profile: Profile;
 
   @Column()
-  urlProyecto: string;  
+  urlProyecto: string;
 
   @Column()
   cargo: string;
