@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 
 import { Experience } from '../entities/experience.entity';
 import { UpdateExperienceDto } from '../dto/update-experience.dto';
-import { UserActiveInterface } from 'src/common/interface/user-active-interface';
+import { UserActiveInterface } from '../../common/interface/user-active-interface';
 import { CreateExperienceDto } from '../dto/create-experience.dto';
 
 @Injectable()

@@ -1,4 +1,4 @@
-import { UserRole } from 'src/constants';
+import { UserRole } from '../../constants/index';
 
 import {
   Column,

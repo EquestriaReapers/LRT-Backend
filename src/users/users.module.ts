@@ -5,8 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DbValidatorsModule } from '@youba/nestjs-dbvalidator';
 import { User } from './entities/user.entity';
 import { ConfigService } from '@nestjs/config';
-import { Profile } from 'src/profiles/entities/profile.entity';
-import { JwtPayloadService } from 'src/common/service/jwt.payload.service';
+import { Profile } from '../profiles/entities/profile.entity';
+import { JwtPayloadService } from '../common/service/jwt.payload.service';
 
 const configService = new ConfigService();
 
@@ -20,10 +20,10 @@ const configService = new ConfigService();
       password: configService.get('DB_PASSWORD'),
       database: configService.get('DB_NAME'),
     }),
-    TypeOrmModule.forFeature([User, Profile])
+    TypeOrmModule.forFeature([User, Profile]),
   ],
   controllers: [UsersController],
   providers: [UsersService, JwtPayloadService],
-  exports: [TypeOrmModule, UsersService]
+  exports: [TypeOrmModule, UsersService],
 })
-export class UsersModule { }
+export class UsersModule {}

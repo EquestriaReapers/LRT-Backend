@@ -3,10 +3,10 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
-import { Profile } from 'src/profiles/entities/profile.entity';
+import { Profile } from '../../profiles/entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcryptjs from 'bcryptjs';
-import { JwtPayloadService } from 'src/common/service/jwt.payload.service';
+import { JwtPayloadService } from '../../common/service/jwt.payload.service';
 export class UsersService {
   constructor(
     @InjectRepository(User)

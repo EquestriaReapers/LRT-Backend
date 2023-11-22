@@ -1,9 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { SkillsService } from './service/skills.service';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
-import { UserRole } from 'src/constants';
+import { UserRole } from '../constants';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('skill')

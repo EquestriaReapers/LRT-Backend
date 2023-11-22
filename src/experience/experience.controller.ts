@@ -1,14 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ExperienceService } from './service/experience.service';
 import { CreateExperienceDto } from './dto/create-experience.dto';
 import { UpdateExperienceDto } from './dto/update-experience.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { Auth } from 'src/auth/decorators/auth.decorator';
-import { UserRole } from 'src/constants';
+import { Auth } from '../auth/decorators/auth.decorator';
+import { UserRole } from '../constants';
 import { ActiveUser } from 'src/common/decorator/active-user-decorator';
-import { UserActiveInterface } from 'src/common/interface/user-active-interface';
+import { UserActiveInterface } from '../common/interface/user-active-interface';
 
-@ApiTags("experience")
+@ApiTags('experience')
 @Controller('experience')
 export class ExperienceController {
   constructor(private readonly experienceService: ExperienceService) {}
@@ -28,13 +36,19 @@ export class ExperienceController {
   @Auth(UserRole.GRADUATE)
   @Get()
   findAllMy(@ActiveUser() user: UserActiveInterface) {
-    return this.experienceService.findAllMy(user)
+    return this.experienceService.findAllMy(user);
   }
 
   @Auth(UserRole.GRADUATE)
   @Post('/my-experience')
-  createMyExperiencia(@Body() createExperienceDto: CreateExperienceDto, @ActiveUser() user: UserActiveInterface) {
-    return this.experienceService.createMyExperiencia(createExperienceDto, user);
+  createMyExperiencia(
+    @Body() createExperienceDto: CreateExperienceDto,
+    @ActiveUser() user: UserActiveInterface,
+  ) {
+    return this.experienceService.createMyExperiencia(
+      createExperienceDto,
+      user,
+    );
   }
 
   @Auth(UserRole.ADMIN)
@@ -45,13 +59,24 @@ export class ExperienceController {
 
   @Auth(UserRole.GRADUATE)
   @Patch('/my-experience/:id')
-  updateMyExperiencia(@Param('id') id: number, @Body() updateExperienceDto: UpdateExperienceDto, @ActiveUser() user: UserActiveInterface) {
-    return this.experienceService.updateMyExperiencia(id, updateExperienceDto, user);
+  updateMyExperiencia(
+    @Param('id') id: number,
+    @Body() updateExperienceDto: UpdateExperienceDto,
+    @ActiveUser() user: UserActiveInterface,
+  ) {
+    return this.experienceService.updateMyExperiencia(
+      id,
+      updateExperienceDto,
+      user,
+    );
   }
 
   @Auth(UserRole.ADMIN)
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updateExperienceDto: UpdateExperienceDto) {
+  update(
+    @Param('id') id: number,
+    @Body() updateExperienceDto: UpdateExperienceDto,
+  ) {
     return this.experienceService.update(+id, updateExperienceDto);
   }
 
@@ -61,4 +86,3 @@ export class ExperienceController {
     return this.experienceService.remove(+id);
   }
 }
-

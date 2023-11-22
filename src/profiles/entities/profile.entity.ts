@@ -1,6 +1,6 @@
-import { Experience } from 'src/experience/entities/experience.entity';
-import { User } from 'src/users/entities/user.entity';
-import { Skill } from 'src/skills/entities/skill.entity';
+import { Experience } from '../../experience/entities/experience.entity';
+import { User } from '../../users/entities/user.entity';
+import { Skill } from '../../skills/entities/skill.entity';
 import {
   Column,
   DeleteDateColumn,

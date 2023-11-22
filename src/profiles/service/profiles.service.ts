@@ -3,9 +3,9 @@ import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { Profile } from '../entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserActiveInterface } from 'src/common/interface/user-active-interface';
-import { Skill } from 'src/skills/entities/skill.entity';
-import { User } from 'src/users/entities/user.entity';
+import { UserActiveInterface } from '../../common/interface/user-active-interface';
+import { Skill } from '../../skills/entities/skill.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Injectable()
 export class ProfilesService {
