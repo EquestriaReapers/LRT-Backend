@@ -9,8 +9,15 @@ import { User } from '../entities/user.entity';
 import { Profile } from '../../profiles/entities/profile.entity';
 import { JwtPayloadService } from '../../common/service/jwt.payload.service';
 import { UserRole } from '../../constants';
-import { mockUserRepository } from './mockUserRepository';
 import { CreateUserDto } from '../dto/create-user.dto';
+
+const mockUserRepository = {
+  save: jest.fn(),
+  find: jest.fn(),
+  findOneBy: jest.fn(),
+  findOneByEmail: jest.fn(),
+  softDelete: jest.fn(),
+};
 
 const mockJwtService = {
   sign: jest.fn().mockReturnValue('token'),

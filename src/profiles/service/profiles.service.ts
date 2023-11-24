@@ -131,7 +131,7 @@ export class ProfilesService {
       (skillItem) => skillItem.id !== skillId,
     );
 
-    // Actualiza la propiedad `anime` de la lista con el nuevo contenido
+    // Actualiza la propiedad `profile` de la lista con el nuevo contenido
     profile.skills = updatedSkillList;
 
     // Guarda la lista actualizada en la base de datos
