@@ -8,4 +8,14 @@ export class CreateProfileDTO {
     @IsString()
     description: string;
 
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    mainTitle: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    countryResidence: string;
+
 }

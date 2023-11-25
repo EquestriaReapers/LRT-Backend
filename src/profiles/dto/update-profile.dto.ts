@@ -4,7 +4,7 @@ import { CreateProfileDTO } from './create-profile.dto';
 import { isUniqueDb } from '@youba/nestjs-dbvalidator';
 import { Transform } from 'class-transformer';
 
-export class UpdateProfileDto extends PartialType(CreateProfileDTO){
+export class UpdateProfileDto extends PartialType(CreateProfileDTO) {
     @ApiProperty({ example: 'Muy proactivo', required: true })
     @IsString()
     @IsOptional()
@@ -13,4 +13,14 @@ export class UpdateProfileDto extends PartialType(CreateProfileDTO){
     @ApiProperty()
     @IsOptional()
     name: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    mainTitle: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    countryResidence: string;
 }

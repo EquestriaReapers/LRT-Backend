@@ -9,6 +9,11 @@ export class RegisterDto {
   name: string;
 
   @ApiProperty()
+  @IsString()
+  @MinLength(1)
+  lastname: string;
+
+  @ApiProperty()
   @IsEmail()
   email: string;
 

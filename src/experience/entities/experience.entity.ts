@@ -24,10 +24,10 @@ export class Experience {
   profile: Profile;
 
   @Column()
-  nombre: string;
+  name: string;
 
   @Column()
-  rol: string;
+  role: string;
 
 
   @Column()

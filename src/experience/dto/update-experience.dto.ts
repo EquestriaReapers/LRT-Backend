@@ -8,7 +8,12 @@ export class UpdateExperienceDto extends PartialType(CreateExperienceDto) {
   @ApiProperty({ example: 'Narrador de futbol en ESPN', required: true })
   @IsString()
   @IsOptional()
-  rol: string;
+  role: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  name: string;
 
   @ApiProperty()
   @IsNumber()

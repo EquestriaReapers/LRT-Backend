@@ -30,8 +30,12 @@ export class Profile {
   @Column()
   description: string;
 
-  //@Column()
-  //image: string;
+  @Column()
+  mainTitle: string;
+
+  @Column()
+  countryResidence: string;
+
 
   @OneToMany(() => Experience, (experience) => experience.profile)
   experience: Experience[];

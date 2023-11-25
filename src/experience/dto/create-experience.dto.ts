@@ -6,7 +6,12 @@ export class CreateExperienceDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-    rol: string;
+    role: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    name: string;
 
     @ApiProperty()
     @IsNumber()

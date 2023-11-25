@@ -16,7 +16,7 @@ export class UsersService {
     private readonly profileRepository: Repository<Profile>,
 
     private readonly jwtPayloadService: JwtPayloadService,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto) {
     const user = await this.userRepository.create(createUserDto);
@@ -67,7 +67,7 @@ export class UsersService {
   async findByEmailWithPassword(email: string) {
     return await this.userRepository.findOne({
       where: { email },
-      select: ['id', 'name', 'email', 'password', 'role', 'verified'],
+      select: ['id', 'name', 'lastname', 'email', 'password', 'role', 'verified'],
     });
   }
 

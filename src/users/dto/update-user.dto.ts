@@ -2,7 +2,7 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { CreateUserDto } from './create-user.dto';
 import { UserRole } from '../../constants';
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 import { isUniqueDb } from '@youba/nestjs-dbvalidator';
 import { Transform } from 'class-transformer';
 
@@ -13,6 +13,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
     @ApiProperty({ example: 'Winchester' })
     @IsOptional()
+    @IsString()
     lastname: string;
 
     @ApiProperty({ example: 'ronaldo@gmail.com' })
