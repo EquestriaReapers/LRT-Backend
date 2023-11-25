@@ -120,7 +120,9 @@ export class ProfilesService {
       throw new NotFoundException('Perfil no se encuentra');
     }
 
-    const skill = await this.skillRepository.findOneBy({ id: skillId });
+    const skill = await this.skillRepository.findOne({
+      where: { id: skillId },
+    });
 
     if (!skill) {
       throw new NotFoundException('Habilidad no se encuentra');

@@ -55,6 +55,7 @@ const mockProfileRepository = {
   save: jest.fn(),
   find: jest.fn().mockResolvedValue(expectProfile),
   findOne: jest.fn(),
+  findOneBy: jest.fn(),
   updateMyProfile: jest.fn(),
   addSkillProfile: jest.fn(),
   removeSkillProfile: jest.fn(),
@@ -203,14 +204,99 @@ describe('ProfilesController', () => {
     const id = 1;
     const skillId = 1;
 
+    const user = {
+      id: 1,
+      name: 'Chadwick',
+      email: 'chadwickboseman@email.com',
+      role: UserRole.ADMIN,
+    };
+
     const expectedProfile = {
       userId: 1,
       description: 'default',
       deletedAt: null,
       user: {
         name: 'Chadwick',
-        email: '',
+        email: 'chadwickboseman@email.com',
       },
+      skills: [
+        {
+          id: 1,
+          name: 'Angular',
+        },
+      ],
     };
+
+    jest
+      .spyOn(mockProfileRepository, 'findOne')
+      .mockReturnValue(expectedProfile);
+    jest.spyOn(mockProfileRepository, 'save').mockReturnValue(expectedProfile);
+    jest
+      .spyOn(mockProfileRepository, 'addSkillProfile')
+      .mockReturnValue(expectedProfile);
+
+    // act
+    const result = await service.addSkillProfile(id, user);
+
+    // assert
+    expect(result).toEqual(expectedProfile);
+    expect(mockProfileRepository.findOne).toBeCalled();
+    expect(mockProfileRepository.findOne).toBeCalledWith({
+      where: { userId: user.id },
+    });
+    expect(mockProfileRepository.save).toBeCalled();
+    expect(mockProfileRepository.save).toBeCalledWith(expectedProfile);
+  });
+
+  it('removeSkillProfile => Should delete a skill to a profile', async () => {
+    // arrange
+    const id = 1;
+    const skillId = 1;
+
+    const user = {
+      id: 1,
+      name: 'Chadwick',
+      email: 'chadwickboseman@email.com',
+      role: UserRole.ADMIN,
+    };
+
+    const expectedProfile = {
+      userId: 1,
+      description: 'default',
+      deletedAt: null,
+      user: {
+        name: 'Chadwick',
+        email: 'chadwickboseman@email.com',
+      },
+      skills: [
+        {
+          id: 1,
+          name: 'Angular',
+        },
+      ], // Asegúrate de que 'skills' no sea undefined
+    };
+
+    jest
+      .spyOn(mockProfileRepository, 'findOne')
+      .mockReturnValue(expectedProfile);
+    //jest.spyOn(mockProfileRepository, 'findOne').mockReturnValue(skill);
+    jest.spyOn(mockProfileRepository, 'save').mockReturnValue(expectedProfile);
+    jest
+      .spyOn(mockProfileRepository, 'removeSkillProfile')
+      .mockReturnValue(expectedProfile);
+
+    // act
+    const result = await service.removeSkillProfile(skillId, user);
+
+    // assert
+    expect(result).toEqual(expectedProfile);
+    expect(mockProfileRepository.findOne).toBeCalledWith({
+      where: { userId: user.id },
+    });
+    expect(mockProfileRepository.findOne).toBeCalledWith({
+      where: { id: skillId },
+    });
+    expect(mockProfileRepository.save).toBeCalled();
+    expect(mockProfileRepository.save).toBeCalledWith(expectedProfile);
   });
 });
