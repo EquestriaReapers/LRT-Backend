@@ -18,6 +18,10 @@ export class CreateUserDto {
   @IsString()
   name: string;
 
+  @ApiProperty({ example: 'Winchester' })
+  @IsOptional()
+  lastname: string;
+
   @ApiProperty({ example: 'ronaldo@gmail.com', required: true })
   @IsNotEmpty()
   @isUniqueDb({

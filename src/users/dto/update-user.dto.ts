@@ -11,8 +11,12 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     @IsOptional()
     name: string;
 
+    @ApiProperty({ example: 'Winchester' })
+    @IsOptional()
+    lastname: string;
+
     @ApiProperty({ example: 'ronaldo@gmail.com' })
-    @isUniqueDb({table : 'user', column: 'email', message: 'Email already exists'})
+    @isUniqueDb({ table: 'user', column: 'email', message: 'Email already exists' })
     @IsEmail()
     @IsOptional()
     email: string;

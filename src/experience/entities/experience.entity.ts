@@ -1,4 +1,5 @@
 import { Profile } from '../../profiles/entities/profile.entity';
+import * as fs from 'fs';
 import {
   Column,
   Entity,
@@ -23,14 +24,15 @@ export class Experience {
   profile: Profile;
 
   @Column()
-  urlProyecto: string;
+  nombre: string;
 
   @Column()
-  cargo: string;
+  rol: string;
+
 
   @Column()
-  descripcion: string;
+  startDate: Date;
 
   @Column()
-  nombreProyecto: string;
+  endDate: Date;
 }
