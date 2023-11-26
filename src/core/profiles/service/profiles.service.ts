@@ -99,12 +99,12 @@ export class ProfilesService {
       throw new NotFoundException('Perfil o habilidades no se encuentra');
     }
 
-    // Asegúrate de que la propiedad "anime" de la lista sea un array antes de agregar el anime
+    // Asegúrate de que la propiedad "skills" de la lista sea un array antes de agregar el anime
     if (!profile.skills) {
       profile.skills = [];
     }
 
-    // Agrega el anime a la lista
+    // Agrega el skill a la lista
     profile.skills.push(skill);
 
     // Guarda la lista actualizada en la base de datos
@@ -132,24 +132,25 @@ export class ProfilesService {
       (skillItem) => skillItem.id !== skillId,
     );
 
-    // Actualiza la propiedad `anime` de la lista con el nuevo contenido
+    // Actualiza la propiedad `skills` de la lista con el nuevo contenido
     profile.skills = updatedSkillList;
 
     // Guarda la lista actualizada en la base de datos
     return await this.profileRepository.save(profile);
   }
 
-  async update(id: number, updateProfileDto: UpdateProfileDto) {
-    const profile = await this.profileRepository.update(id, {
-      description: updateProfileDto.description,
+  async update(
+    userId: number,
+    updateProfileDto: UpdateProfileDto,
+  ): Promise<void> {
+    const profile = await this.profileRepository.update(userId, {
+      ...updateProfileDto,
     });
 
-    if (profile.affected === 0) {
-      throw new NotFoundException('Perfil no se encuentra');
-    }
+    if (profile.affected === 0) throw new NotFoundException(PROFILE_NOT_FOUND);
 
     if (updateProfileDto.name) {
-      const userUpdateResult = await this.userRepository.update(id, {
+      const userUpdateResult = await this.userRepository.update(userId, {
         name: updateProfileDto.name,
       });
 
@@ -158,7 +159,7 @@ export class ProfilesService {
       }
     }
 
-    return profile;
+    return;
   }
 
   async remove(id: number) {
