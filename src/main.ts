@@ -37,8 +37,8 @@ async function bootstrap() {
 
   const config = new DocumentBuilder() // Documentación
     //.addBearerAuth()
-    .setTitle('UCAB PERFIL')
-    .setDescription('Esta es la api de UCAB PERFIL')
+    .setTitle('UCAB PROFILE')
+    .setDescription('Esta es la api de UCAB PROFILE 😎🤙🏻')
     .addBearerAuth()
     .addTag('users')
     .addTag('profile')

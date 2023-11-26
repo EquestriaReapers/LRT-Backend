@@ -10,9 +10,10 @@ import {
 import { UsersService } from './service/users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
-import { Auth } from '../auth/decorators/auth.decorator';
-import { UserRole } from '../../constants';
+import { ApiTags, ApiOkResponse } from '@nestjs/swagger';
+import { Auth } from '../../core/auth/decorators/auth.decorator';
+import { UserRole } from '../..//constants';
+import CreateUserResponseDTO from './dto/create-user-response.dto';
 
 @ApiTags('users')
 @Auth(UserRole.ADMIN)
@@ -21,6 +22,11 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @ApiOkResponse({
+    status: 200,
+    description: 'Respuesta de la creacion de un usuario',
+    type: CreateUserResponseDTO,
+  })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }

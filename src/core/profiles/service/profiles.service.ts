@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { UserActiveInterface } from '../../../common/interface/user-active-interface';
 import { Skill } from '../../skills/entities/skill.entity';
 import { User } from '../../users/entities/user.entity';
+import { PROFILE_NOT_FOUND } from '../messages';
 
 @Injectable()
 export class ProfilesService {
@@ -162,11 +163,8 @@ export class ProfilesService {
 
   async remove(id: number) {
     const profile = await this.profileRepository.softDelete(id);
-    // const user = await this.userRepository.softRemove({id});
 
-    if (!profile) {
-      throw new NotFoundException('Perfil no se encuentra');
-    }
+    if (!profile) throw new NotFoundException(PROFILE_NOT_FOUND);
 
     return profile;
   }

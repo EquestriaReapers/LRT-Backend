@@ -9,12 +9,13 @@ import {
 } from '@nestjs/common';
 import { ProfilesService } from './service/profiles.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { UserRole } from '../../constants';
 import { ActiveUser } from '../../common/decorator/active-user-decorator';
 import { UserActiveInterface } from '../../common/interface/user-active-interface';
 import { AddSkillDto } from './dto/add-skill.dto';
+import { Profile } from './entities/profile.entity';
 @ApiTags('profile')
 @Controller('profiles')
 export class ProfilesController {
@@ -22,12 +23,22 @@ export class ProfilesController {
 
   @Auth(UserRole.GRADUATE)
   @Get()
+  @ApiResponse({
+    status: 200,
+    description: 'Retorna un arreglo de TODOS los perfiles',
+    type: [Profile],
+  })
   findAll() {
     return this.profilesService.findAll();
   }
 
   @Auth(UserRole.GRADUATE)
   @Get(':id')
+  @ApiResponse({
+    status: 200,
+    description: 'Retorna un perfil',
+    type: Profile,
+  })
   findOne(@Param('id') id: string) {
     return this.profilesService.findOne(+id);
   }
