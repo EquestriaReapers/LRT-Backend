@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsDate,
+  IsDateString,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -23,16 +24,16 @@ export class CreateExperienceDto {
   @IsOptional()
   profileId: number;
 
-  @ApiProperty({ type: 'file' })
-  file: Express.Multer.File;
-
   @ApiProperty()
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   startDate: Date;
 
-  @ApiProperty()
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
   @IsOptional()
-  @IsDate()
+  @IsDateString()
   endDate: Date;
 }

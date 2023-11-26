@@ -6,6 +6,7 @@ import { Experience } from '../entities/experience.entity';
 import { UpdateExperienceDto } from '../dto/update-experience.dto';
 import { UserActiveInterface } from '../../../common/interface/user-active-interface';
 import { CreateExperienceDto } from '../dto/create-experience.dto';
+import { EXPERIENCE_NOT_FOUND } from '../messages';
 
 @Injectable()
 export class ExperienceService {
@@ -28,16 +29,10 @@ export class ExperienceService {
       relations: ['profile'],
     });
     if (!experience) {
-      throw new NotFoundException('Experiencia no encontrada');
+      throw new NotFoundException(EXPERIENCE_NOT_FOUND);
     }
 
     return experience;
-  }
-
-  async findAllMy(user: UserActiveInterface) {
-    return await this.experienceRepository.find({
-      where: { profileId: user.id },
-    });
   }
 
   async create(createExperienceDto: CreateExperienceDto) {
@@ -64,38 +59,41 @@ export class ExperienceService {
     id: number,
     updateExperienceDto: UpdateExperienceDto,
     user: UserActiveInterface,
-  ) {
+  ): Promise<void> {
     const experience = await this.experienceRepository.update(
       { profileId: user.id, id },
       updateExperienceDto,
     );
 
     if (experience.affected === 0) {
-      throw new NotFoundException('Experiencia no encontrada');
+      throw new NotFoundException(EXPERIENCE_NOT_FOUND);
     }
 
-    return experience;
+    return;
   }
 
-  async update(id: number, updateExperienciaDto: UpdateExperienceDto) {
+  async update(
+    id: number,
+    updateExperienciaDto: UpdateExperienceDto,
+  ): Promise<void> {
     const experience = await this.experienceRepository.update(id, {
       ...updateExperienciaDto,
     });
 
     if (experience.affected === 0) {
-      throw new NotFoundException('Experiencia no encontrada');
+      throw new NotFoundException(EXPERIENCE_NOT_FOUND);
     }
 
-    return experience;
+    return;
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<void> {
     const experience = await this.experienceRepository.softDelete(id);
 
     if (!experience) {
-      throw new NotFoundException('Experiencia no encontrada');
+      throw new NotFoundException(EXPERIENCE_NOT_FOUND);
     }
 
-    return experience;
+    return;
   }
 }

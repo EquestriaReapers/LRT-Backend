@@ -22,6 +22,7 @@ import { transporter } from '../../../constants';
 import * as handlebars from 'handlebars';
 import * as fs from 'fs';
 import * as path from 'path';
+import { USER_NOT_FOUND } from 'src/core/users/messages';
 
 @Injectable()
 export class AuthService {
@@ -167,7 +168,7 @@ export class AuthService {
 
       return await this.sendEmail(mailOptions);
     } else {
-      throw new HttpException('Usuario no encontrado', HttpStatus.FORBIDDEN);
+      throw new HttpException(USER_NOT_FOUND, HttpStatus.FORBIDDEN);
     }
   }
 

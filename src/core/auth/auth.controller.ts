@@ -1,15 +1,40 @@
-import { Controller, Get, Post, Body, Param, Response } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Response,
+  InternalServerErrorException,
+  BadRequestException,
+  UnauthorizedException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { AuthService } from './service/auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as express from 'express';
+import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator';
+import { SuccessfullyLogin, SuccessfullyRegister } from './dto/responses.dto';
+import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
+import { MessageDTO } from 'src/common/dto/response.dto';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @ApiOkResponse({
+    description: 'Returns the created user',
+    type: SuccessfullyRegister,
+  })
+  @ApiException(() => BadRequestException, {
+    description: 'User already exists',
+  })
+  @ApiException(() => InternalServerErrorException, {
+    description: INTERNAL_SERVER_ERROR,
+  })
   async register(@Body() registerDto: RegisterDto) {
     const response = await this.authService.register(registerDto);
     await this.authService.createEmailToken(registerDto.email);
@@ -24,20 +49,48 @@ export class AuthController {
   }
 
   @Post('login')
+  @ApiOkResponse({
+    description: 'Returns the token',
+    type: SuccessfullyLogin,
+  })
+  @ApiException(() => UnauthorizedException, {
+    description: 'Email or password incorrect',
+  })
+  @ApiException(() => InternalServerErrorException, {
+    description: INTERNAL_SERVER_ERROR,
+  })
   login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
 
-  @ApiResponse({ status: 403, description: 'El usuario no se puede encontrar' })
   @Get('email/resend-verification/:email')
+  @ApiOkResponse({
+    description: 'Returns the message',
+    type: MessageDTO,
+  })
+  @ApiException(() => ForbiddenException, {
+    description: 'user not found',
+  })
+  @ApiException(() => InternalServerErrorException, {
+    description: INTERNAL_SERVER_ERROR,
+  })
   async sendEmailVerification(@Param('email') email: string) {
     await this.authService.createEmailToken(email);
     return await this.authService.sendEmailVerification(email);
   }
 
-  @ApiResponse({ status: 200, description: 'Correo verificado con exito' })
-  @ApiResponse({ status: 403, description: 'Token invalido' })
   @Get('email/verify/:token')
+  @ApiResponse({
+    status: 200,
+    description: 'Email verified successfully',
+    type: MessageDTO,
+  })
+  @ApiException(() => UnauthorizedException, {
+    description: 'Token invalid',
+  })
+  @ApiException(() => InternalServerErrorException, {
+    description: INTERNAL_SERVER_ERROR,
+  })
   async verifyEmail(
     @Param('token') token: string,
     @Response() response: express.Response,

@@ -1,44 +1,61 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from 'src/constants';
 import { Profile } from 'src/core/profiles/entities/profile.entity';
+import { User } from '../entities/user.entity';
 
-export interface CreateProfileResponseDTOI {
-  perfil: Profile;
-  token: {
-    expiresIn: string;
-    token: any;
-  };
+export class UserData {
+  @ApiProperty()
   id: number;
+
+  @ApiProperty()
   name: string;
+
+  @ApiProperty()
+  lastname: string;
+
+  @ApiProperty()
   email: string;
-  password: string;
+
+  @ApiProperty()
   verified: boolean;
+
+  @ApiProperty()
   role: UserRole;
+
+  @ApiProperty()
   deletedAt: Date;
 }
 
-export default class CreateProfileResponseDTO
-  implements CreateProfileResponseDTOI
-{
-  @ApiProperty()
-  perfil: Profile;
-  @ApiProperty()
-  token: {
-    expiresIn: string;
-    token: any;
-  };
+export class ProfileData {
   @ApiProperty()
   id: number;
+
   @ApiProperty()
-  name: string;
+  userId: number;
+
   @ApiProperty()
-  email: string;
+  description: string;
+
   @ApiProperty()
-  password: string;
+  mainTitle: string;
+
   @ApiProperty()
-  verified: boolean;
+  countryResidence: string;
+
   @ApiProperty()
-  role: UserRole;
+  deleteAt: Date;
+}
+
+export class UserCreateResponse {
+  @ApiProperty({ type: UserData })
+  user: UserData;
+
+  @ApiProperty({ type: ProfileData })
+  profile: ProfileData;
+
   @ApiProperty()
-  deletedAt: Date;
+  expiresIn: string;
+
+  @ApiProperty()
+  token: string;
 }

@@ -7,6 +7,7 @@ import { Profile } from '../../profiles/entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcryptjs from 'bcryptjs';
 import { JwtPayloadService } from '../../../common/service/jwt.payload.service';
+import { USER_NOT_FOUND } from '../messages';
 export class UsersService {
   constructor(
     @InjectRepository(User)
@@ -40,7 +41,7 @@ export class UsersService {
     const token = await this.jwtPayloadService.createJwtPayload(user);
 
     const response = {
-      ...getUser,
+      user: getUser,
       perfil,
       token,
     };
@@ -56,7 +57,7 @@ export class UsersService {
     const user = await this.userRepository.findOneBy({ id });
 
     if (!user) {
-      throw new NotFoundException('Usuario no se encuentra');
+      throw new NotFoundException(USER_NOT_FOUND);
     }
 
     return user;
@@ -81,21 +82,21 @@ export class UsersService {
     });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<void> {
     const user = await this.userRepository.update({ id }, updateUserDto);
 
     if (user.affected === 0) {
-      throw new NotFoundException('Usuario no se encuentra');
+      throw new NotFoundException(USER_NOT_FOUND);
     }
 
-    return user;
+    return;
   }
 
   async remove(id: number) {
     const user = await this.userRepository.softDelete({ id });
 
     if (!user) {
-      throw new NotFoundException('Usuario no se encuentra');
+      throw new NotFoundException(USER_NOT_FOUND);
     }
 
     return user;

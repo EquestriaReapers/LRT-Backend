@@ -31,6 +31,7 @@ export class ProfilesService {
       select: {
         user: {
           name: true,
+          lastname: true,
           email: true,
         },
       },
@@ -50,6 +51,7 @@ export class ProfilesService {
       select: {
         user: {
           name: true,
+          lastname: true,
           email: true,
         },
       },
@@ -65,7 +67,7 @@ export class ProfilesService {
   async updateMyProfile(
     updateProfileDto: UpdateProfileDto,
     user: UserActiveInterface,
-  ) {
+  ): Promise<void> {
     const profile = await this.profileRepository.update(user.id, {
       description: updateProfileDto.description,
     });
@@ -84,7 +86,7 @@ export class ProfilesService {
       }
     }
 
-    return profile;
+    return;
   }
 
   async addSkillProfile(skillId: number, user: UserActiveInterface) {
@@ -111,7 +113,10 @@ export class ProfilesService {
     return await this.profileRepository.save(profile);
   }
 
-  async removeSkillProfile(skillId: number, user: UserActiveInterface) {
+  async removeSkillProfile(
+    skillId: number,
+    user: UserActiveInterface,
+  ): Promise<void> {
     const profile = await this.profileRepository.findOne({
       relations: ['skills'],
       where: { userId: user.id },
@@ -136,7 +141,8 @@ export class ProfilesService {
     profile.skills = updatedSkillList;
 
     // Guarda la lista actualizada en la base de datos
-    return await this.profileRepository.save(profile);
+    await this.profileRepository.save(profile);
+    return;
   }
 
   async update(

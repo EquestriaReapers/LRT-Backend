@@ -13,6 +13,11 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import {
+  ExperienceData,
+  SkillData,
+  UserProfileData,
+} from '../dto/responses.dto';
 
 @Entity()
 export class Profile {
@@ -24,6 +29,9 @@ export class Profile {
   @Column()
   userId: number;
 
+  @ApiProperty({
+    type: UserProfileData,
+  })
   @OneToOne(() => User, { cascade: true })
   @JoinColumn({ name: 'userId' }) // This matches @PrimaryColumn name
   user: User;
@@ -40,11 +48,15 @@ export class Profile {
   @Column()
   countryResidence: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: [ExperienceData],
+  })
   @OneToMany(() => Experience, (experience) => experience.profile)
   experience: Experience[];
 
-  @ApiProperty()
+  @ApiProperty({
+    type: [SkillData],
+  })
   @ManyToMany(() => Skill, (skill) => skill.profiles)
   @JoinTable()
   skills: Skill[];

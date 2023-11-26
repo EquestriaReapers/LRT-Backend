@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Profile } from '../../profiles/entities/profile.entity';
 import {
   Column,
@@ -9,9 +10,11 @@ import {
 
 @Entity()
 export class Experience {
+  @ApiProperty()
   @PrimaryGeneratedColumn('increment')
   id: number;
 
+  @ApiProperty()
   @Column()
   profileId: number;
 
@@ -19,15 +22,21 @@ export class Experience {
   @JoinColumn({ name: 'profileId' })
   profile: Profile;
 
+  @ApiProperty()
   @Column()
   name: string;
 
+  @ApiProperty()
   @Column()
   role: string;
 
+  @ApiProperty()
   @Column()
   startDate: Date;
 
-  @Column()
+  @ApiProperty()
+  @Column({
+    default: null,
+  })
   endDate: Date;
 }

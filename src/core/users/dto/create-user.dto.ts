@@ -27,7 +27,7 @@ export class CreateUserDto {
   @isUniqueDb({
     table: 'user',
     column: 'email',
-    message: 'Email already exists',
+    message: 'El correo ya existe',
   })
   @IsEmail()
   email: string;
