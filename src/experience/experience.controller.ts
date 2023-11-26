@@ -19,7 +19,7 @@ import { UserActiveInterface } from '../common/interface/user-active-interface';
 @ApiTags('experience')
 @Controller('experience')
 export class ExperienceController {
-  constructor(private readonly experienceService: ExperienceService) {}
+  constructor(private readonly experienceService: ExperienceService) { }
 
   @Auth(UserRole.GRADUATE)
   @Get()
@@ -45,7 +45,7 @@ export class ExperienceController {
     @Body() createExperienceDto: CreateExperienceDto,
     @ActiveUser() user: UserActiveInterface,
   ) {
-    return this.experienceService.createMyExperiencia(
+    return this.experienceService.createMyExperience(
       createExperienceDto,
       user,
     );
@@ -64,7 +64,7 @@ export class ExperienceController {
     @Body() updateExperienceDto: UpdateExperienceDto,
     @ActiveUser() user: UserActiveInterface,
   ) {
-    return this.experienceService.updateMyExperiencia(
+    return this.experienceService.updateMyExperience(
       id,
       updateExperienceDto,
       user,

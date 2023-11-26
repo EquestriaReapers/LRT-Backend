@@ -13,7 +13,7 @@ export class ExperienceService {
   constructor(
     @InjectRepository(Experience)
     private readonly experienceRepository: Repository<Experience>,
-  ) {}
+  ) { }
 
   async findAll() {
     return await this.experienceRepository.find({
@@ -24,15 +24,15 @@ export class ExperienceService {
   }
 
   async findOne(@Param('id') id: number) {
-    const experiencia = await this.experienceRepository.findOne({
+    const experience = await this.experienceRepository.findOne({
       where: { id: id },
       relations: ['profile'],
     });
-    if (!experiencia) {
+    if (!experience) {
       throw new NotFoundException('Experiencia no encontrada');
     }
 
-    return experiencia;
+    return experience;
   }
 
   async findAllMy(user: UserActiveInterface) {
@@ -42,61 +42,61 @@ export class ExperienceService {
   }
 
   async create(createExperienceDto: CreateExperienceDto) {
-    const experiencia = this.experienceRepository.create(createExperienceDto);
-    await this.experienceRepository.save(experiencia);
+    const experience = this.experienceRepository.create(createExperienceDto);
+    await this.experienceRepository.save(experience);
 
-    return experiencia;
+    return experience;
   }
 
-  async createMyExperiencia(
+  async createMyExperience(
     createExperienceDto: CreateExperienceDto,
     user: UserActiveInterface,
   ) {
-    const experiencia = this.experienceRepository.create({
+    const experience = this.experienceRepository.create({
       ...createExperienceDto,
       profileId: user.id,
     });
-    await this.experienceRepository.save(experiencia);
+    await this.experienceRepository.save(experience);
 
-    return experiencia;
+    return experience;
   }
 
-  async updateMyExperiencia(
+  async updateMyExperience(
     id: number,
-    updateExperienciaDto: UpdateExperienceDto,
+    updateExperienceDto: UpdateExperienceDto,
     user: UserActiveInterface,
   ) {
-    const experiencia = await this.experienceRepository.update(
+    const experience = await this.experienceRepository.update(
       { profileId: user.id, id },
-      updateExperienciaDto,
+      updateExperienceDto,
     );
 
-    if (experiencia.affected === 0) {
+    if (experience.affected === 0) {
       throw new NotFoundException('Experiencia no encontrada');
     }
 
-    return experiencia;
+    return experience;
   }
 
   async update(id: number, updateExperienciaDto: UpdateExperienceDto) {
-    const experiencia = await this.experienceRepository.update(id, {
+    const experience = await this.experienceRepository.update(id, {
       ...updateExperienciaDto,
     });
 
-    if (experiencia.affected === 0) {
+    if (experience.affected === 0) {
       throw new NotFoundException('Experiencia no encontrada');
     }
 
-    return experiencia;
+    return experience;
   }
 
   async remove(id: number) {
-    const experiencia = await this.experienceRepository.softDelete(id);
+    const experience = await this.experienceRepository.softDelete(id);
 
-    if (!experiencia) {
+    if (!experience) {
       throw new NotFoundException('Experiencia no encontrada');
     }
 
-    return experiencia;
+    return experience;
   }
 }
