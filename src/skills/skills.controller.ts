@@ -10,7 +10,7 @@ import {
 import { SkillsService } from './service/skills.service';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
-import { Auth } from 'src/auth/decorators/auth.decorator';
+import { Auth } from '../auth/decorators/auth.decorator';
 import { UserRole } from '../constants';
 import { ApiTags } from '@nestjs/swagger';
 
