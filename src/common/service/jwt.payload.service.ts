@@ -1,7 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from '../../auth/interface/jwt-payload.interface';
-
+import { JwtPayload } from '../../core/auth/interface/jwt-payload.interface';
 
 @Injectable()
 export class JwtPayloadService {
@@ -24,7 +23,7 @@ export class JwtPayloadService {
     }
 
     return {
-      expiresIn: "31d",
+      expiresIn: '31d',
       token: jwt,
     };
   }
