@@ -12,12 +12,12 @@ import { CORS } from './constants';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get<ConfigService>(ConfigService);
-  
-  const PORT = configService.get('DB_PORT')|| 3000;
+
+  const PORT = configService.get('DB_PORT') || 3000;
 
   app.use(json({ limit: '500mb' })); // Tamaño máximo de los datos (60mb)
 
-  app.setGlobalPrefix("api/v1");
+  app.setGlobalPrefix('api/v1');
 
   app.use(morgan('dev'));
   app.enableCors(CORS);
@@ -27,30 +27,29 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
-    })
+    }),
   );
 
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), { // Ruta de las imagenes
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    // Ruta de las imagenes
     prefix: '/uploads/',
   });
 
-
   const config = new DocumentBuilder() // Documentación
-  //.addBearerAuth()
-  .setTitle('UCAB PERFIL')
-  .setDescription('Esta es la api de UCAB PERFIL')
-  .addBearerAuth()
-  .addTag('users')
-  .addTag('profile')
-  .addTag('skill')
-  .addTag('experience')
-  .build();
+    //.addBearerAuth()
+    .setTitle('UCAB PROFILE')
+    .setDescription('Esta es la api de UCAB PROFILE 😎🤙🏻')
+    .addBearerAuth()
+    .addTag('users')
+    .addTag('profile')
+    .addTag('experience')
+    .addTag('skill')
+    .build();
 
   const document = SwaggerModule.createDocument(app, config); // Documentación
   SwaggerModule.setup('api', app, document); // Documentación
 
   await app.listen(PORT);
   console.log(`Application running on: ${await app.getUrl()}`);
-
 }
 bootstrap();
