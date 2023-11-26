@@ -32,6 +32,8 @@ export class UsersService {
     const perfil = await this.profileRepository.create({
       userId: getUser.id,
       description: 'default',
+      mainTitle: 'default',
+      countryResidence: 'default',
     });
     await this.profileRepository.save(perfil);
 
@@ -50,7 +52,7 @@ export class UsersService {
     return await this.userRepository.find();
   }
 
-  async findOne(@Param('id') id: number) {
+  async findOne(id: number) {
     const user = await this.userRepository.findOneBy({ id });
 
     if (!user) {
@@ -91,7 +93,6 @@ export class UsersService {
 
   async remove(id: number) {
     const user = await this.userRepository.softDelete({ id });
-    // const user = await this.userRepository.softRemove({id});
 
     if (!user) {
       throw new NotFoundException('Usuario no se encuentra');

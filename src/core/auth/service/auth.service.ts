@@ -143,6 +143,7 @@ export class AuthService {
     const filePath = path.join(
       __dirname,
       'src',
+      'core',
       'auth',
       'template',
       'template.html',
