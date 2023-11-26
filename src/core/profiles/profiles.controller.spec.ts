@@ -14,7 +14,7 @@ describe('ProfilesController', () => {
     controller = module.get<ProfilesController>(ProfilesController);
   });
 
-  it('should be defined', () => {
+  it('Should be defined', () => {
     expect(controller).toBeDefined();
   });
 });

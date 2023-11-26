@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './service/auth.service';
 import { AuthController } from './auth.controller';
-import { UsersModule } from 'src/users/users.module';
+import { UsersModule } from 'src/core/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { envData } from 'src/config/datasource';
 import { EmailVerificationEntity } from './entities/emailverification.entity';

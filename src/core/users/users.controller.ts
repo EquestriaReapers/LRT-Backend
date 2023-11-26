@@ -1,10 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { UsersService } from './service/users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
-import { Auth } from 'src/auth/decorators/auth.decorator';
+import { ApiTags, ApiOkResponse } from '@nestjs/swagger';
+import { Auth } from 'src/core/auth/decorators/auth.decorator';
 import { UserRole } from 'src/constants';
+import CreateUserResponseDTO from './dto/create-user-response.dto';
 
 @ApiTags('users')
 @Auth(UserRole.ADMIN)
@@ -13,6 +22,11 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @ApiOkResponse({
+    status: 200,
+    description: 'Respuesta de la creacion de un usuario',
+    type: CreateUserResponseDTO,
+  })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
