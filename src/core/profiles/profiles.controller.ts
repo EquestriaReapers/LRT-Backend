@@ -8,9 +8,8 @@ import {
   Delete,
   NotFoundException,
   Response,
-  UnauthorizedException,
   InternalServerErrorException,
-  Res,
+  Query,
 } from '@nestjs/common';
 import { ProfilesService } from './service/profiles.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -46,8 +45,18 @@ export class ProfilesController {
   @ApiException(() => InternalServerErrorException, {
     description: INTERNAL_SERVER_ERROR,
   })
-  findAll() {
-    return this.profilesService.findAll();
+  findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('random') random: number,
+  ) {
+    limit = limit > 100 ? 100 : limit;
+
+    return this.profilesService.findAll({
+      page,
+      limit,
+      random,
+    });
   }
 
   @Auth(UserRole.GRADUATE)

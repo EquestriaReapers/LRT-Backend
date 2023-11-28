@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Param } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { Profile } from '../entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +7,9 @@ import { UserActiveInterface } from '../../../common/interface/user-active-inter
 import { Skill } from '../../skills/entities/skill.entity';
 import { User } from '../../users/entities/user.entity';
 import { PROFILE_NOT_FOUND } from '../messages';
+import { PaginationMessage } from '../../../common/interface/pagination-message.interface';
+import { AppService } from 'src/app.service';
+import { Console } from 'console';
 
 @Injectable()
 export class ProfilesService {
@@ -21,26 +24,59 @@ export class ProfilesService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async findAll() {
-    const profiles = await this.profileRepository.find({
-      relations: {
-        user: true,
-        skills: true,
-        experience: true,
-      },
-      select: {
-        user: {
-          name: true,
-          lastname: true,
-          email: true,
-        },
-      },
-    });
+  async findAll({ page, limit, random }) {
+    const skip = (page - 1) * limit;
 
-    return profiles;
+    if (!random) {
+      random = Math.random();
+    }
+
+    const queryBuilder = await this.profileRepository
+      .createQueryBuilder('profile')
+      .leftJoinAndSelect('profile.user', 'user')
+      .leftJoinAndSelect('profile.skills', 'skills')
+      .leftJoinAndSelect('profile.experience', 'experience')
+      .select([
+        'profile.id',
+        'profile.userId',
+        'profile.description',
+        'profile.mainTitle',
+        'profile.countryResidence',
+        'profile.deletedAt',
+        'user.name',
+        'user.lastname',
+        'user.email',
+        'skills.id',
+        'skills.name',
+        'skills.level',
+        'experience.id',
+        'experience.profileId',
+        'experience.name',
+        'experience.role',
+        'experience.startDate',
+        'experience.endDate',
+      ])
+      .skip(skip)
+      .take(limit);
+
+    const profiles = await queryBuilder.getMany();
+    const totalCount = await this.profileRepository.count();
+
+    const pagination: PaginationMessage = {
+      itemCount: profiles.length,
+      totalItems: totalCount,
+      itemsPerPage: limit,
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: page,
+      randomSeed: random,
+    };
+
+    const response = { profiles, pagination };
+
+    return response;
   }
 
-  async findOne(@Param('id') id: number) {
+  async findOne(id: number) {
     const profile = await this.profileRepository.findOne({
       where: { userId: id },
       relations: {
@@ -101,15 +137,12 @@ export class ProfilesService {
       throw new NotFoundException('Perfil o habilidades no se encuentra');
     }
 
-    // Asegúrate de que la propiedad "skills" de la lista sea un array antes de agregar el anime
     if (!profile.skills) {
       profile.skills = [];
     }
 
-    // Agrega el skill a la lista
     profile.skills.push(skill);
 
-    // Guarda la lista actualizada en la base de datos
     return await this.profileRepository.save(profile);
   }
 
@@ -132,15 +165,12 @@ export class ProfilesService {
       throw new NotFoundException('Habilidad no se encuentra');
     }
 
-    // Ahora, realiza la lógica para eliminar el anime de la lista
     const updatedSkillList = profile.skills.filter(
       (skillItem) => skillItem.id !== skillId,
     );
 
-    // Actualiza la propiedad `skills` de la lista con el nuevo contenido
     profile.skills = updatedSkillList;
 
-    // Guarda la lista actualizada en la base de datos
     await this.profileRepository.save(profile);
     return;
   }
