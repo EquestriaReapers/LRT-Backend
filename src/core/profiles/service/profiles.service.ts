@@ -31,39 +31,54 @@ export class ProfilesService {
       random = Math.random();
     }
 
-    const queryBuilder = await this.profileRepository
-      .createQueryBuilder('profile')
-      .leftJoinAndSelect('profile.user', 'user')
-      .leftJoinAndSelect('profile.skills', 'skills')
-      .leftJoinAndSelect('profile.experience', 'experience')
-      .select([
-        'profile.id',
-        'profile.userId',
-        'profile.description',
-        'profile.mainTitle',
-        'profile.countryResidence',
-        'profile.deletedAt',
-        'user.name',
-        'user.lastname',
-        'user.email',
-        'skills.id',
-        'skills.name',
-        'skills.level',
-        'experience.id',
-        'experience.profileId',
-        'experience.name',
-        'experience.role',
-        'experience.startDate',
-        'experience.endDate',
-      ])
-      .skip(skip)
-      .take(limit);
+    await this.profileRepository.query(
+      `SELECT 0
+    FROM (
+          SELECT setseed(${random})
+        ) AS randomization_seed;`,
+    );
 
-    const profiles = await queryBuilder.getMany();
+    const queryBuilder = await this.profileRepository.query(
+      `
+    SELECT "profile"."id" AS "profile_id", "profile"."userId" AS "profile_userId", "profile"."description" AS "profile_description", "profile"."mainTitle" AS "profile_mainTitle", "profile"."countryResidence" AS "profile_countryResidence", "profile"."deletedAt" AS "profile_deletedAt", "user"."id" AS "user_id", "user"."name" AS "user_name", "user"."lastname" AS "user_lastname", "user"."email" AS "user_email", "skills"."id" AS "skills_id", "skills"."name" AS "skills_name", "experience"."id" AS "experience_id", "experience"."profileId" AS "experience_profileId", "experience"."name" AS "experience_name", "experience"."role" AS "experience_role", "experience"."startDate" AS "experience_startDate", "experience"."endDate" AS "experience_endDate" FROM "profile" "profile" LEFT JOIN "user" "user" ON "user"."id"="profile"."userId" AND ("user"."deletedAt" IS NULL)  LEFT JOIN "profile_skills_skill" "profile_skills" ON "profile_skills"."profileId"="profile"."id" LEFT JOIN "skill" "skills" ON "skills"."id"="profile_skills"."skillId"  LEFT JOIN "experience" "experience" ON "experience"."profileId"="profile"."id" WHERE "profile"."deletedAt" IS NULL ORDER BY RANDOM() ASC LIMIT ${limit} OFFSET ${skip} 
+    `,
+    );
+
+    const formattedResult = queryBuilder.map((row) => ({
+      id: row.profile_id,
+      userId: row.profile_userId,
+      user: {
+        id: row.user_id,
+        name: row.user_name,
+        lastname: row.user_lastname,
+        email: row.user_email,
+      },
+      description: row.profile_description,
+      mainTitle: row.profile_mainTitle,
+      countryResidence: row.profile_countryResidence,
+      experience: [
+        {
+          id: row.experience_id,
+          profileId: row.experience_profileId,
+          name: row.experience_name,
+          role: row.experience_role,
+          startDate: row.experience_startDate,
+          endDate: row.experience_endDate,
+        },
+      ],
+      skills: [
+        {
+          id: row.skills_id,
+          name: row.skills_name,
+        },
+      ],
+      deletedAt: row.profile_deletedAt,
+    }));
+
     const totalCount = await this.profileRepository.count();
 
     const pagination: PaginationMessage = {
-      itemCount: profiles.length,
+      itemCount: formattedResult.length,
       totalItems: totalCount,
       itemsPerPage: limit,
       totalPages: Math.ceil(totalCount / limit),
@@ -71,7 +86,7 @@ export class ProfilesService {
       randomSeed: random,
     };
 
-    const response = { profiles, pagination };
+    const response = { profiles: formattedResult, pagination };
 
     return response;
   }

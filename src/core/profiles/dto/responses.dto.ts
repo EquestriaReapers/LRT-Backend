@@ -1,4 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Profile } from '../entities/profile.entity';
+import { Skill } from 'src/core/skills/entities/skill.entity';
+import { Experience } from 'src/core/experience/entities/experience.entity';
+import { User } from 'src/core/users/entities/user.entity';
 
 export class UserProfileData {
   @ApiProperty()
@@ -50,4 +54,59 @@ export class AddSkillResponse {
     type: [SkillData],
   })
   skills: SkillData[];
+}
+
+export class PaginationMessage {
+  @ApiProperty()
+  itemCount: number;
+  @ApiProperty()
+  totalItems: number;
+  @ApiProperty()
+  itemsPerPage: number;
+  @ApiProperty()
+  totalPages: number;
+  @ApiProperty()
+  currentPage: number;
+  @ApiProperty()
+  randomSeed: number;
+}
+
+export class ResponseProfile {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  userId: number;
+
+  @ApiProperty({
+    type: UserProfileData,
+  })
+  user: User;
+
+  @ApiProperty()
+  description: string;
+
+  @ApiProperty()
+  mainTitle: string;
+
+  @ApiProperty()
+  countryResidence: string;
+
+  @ApiProperty({
+    type: [ExperienceData],
+  })
+  experience: Experience[];
+
+  @ApiProperty({
+    type: [SkillData],
+  })
+  skills: Skill[];
+
+  @ApiProperty()
+  deletedAt: Date;
+
+  @ApiProperty({
+    type: PaginationMessage,
+  })
+  pagination: PaginationMessage;
 }

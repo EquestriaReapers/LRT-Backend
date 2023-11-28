@@ -23,12 +23,11 @@ import { Profile } from './entities/profile.entity';
 import { MessageDTO } from 'src/common/dto/response.dto';
 import * as express from 'express';
 import {
-  PROFILE_NOT_FOUND,
   PROFILE_SUCCESFULLY_DELETED_SKILL,
   PROFILE_SUCCESFULLY_UPDATED,
 } from './messages';
 import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator';
-import { AddSkillResponse } from './dto/responses.dto';
+import { AddSkillResponse, ResponseProfile } from './dto/responses.dto';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 
 @ApiTags('profile')
@@ -40,7 +39,7 @@ export class ProfilesController {
   @Get()
   @ApiOkResponse({
     description: 'Returns an array of ALL profiles',
-    type: [Profile],
+    type: [ResponseProfile],
   })
   @ApiException(() => InternalServerErrorException, {
     description: INTERNAL_SERVER_ERROR,

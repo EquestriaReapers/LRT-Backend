@@ -15,6 +15,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import {
   ExperienceData,
+  PaginationMessage,
   SkillData,
   UserProfileData,
 } from '../dto/responses.dto';

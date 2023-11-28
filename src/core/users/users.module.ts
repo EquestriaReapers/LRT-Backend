@@ -7,13 +7,14 @@ import { User } from './entities/user.entity';
 import { ConfigService } from '@nestjs/config';
 import { Profile } from '../profiles/entities/profile.entity';
 import { JwtPayloadService } from '../../common/service/jwt.payload.service';
+import { config } from 'dotenv';
 
 const configService = new ConfigService();
 
 @Module({
   imports: [
     DbValidatorsModule.register({
-      type: 'mysql',
+      type: configService.get('DB_TYPE'),
       host: configService.get('DB_HOST'),
       port: configService.get('PORT'),
       username: configService.get('DB_USER'),
