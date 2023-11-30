@@ -3,6 +3,7 @@ export interface ExperienceI {
   profileId?: number;
   name?: string;
   role?: string;
+  location?: string;
   startDate?: Date;
   endDate?: Date;
 }

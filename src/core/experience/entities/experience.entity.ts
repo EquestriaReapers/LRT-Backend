@@ -31,6 +31,9 @@ export class Experience {
   role: string;
 
   @ApiProperty()
+  location: string;
+
+  @ApiProperty()
   @Column()
   startDate: Date;
 

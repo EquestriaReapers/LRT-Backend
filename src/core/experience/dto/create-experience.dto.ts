@@ -29,6 +29,11 @@ export class ExperienceCreateResponseDTO {
   @IsDateString()
   startDate: Date;
 
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  location: string;
+
   @ApiProperty({
     required: false,
     nullable: true,
