@@ -17,7 +17,7 @@ export class ExperienceCreateResponseDTO {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  name: string;
+  businessName: string;
 
   @ApiProperty()
   @IsNumber()

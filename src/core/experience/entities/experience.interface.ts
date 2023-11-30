@@ -1,7 +1,7 @@
 export interface ExperienceI {
   id?: number;
   profileId?: number;
-  name?: string;
+  businessName?: string;
   role?: string;
   location?: string;
   startDate?: Date;

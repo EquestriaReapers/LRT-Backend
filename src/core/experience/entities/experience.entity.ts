@@ -24,7 +24,7 @@ export class Experience {
 
   @ApiProperty()
   @Column()
-  name: string;
+  businessName: string;
 
   @ApiProperty()
   @Column()

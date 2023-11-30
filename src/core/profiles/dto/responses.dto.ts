@@ -19,9 +19,11 @@ export class ExperienceData {
   @ApiProperty()
   profileId: number;
   @ApiProperty()
-  name: string;
+  businessName: string;
   @ApiProperty()
   role: string;
+  @ApiProperty()
+  location: string;
   @ApiProperty()
   startDate: Date;
   @ApiProperty()
