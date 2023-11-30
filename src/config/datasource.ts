@@ -24,9 +24,8 @@ export const DataSourceConfig: DataSourceOptions = {
 
 export const envData = {
   JWTSECRET: configService.get('JWT_SECRET'),
-  DATABASE_URL: configService.get('DATABASE_URL'),
-  PORT: configService.get('PORT'),
-  HOST: configService.get('DB_HOST'),
+  BACKEND_BASE_URL: configService.get('BACKEND_BASE_URL'),
+  DB_PORT: configService.get('DB_PORT'),
 };
 
 export const AppOS = new DataSource(DataSourceConfig);

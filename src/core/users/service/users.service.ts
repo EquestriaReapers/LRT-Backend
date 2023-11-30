@@ -26,12 +26,12 @@ export class UsersService {
 
     await this.userRepository.save(user);
 
-    const getUser = await this.userRepository.findOne({
+    const _user = await this.userRepository.findOne({
       where: { email: createUserDto.email },
     });
 
     const perfil = await this.profileRepository.create({
-      userId: getUser.id,
+      userId: _user.id,
       description: 'default',
       mainTitle: 'default',
       countryResidence: 'default',
@@ -41,7 +41,7 @@ export class UsersService {
     const token = await this.jwtPayloadService.createJwtPayload(user);
 
     const response = {
-      user: getUser,
+      user: _user,
       perfil,
       token,
     };

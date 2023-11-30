@@ -16,9 +16,16 @@ import { RegisterDto } from './dto/register.dto';
 import { ApiOkResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as express from 'express';
 import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator';
-import { SuccessfullyLogin, SuccessfullyRegister } from './dto/responses.dto';
+import {
+  SuccessfullyLoginDTO,
+  SuccessfullyRegisterDTO,
+} from './dto/responses.dto';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { MessageDTO } from 'src/common/dto/response.dto';
+import {
+  INVALID_TOKEN_EMAIL_MESSAGE,
+  SUCCESSFULY_VERIFIED_EMAIL_MESSAGE,
+} from './message';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
@@ -27,7 +34,7 @@ export class AuthController {
   @Post('register')
   @ApiOkResponse({
     description: 'Returns the created user',
-    type: SuccessfullyRegister,
+    type: SuccessfullyRegisterDTO,
   })
   @ApiException(() => BadRequestException, {
     description: 'User already exists',
@@ -51,7 +58,7 @@ export class AuthController {
   @Post('login')
   @ApiOkResponse({
     description: 'Returns the token',
-    type: SuccessfullyLogin,
+    type: SuccessfullyLoginDTO,
   })
   @ApiException(() => UnauthorizedException, {
     description: 'Email or password incorrect',
@@ -98,11 +105,11 @@ export class AuthController {
     const verified = await this.authService.verifyEmail(token);
     if (verified) {
       return response.status(200).json({
-        message: 'Correo verificado con exito',
+        message: SUCCESSFULY_VERIFIED_EMAIL_MESSAGE,
       });
     } else {
       return response.status(403).json({
-        message: 'Token invalido',
+        message: INVALID_TOKEN_EMAIL_MESSAGE,
       });
     }
   }

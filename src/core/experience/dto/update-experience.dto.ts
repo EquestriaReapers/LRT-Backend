@@ -1,5 +1,5 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { CreateExperienceDto } from './create-experience.dto';
+import { ExperienceCreateResponseDTO } from './create-experience.dto';
 import {
   IsDate,
   IsNotEmpty,
@@ -8,7 +8,9 @@ import {
   IsString,
 } from 'class-validator';
 
-export class UpdateExperienceDto extends PartialType(CreateExperienceDto) {
+export class UpdateExperienceDto extends PartialType(
+  ExperienceCreateResponseDTO,
+) {
   @ApiProperty({ example: 'Narrador de futbol en ESPN', required: true })
   @IsString()
   @IsOptional()
@@ -23,9 +25,6 @@ export class UpdateExperienceDto extends PartialType(CreateExperienceDto) {
   @IsNumber()
   @IsOptional()
   profileId: number;
-
-  @ApiProperty({ type: 'file' })
-  file: Express.Multer.File;
 
   @ApiProperty()
   @IsNotEmpty()

@@ -15,7 +15,7 @@ import {
 import { UsersService } from './service/users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags, ApiOkResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { Auth } from '../../core/auth/decorators/auth.decorator';
 import { UserRole } from '../..//constants';
 import { UserCreateResponse } from './dto/create-user-response.dto';
@@ -33,7 +33,7 @@ export class UsersController {
 
   @Auth(UserRole.ADMIN)
   @Post()
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     status: 200,
     description: 'Response of user creation',
     type: UserCreateResponse,
@@ -45,7 +45,7 @@ export class UsersController {
     description: 'Email already exists',
   })
   @ApiException(() => InternalServerErrorException, {
-    description: 'Internal server error',
+    description: INTERNAL_SERVER_ERROR,
   })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);

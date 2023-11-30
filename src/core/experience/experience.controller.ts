@@ -11,9 +11,9 @@ import {
   Response,
 } from '@nestjs/common';
 import { ExperienceService } from './service/experience.service';
-import { CreateExperienceDto } from './dto/create-experience.dto';
+import { ExperienceCreateResponseDTO } from './dto/create-experience.dto';
 import { UpdateExperienceDto } from './dto/update-experience.dto';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { UserRole } from '../../constants';
 import { ActiveUser } from 'src/common/decorator/active-user-decorator';
@@ -65,7 +65,7 @@ export class ExperienceController {
 
   @Auth(UserRole.GRADUATE)
   @Post('/my-experience')
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     description: 'Return one experience',
     type: Experience,
   })
@@ -73,7 +73,7 @@ export class ExperienceController {
     description: INTERNAL_SERVER_ERROR,
   })
   createMyExperiencia(
-    @Body() createExperienceDto: CreateExperienceDto,
+    @Body() createExperienceDto: ExperienceCreateResponseDTO,
     @ActiveUser() user: UserActiveInterface,
   ) {
     return this.experienceService.createMyExperience(createExperienceDto, user);
@@ -81,14 +81,14 @@ export class ExperienceController {
 
   @Auth(UserRole.ADMIN)
   @Post()
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     description: 'Return one experience',
     type: Experience,
   })
   @ApiException(() => InternalServerErrorException, {
     description: INTERNAL_SERVER_ERROR,
   })
-  create(@Body() createExperienceDto: CreateExperienceDto) {
+  create(@Body() createExperienceDto: ExperienceCreateResponseDTO) {
     return this.experienceService.create(createExperienceDto);
   }
 
