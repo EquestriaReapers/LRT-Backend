@@ -5,7 +5,7 @@ export class EmailVerification {
   message: string;
 }
 
-export class SuccessfullyRegister {
+export class SuccessfullyRegisterDTO {
   @ApiProperty()
   email: string;
   @ApiProperty()
@@ -17,7 +17,7 @@ export class SuccessfullyRegister {
   emailVerification: EmailVerification;
 }
 
-export class SuccessfullyLogin {
+export class SuccessfullyLoginDTO {
   @ApiProperty()
   token: string;
   @ApiProperty()

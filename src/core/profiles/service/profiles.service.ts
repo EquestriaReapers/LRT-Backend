@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Param } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { Profile } from '../entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +7,9 @@ import { UserActiveInterface } from '../../../common/interface/user-active-inter
 import { Skill } from '../../skills/entities/skill.entity';
 import { User } from '../../users/entities/user.entity';
 import { PROFILE_NOT_FOUND } from '../messages';
+import { PaginationMessage } from '../../../common/interface/pagination-message.interface';
+import { AppService } from 'src/app.service';
+import { Console } from 'console';
 
 @Injectable()
 export class ProfilesService {
@@ -21,26 +24,74 @@ export class ProfilesService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async findAll() {
-    const profiles = await this.profileRepository.find({
-      relations: {
-        user: true,
-        skills: true,
-        experience: true,
-      },
-      select: {
-        user: {
-          name: true,
-          lastname: true,
-          email: true,
-        },
-      },
-    });
+  async findAll({ page, limit, random }) {
+    const skip = (page - 1) * limit;
 
-    return profiles;
+    if (!random) {
+      random = Math.random();
+    }
+
+    await this.profileRepository.query(
+      `SELECT 0
+    FROM (
+          SELECT setseed(${random})
+        ) AS randomization_seed;`,
+    );
+
+    const queryBuilder = await this.profileRepository.query(
+      `
+    SELECT "profile"."id" AS "profile_id", "profile"."userId" AS "profile_userId", "profile"."description" AS "profile_description", "profile"."mainTitle" AS "profile_mainTitle", "profile"."countryResidence" AS "profile_countryResidence", "profile"."deletedAt" AS "profile_deletedAt", "user"."id" AS "user_id", "user"."name" AS "user_name", "user"."lastname" AS "user_lastname", "user"."email" AS "user_email", "skills"."id" AS "skills_id", "skills"."name" AS "skills_name", "experience"."id" AS "experience_id", "experience"."profileId" AS "experience_profileId", "experience"."name" AS "experience_name", "experience"."role" AS "experience_role", "experience"."startDate" AS "experience_startDate", "experience"."endDate" AS "experience_endDate" FROM "profile" "profile" LEFT JOIN "user" "user" ON "user"."id"="profile"."userId" AND ("user"."deletedAt" IS NULL)  LEFT JOIN "profile_skills_skill" "profile_skills" ON "profile_skills"."profileId"="profile"."id" LEFT JOIN "skill" "skills" ON "skills"."id"="profile_skills"."skillId"  LEFT JOIN "experience" "experience" ON "experience"."profileId"="profile"."id" WHERE "profile"."deletedAt" IS NULL ORDER BY RANDOM() ASC LIMIT ${limit} OFFSET ${skip} 
+    `,
+    );
+
+    const formattedResult = queryBuilder.map((row) => ({
+      id: row.profile_id,
+      userId: row.profile_userId,
+      user: {
+        id: row.user_id,
+        name: row.user_name,
+        lastname: row.user_lastname,
+        email: row.user_email,
+      },
+      description: row.profile_description,
+      mainTitle: row.profile_mainTitle,
+      countryResidence: row.profile_countryResidence,
+      experience: [
+        {
+          id: row.experience_id,
+          profileId: row.experience_profileId,
+          name: row.experience_name,
+          role: row.experience_role,
+          startDate: row.experience_startDate,
+          endDate: row.experience_endDate,
+        },
+      ],
+      skills: [
+        {
+          id: row.skills_id,
+          name: row.skills_name,
+        },
+      ],
+      deletedAt: row.profile_deletedAt,
+    }));
+
+    const totalCount = await this.profileRepository.count();
+
+    const pagination: PaginationMessage = {
+      itemCount: formattedResult.length,
+      totalItems: totalCount,
+      itemsPerPage: limit,
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: page,
+      randomSeed: random,
+    };
+
+    const response = { profiles: formattedResult, pagination };
+
+    return response;
   }
 
-  async findOne(@Param('id') id: number) {
+  async findOne(id: number) {
     const profile = await this.profileRepository.findOne({
       where: { userId: id },
       relations: {
@@ -101,15 +152,12 @@ export class ProfilesService {
       throw new NotFoundException('Perfil o habilidades no se encuentra');
     }
 
-    // Asegúrate de que la propiedad "skills" de la lista sea un array antes de agregar el anime
     if (!profile.skills) {
       profile.skills = [];
     }
 
-    // Agrega el skill a la lista
     profile.skills.push(skill);
 
-    // Guarda la lista actualizada en la base de datos
     return await this.profileRepository.save(profile);
   }
 
@@ -132,15 +180,12 @@ export class ProfilesService {
       throw new NotFoundException('Habilidad no se encuentra');
     }
 
-    // Ahora, realiza la lógica para eliminar el anime de la lista
     const updatedSkillList = profile.skills.filter(
       (skillItem) => skillItem.id !== skillId,
     );
 
-    // Actualiza la propiedad `skills` de la lista con el nuevo contenido
     profile.skills = updatedSkillList;
 
-    // Guarda la lista actualizada en la base de datos
     await this.profileRepository.save(profile);
     return;
   }

@@ -11,9 +11,9 @@ import {
   Response,
 } from '@nestjs/common';
 import { ExperienceService } from './service/experience.service';
-import { CreateExperienceDto } from './dto/create-experience.dto';
+import { ExperienceCreateResponseDTO } from './dto/create-experience.dto';
 import { UpdateExperienceDto } from './dto/update-experience.dto';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { UserRole } from '../../constants';
 import { ActiveUser } from 'src/common/decorator/active-user-decorator';
@@ -29,11 +29,10 @@ import {
 } from './messages';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 
-@ApiTags('experience')
 @Controller('experience')
 export class ExperienceController {
   constructor(private readonly experienceService: ExperienceService) {}
-
+  @ApiTags('experience')
   @Auth(UserRole.GRADUATE)
   @Get()
   @ApiOkResponse({
@@ -46,7 +45,7 @@ export class ExperienceController {
   findAll() {
     return this.experienceService.findAll();
   }
-
+  @ApiTags('experience')
   @Auth(UserRole.GRADUATE)
   @Get(':id')
   @ApiOkResponse({
@@ -62,10 +61,10 @@ export class ExperienceController {
   findOne(@Param('id') id: string) {
     return this.experienceService.findOne(+id);
   }
-
+  @ApiTags('experience')
   @Auth(UserRole.GRADUATE)
   @Post('/my-experience')
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     description: 'Return one experience',
     type: Experience,
   })
@@ -73,25 +72,25 @@ export class ExperienceController {
     description: INTERNAL_SERVER_ERROR,
   })
   createMyExperiencia(
-    @Body() createExperienceDto: CreateExperienceDto,
+    @Body() createExperienceDto: ExperienceCreateResponseDTO,
     @ActiveUser() user: UserActiveInterface,
   ) {
     return this.experienceService.createMyExperience(createExperienceDto, user);
   }
-
+  @ApiTags('admin-experience')
   @Auth(UserRole.ADMIN)
   @Post()
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     description: 'Return one experience',
     type: Experience,
   })
   @ApiException(() => InternalServerErrorException, {
     description: INTERNAL_SERVER_ERROR,
   })
-  create(@Body() createExperienceDto: CreateExperienceDto) {
+  create(@Body() createExperienceDto: ExperienceCreateResponseDTO) {
     return this.experienceService.create(createExperienceDto);
   }
-
+  @ApiTags('experience')
   @Auth(UserRole.GRADUATE)
   @Patch('/my-experience/:id')
   @ApiOkResponse({
@@ -120,7 +119,7 @@ export class ExperienceController {
       message: EXPERIENCE_SUCCESFULLY_UPDATED,
     });
   }
-
+  @ApiTags('admin-experience')
   @Auth(UserRole.ADMIN)
   @Patch(':id')
   @ApiOkResponse({
@@ -145,6 +144,7 @@ export class ExperienceController {
     });
   }
 
+  @ApiTags('admin-experience')
   @Auth(UserRole.ADMIN)
   @Delete(':id')
   @ApiOkResponse({

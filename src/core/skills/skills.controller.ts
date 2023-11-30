@@ -9,13 +9,14 @@ import {
   InternalServerErrorException,
   NotFoundException,
   Response,
+  Query,
 } from '@nestjs/common';
 import { SkillsService } from './service/skills.service';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { UserRole } from '../../constants';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { Skill } from './entities/skill.entity';
@@ -26,14 +27,14 @@ import {
   SKILL_SUCCESFULLY_UPDATED,
 } from './messages';
 
-@ApiTags('skill')
 @Controller('skills')
 export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
 
+  @ApiTags('skill')
   @Auth(UserRole.GRADUATE)
   @Post()
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     description: 'Returns the created skill',
     type: Skill,
   })
@@ -43,7 +44,7 @@ export class SkillsController {
   create(@Body() createSkillDto: CreateSkillDto) {
     return this.skillsService.create(createSkillDto);
   }
-
+  @ApiTags('skill')
   @Auth(UserRole.GRADUATE || UserRole.ADMIN)
   @Get()
   @ApiOkResponse({
@@ -53,10 +54,10 @@ export class SkillsController {
   @ApiException(() => InternalServerErrorException, {
     description: INTERNAL_SERVER_ERROR,
   })
-  findAll() {
-    return this.skillsService.findAll();
+  findAll(@Query('name') name: string) {
+    return this.skillsService.findAll(name);
   }
-
+  @ApiTags('skill')
   @Auth(UserRole.GRADUATE || UserRole.ADMIN)
   @Get(':id')
   @ApiOkResponse({
@@ -73,6 +74,7 @@ export class SkillsController {
     return this.skillsService.findOne(+id);
   }
 
+  @ApiTags('admin-skill')
   @Auth(UserRole.ADMIN)
   @Patch(':id')
   @ApiOkResponse({
@@ -97,6 +99,7 @@ export class SkillsController {
     });
   }
 
+  @ApiTags('admin-skill')
   @Auth(UserRole.ADMIN)
   @Delete(':id')
   @ApiOkResponse({

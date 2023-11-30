@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { Experience } from '../entities/experience.entity';
 import { UpdateExperienceDto } from '../dto/update-experience.dto';
 import { UserActiveInterface } from '../../../common/interface/user-active-interface';
-import { CreateExperienceDto } from '../dto/create-experience.dto';
+import { ExperienceCreateResponseDTO } from '../dto/create-experience.dto';
 import { EXPERIENCE_NOT_FOUND } from '../messages';
 
 @Injectable()
@@ -23,7 +23,7 @@ export class ExperienceService {
     });
   }
 
-  async findOne(@Param('id') id: number) {
+  async findOne(id: number) {
     const experience = await this.experienceRepository.findOne({
       where: { id: id },
       relations: ['profile'],
@@ -35,7 +35,7 @@ export class ExperienceService {
     return experience;
   }
 
-  async create(createExperienceDto: CreateExperienceDto) {
+  async create(createExperienceDto: ExperienceCreateResponseDTO) {
     const experience = this.experienceRepository.create(createExperienceDto);
     await this.experienceRepository.save(experience);
 
@@ -43,7 +43,7 @@ export class ExperienceService {
   }
 
   async createMyExperience(
-    createExperienceDto: CreateExperienceDto,
+    createExperienceDto: ExperienceCreateResponseDTO,
     user: UserActiveInterface,
   ) {
     const experience = this.experienceRepository.create({

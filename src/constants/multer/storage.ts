@@ -1,4 +1,4 @@
-import { diskStorage } from "multer";
+/* import { diskStorage } from "multer";
 import { extname } from "path";
 
 const storagePerfil = diskStorage({
@@ -19,8 +19,7 @@ export const multerOptions = {
     },
     storage: storagePerfil,
 
-}
-
+} */
 
 //const imagePath = file ? process.env.DATABASE_URL + file.path.replace("\\", "/") : "default"; // This is the code that I used in the past to save the image path in the database
 
@@ -38,8 +37,9 @@ export const multerOptions = {
     )
   )
   */
- 
-  function generateFilename(file) {
+
+/*   function generateFilename(file) {
     return `${Date.now()}.${extname(file.originalname)}`;
   }
 
+ */

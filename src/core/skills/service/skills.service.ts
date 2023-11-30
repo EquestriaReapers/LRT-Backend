@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSkillDto } from '../dto/create-skill.dto';
 import { UpdateSkillDto } from '../dto/update-skill.dto';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Skill } from '../entities/skill.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SKILL_NOT_FOUND } from '../messages';
@@ -20,8 +20,12 @@ export class SkillsService {
     return this.skillsRepository.save(newSkill);
   }
 
-  async findAll() {
-    return await this.skillsRepository.find();
+  async findAll(name: string) {
+    return await this.skillsRepository.find({
+      where: {
+        name: Like(`%${name}%`),
+      },
+    });
   }
 
   async findOne(id: number) {

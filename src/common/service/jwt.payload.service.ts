@@ -6,13 +6,13 @@ import { JwtPayload } from '../../core/auth/interface/jwt-payload.interface';
 export class JwtPayloadService {
   constructor(private readonly jwtService: JwtService) {}
 
-  createJwtPayload(user) {
+  createJwtPayload({ email, role }) {
     const data: JwtPayload = {
-      email: user.email,
-      role: user.role,
+      email,
+      role,
     };
 
-    let jwt;
+    let jwt = null;
     try {
       jwt = this.jwtService.sign(data);
     } catch (error) {

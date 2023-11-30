@@ -8,9 +8,8 @@ import {
   Delete,
   NotFoundException,
   Response,
-  UnauthorizedException,
   InternalServerErrorException,
-  Res,
+  Query,
 } from '@nestjs/common';
 import { ProfilesService } from './service/profiles.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -24,32 +23,42 @@ import { Profile } from './entities/profile.entity';
 import { MessageDTO } from 'src/common/dto/response.dto';
 import * as express from 'express';
 import {
-  PROFILE_NOT_FOUND,
   PROFILE_SUCCESFULLY_DELETED_SKILL,
   PROFILE_SUCCESFULLY_UPDATED,
 } from './messages';
 import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator';
-import { AddSkillResponse } from './dto/responses.dto';
+import { AddSkillResponse, ResponseProfile } from './dto/responses.dto';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 
-@ApiTags('profile')
 @Controller('profiles')
 export class ProfilesController {
   constructor(private readonly profilesService: ProfilesService) {}
 
+  @ApiTags('profile')
   @Auth(UserRole.GRADUATE)
   @Get()
   @ApiOkResponse({
     description: 'Returns an array of ALL profiles',
-    type: [Profile],
+    type: [ResponseProfile],
   })
   @ApiException(() => InternalServerErrorException, {
     description: INTERNAL_SERVER_ERROR,
   })
-  findAll() {
-    return this.profilesService.findAll();
+  findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('random') random: number,
+  ) {
+    limit = limit > 100 ? 100 : limit;
+
+    return this.profilesService.findAll({
+      page,
+      limit,
+      random,
+    });
   }
 
+  @ApiTags('profile')
   @Auth(UserRole.GRADUATE)
   @Get(':id')
   @ApiException(() => InternalServerErrorException, {
@@ -67,6 +76,7 @@ export class ProfilesController {
     return this.profilesService.findOne(+id);
   }
 
+  @ApiTags('profile')
   @Auth(UserRole.GRADUATE)
   @Patch('/my-profile')
   @ApiOkResponse({
@@ -94,6 +104,7 @@ export class ProfilesController {
     });
   }
 
+  @ApiTags('admin-profile')
   @Auth(UserRole.ADMIN)
   @Patch(':id')
   @ApiException(() => InternalServerErrorException, {
@@ -122,8 +133,9 @@ export class ProfilesController {
     });
   }
 
+  @ApiTags('profile')
   @Auth(UserRole.GRADUATE)
-  @Post('/my-profile')
+  @Post('/my-profile/skill')
   @ApiOkResponse({
     description: 'Return my profile with skills',
     type: AddSkillResponse,
@@ -141,8 +153,9 @@ export class ProfilesController {
     return this.profilesService.addSkillProfile(addSkillDto.skillId, user);
   }
 
+  @ApiTags('profile')
   @Auth(UserRole.GRADUATE)
-  @Delete('/my-profile')
+  @Delete('/my-profile/skill/:skillId')
   @ApiOkResponse({
     description: 'Delete skill from my profile',
     type: MessageDTO,
@@ -154,17 +167,18 @@ export class ProfilesController {
     description: INTERNAL_SERVER_ERROR,
   })
   async removeSkillProfile(
-    @Body() addSkillDto: AddSkillDto,
+    @Param('skillId') skillId: number,
     @ActiveUser() user: UserActiveInterface,
     @Response() response: express.Response,
   ) {
-    await this.profilesService.removeSkillProfile(addSkillDto.skillId, user);
+    await this.profilesService.removeSkillProfile(skillId, user);
 
     return response.status(200).json({
       message: PROFILE_SUCCESFULLY_DELETED_SKILL,
     });
   }
 
+  @ApiTags('admin-profile')
   @Auth(UserRole.ADMIN)
   @Delete(':id')
   @ApiException(() => InternalServerErrorException, {

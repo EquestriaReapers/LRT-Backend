@@ -23,6 +23,11 @@ import * as handlebars from 'handlebars';
 import * as fs from 'fs';
 import * as path from 'path';
 import { USER_NOT_FOUND } from 'src/core/users/messages';
+import {
+  INVALID_TOKEN_EMAIL_MESSAGE,
+  SUCCESSFULY_SEND_EMAIL_VERIFICATION_MESSAGE,
+  USER_ALREADY_EXISTS_MESSAGE,
+} from '../message';
 
 @Injectable()
 export class AuthService {
@@ -41,7 +46,7 @@ export class AuthService {
     const user = await this.usersService.findOneByEmail(email);
 
     if (user) {
-      throw new BadRequestException('Usuario ya existe');
+      throw new BadRequestException(USER_ALREADY_EXISTS_MESSAGE);
     }
 
     await this.usersService.create({
@@ -92,10 +97,12 @@ export class AuthService {
       where: { email: email },
     });
 
+    const SOME_TIME = Math.floor(Math.random() * 9000000) + 1000000; // 000 days
+
     if (!emailVerification) {
       const emailVerificationToken = await this.emailVerification.save({
         email,
-        emailToken: (Math.floor(Math.random() * 9000000) + 1000000).toString(),
+        emailToken: SOME_TIME.toString(),
         timestamp: new Date(),
       });
       return emailVerificationToken;
@@ -131,7 +138,10 @@ export class AuthService {
         return !!userFromDb;
       }
     } else {
-      throw new HttpException('Token invalido', HttpStatus.FORBIDDEN);
+      throw new HttpException(
+        INVALID_TOKEN_EMAIL_MESSAGE,
+        HttpStatus.FORBIDDEN,
+      );
     }
   }
 
@@ -152,7 +162,7 @@ export class AuthService {
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source);
     const replacements = {
-      verificationLink: `${process.env.DATABASE_URL}/api/v1/auth/email/verify/${repository.emailToken}`,
+      verificationLink: `${process.env.BACKEND_BASE_URL}/api/v1/auth/email/verify/${repository.emailToken}`,
     };
 
     const htmlToSend = template(replacements);
@@ -183,7 +193,7 @@ export class AuthService {
           return reject(error);
         }
         Logger.log(`Send message: ${info.messageId}`, 'sendEmailVerification');
-        resolve({ message: 'Correo enviado con exito' });
+        resolve({ message: SUCCESSFULY_SEND_EMAIL_VERIFICATION_MESSAGE });
       });
     });
   }
