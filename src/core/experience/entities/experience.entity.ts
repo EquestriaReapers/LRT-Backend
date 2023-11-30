@@ -31,6 +31,7 @@ export class Experience {
   role: string;
 
   @ApiProperty()
+  @Column()
   location: string;
 
   @ApiProperty()
