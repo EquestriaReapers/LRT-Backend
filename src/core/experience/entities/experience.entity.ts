@@ -24,11 +24,14 @@ export class Experience {
 
   @ApiProperty()
   @Column()
-  name: string;
+  businessName: string;
 
   @ApiProperty()
   @Column()
   role: string;
+
+  @ApiProperty()
+  location: string;
 
   @ApiProperty()
   @Column()

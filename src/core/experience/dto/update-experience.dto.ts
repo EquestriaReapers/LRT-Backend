@@ -19,12 +19,17 @@ export class UpdateExperienceDto extends PartialType(
   @ApiProperty()
   @IsString()
   @IsOptional()
-  name: string;
+  businessName: string;
 
   @ApiProperty()
   @IsNumber()
   @IsOptional()
   profileId: number;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  location: string;
 
   @ApiProperty()
   @IsNotEmpty()

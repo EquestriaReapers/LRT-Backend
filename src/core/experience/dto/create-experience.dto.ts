@@ -17,7 +17,7 @@ export class ExperienceCreateResponseDTO {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  name: string;
+  businessName: string;
 
   @ApiProperty()
   @IsNumber()
@@ -28,6 +28,11 @@ export class ExperienceCreateResponseDTO {
   @IsNotEmpty()
   @IsDateString()
   startDate: Date;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  location: string;
 
   @ApiProperty({
     required: false,
