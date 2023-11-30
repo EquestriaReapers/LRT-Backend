@@ -27,11 +27,11 @@ import {
   SKILL_SUCCESFULLY_UPDATED,
 } from './messages';
 
-@ApiTags('skill')
 @Controller('skills')
 export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
 
+  @ApiTags('skill')
   @Auth(UserRole.GRADUATE)
   @Post()
   @ApiCreatedResponse({
@@ -44,7 +44,7 @@ export class SkillsController {
   create(@Body() createSkillDto: CreateSkillDto) {
     return this.skillsService.create(createSkillDto);
   }
-
+  @ApiTags('skill')
   @Auth(UserRole.GRADUATE || UserRole.ADMIN)
   @Get()
   @ApiOkResponse({
@@ -57,7 +57,7 @@ export class SkillsController {
   findAll(@Query('name') name: string) {
     return this.skillsService.findAll(name);
   }
-
+  @ApiTags('skill')
   @Auth(UserRole.GRADUATE || UserRole.ADMIN)
   @Get(':id')
   @ApiOkResponse({
@@ -74,6 +74,7 @@ export class SkillsController {
     return this.skillsService.findOne(+id);
   }
 
+  @ApiTags('admin-skill')
   @Auth(UserRole.ADMIN)
   @Patch(':id')
   @ApiOkResponse({
@@ -98,6 +99,7 @@ export class SkillsController {
     });
   }
 
+  @ApiTags('admin-skill')
   @Auth(UserRole.ADMIN)
   @Delete(':id')
   @ApiOkResponse({

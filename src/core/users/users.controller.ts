@@ -26,7 +26,7 @@ import * as express from 'express';
 import { USER_SUCCESFULLY_DELETE, USER_SUCCESFULLY_UPDATED } from './messages';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 
-@ApiTags('users')
+@ApiTags('admin-users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

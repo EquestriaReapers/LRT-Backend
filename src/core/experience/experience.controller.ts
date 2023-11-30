@@ -29,11 +29,10 @@ import {
 } from './messages';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 
-@ApiTags('experience')
 @Controller('experience')
 export class ExperienceController {
   constructor(private readonly experienceService: ExperienceService) {}
-
+  @ApiTags('experience')
   @Auth(UserRole.GRADUATE)
   @Get()
   @ApiOkResponse({
@@ -46,7 +45,7 @@ export class ExperienceController {
   findAll() {
     return this.experienceService.findAll();
   }
-
+  @ApiTags('experience')
   @Auth(UserRole.GRADUATE)
   @Get(':id')
   @ApiOkResponse({
@@ -62,7 +61,7 @@ export class ExperienceController {
   findOne(@Param('id') id: string) {
     return this.experienceService.findOne(+id);
   }
-
+  @ApiTags('experience')
   @Auth(UserRole.GRADUATE)
   @Post('/my-experience')
   @ApiCreatedResponse({
@@ -78,7 +77,7 @@ export class ExperienceController {
   ) {
     return this.experienceService.createMyExperience(createExperienceDto, user);
   }
-
+  @ApiTags('admin-experience')
   @Auth(UserRole.ADMIN)
   @Post()
   @ApiCreatedResponse({
@@ -91,7 +90,7 @@ export class ExperienceController {
   create(@Body() createExperienceDto: ExperienceCreateResponseDTO) {
     return this.experienceService.create(createExperienceDto);
   }
-
+  @ApiTags('experience')
   @Auth(UserRole.GRADUATE)
   @Patch('/my-experience/:id')
   @ApiOkResponse({
@@ -120,7 +119,7 @@ export class ExperienceController {
       message: EXPERIENCE_SUCCESFULLY_UPDATED,
     });
   }
-
+  @ApiTags('admin-experience')
   @Auth(UserRole.ADMIN)
   @Patch(':id')
   @ApiOkResponse({
@@ -145,6 +144,7 @@ export class ExperienceController {
     });
   }
 
+  @ApiTags('admin-experience')
   @Auth(UserRole.ADMIN)
   @Delete(':id')
   @ApiOkResponse({
