@@ -4,6 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { json } from 'express';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { SwaggerTheme } from 'swagger-themes';
 import { ConfigService } from '@nestjs/config';
 import * as morgan from 'morgan';
 import { CORS } from './constants';
@@ -50,7 +51,13 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config); // Documentación
-  SwaggerModule.setup('api', app, document); // Documentación
+  const theme = new SwaggerTheme('v3');
+  const options = {
+    explorer: true,
+    customCss: theme.getBuffer('material'),
+    customSiteTitle: 'UCAB PROFILE',
+  };
+  SwaggerModule.setup('api', app, document, options); // Documentación
 
   await app.listen(PORT);
   console.log(`Application running on: ${await app.getUrl()}`);
