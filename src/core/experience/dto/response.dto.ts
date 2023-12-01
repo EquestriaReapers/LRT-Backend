@@ -13,6 +13,8 @@ export class ExperienceCreateResponse {
   @ApiProperty()
   location: string;
   @ApiProperty()
+  description: string;
+  @ApiProperty()
   startDate: Date;
   @ApiProperty()
   endDate: Date;

@@ -4,6 +4,7 @@ export interface ExperienceI {
   businessName?: string;
   role?: string;
   location?: string;
+  description?: string;
   startDate?: Date;
   endDate?: Date;
 }
