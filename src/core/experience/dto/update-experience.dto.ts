@@ -32,6 +32,11 @@ export class UpdateExperienceDto extends PartialType(
   location: string;
 
   @ApiProperty()
+  @IsString()
+  @IsOptional()
+  description: string;
+
+  @ApiProperty()
   @IsNotEmpty()
   @IsDate()
   startDate: Date;

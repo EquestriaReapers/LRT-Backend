@@ -34,6 +34,11 @@ export class ExperienceCreateResponseDTO {
   @IsString()
   location: string;
 
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  description: string;
+
   @ApiProperty({
     required: false,
     nullable: true,
