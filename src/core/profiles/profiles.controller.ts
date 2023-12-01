@@ -29,6 +29,7 @@ import {
 import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator';
 import { AddSkillResponse, ResponseProfile } from './dto/responses.dto';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
+import { ApiQuery } from '@nestjs/swagger';
 
 @Controller('profiles')
 export class ProfilesController {
@@ -44,6 +45,21 @@ export class ProfilesController {
   @ApiException(() => InternalServerErrorException, {
     description: INTERNAL_SERVER_ERROR,
   })
+
+  // ...
+  @ApiTags('profile')
+  @Auth(UserRole.GRADUATE)
+  @Get()
+  @ApiOkResponse({
+    description: 'Returns an array of ALL profiles',
+    type: [ResponseProfile],
+  })
+  @ApiException(() => InternalServerErrorException, {
+    description: INTERNAL_SERVER_ERROR,
+  })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'limit', required: false })
+  @ApiQuery({ name: 'random', required: false })
   findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
