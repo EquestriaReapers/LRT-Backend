@@ -10,6 +10,8 @@ import { PROFILE_NOT_FOUND } from '../messages';
 import { PaginationMessage } from '../../../common/interface/pagination-message.interface';
 import { AppService } from 'src/app.service';
 import { Console } from 'console';
+import { USER_NOT_FOUND } from 'src/core/users/messages';
+import { SKILL_NOT_FOUND } from 'src/core/skills/messages';
 
 @Injectable()
 export class ProfilesService {
@@ -109,7 +111,7 @@ export class ProfilesService {
     });
 
     if (!profile) {
-      throw new NotFoundException('Perfil no se encuentra');
+      throw new NotFoundException(PROFILE_NOT_FOUND);
     }
 
     return profile;
@@ -121,10 +123,12 @@ export class ProfilesService {
   ): Promise<void> {
     const profile = await this.profileRepository.update(user.id, {
       description: updateProfileDto.description,
+      mainTitle: updateProfileDto.mainTitle,
+      countryResidence: updateProfileDto.countryResidence,
     });
 
     if (profile.affected === 0) {
-      throw new NotFoundException('Perfil no se encuentra');
+      throw new NotFoundException(PROFILE_NOT_FOUND);
     }
 
     if (updateProfileDto.name) {
@@ -133,7 +137,7 @@ export class ProfilesService {
       });
 
       if (userUpdated.affected === 0) {
-        throw new NotFoundException('Usuario no se encuentra');
+        throw new NotFoundException(USER_NOT_FOUND);
       }
     }
 
@@ -171,13 +175,13 @@ export class ProfilesService {
     });
 
     if (!profile) {
-      throw new NotFoundException('Perfil no se encuentra');
+      throw new NotFoundException(PROFILE_NOT_FOUND);
     }
 
     const skill = await this.skillRepository.findOneBy({ id: skillId });
 
     if (!skill) {
-      throw new NotFoundException('Habilidad no se encuentra');
+      throw new NotFoundException(SKILL_NOT_FOUND);
     }
 
     const updatedSkillList = profile.skills.filter(
@@ -195,7 +199,9 @@ export class ProfilesService {
     updateProfileDto: UpdateProfileDto,
   ): Promise<void> {
     const profile = await this.profileRepository.update(userId, {
-      ...updateProfileDto,
+      description: updateProfileDto.description,
+      mainTitle: updateProfileDto.mainTitle,
+      countryResidence: updateProfileDto.countryResidence,
     });
 
     if (profile.affected === 0) throw new NotFoundException(PROFILE_NOT_FOUND);
@@ -206,7 +212,7 @@ export class ProfilesService {
       });
 
       if (userUpdateResult.affected === 0) {
-        throw new NotFoundException('Usuario no se encuentra');
+        throw new NotFoundException(USER_NOT_FOUND);
       }
     }
 
