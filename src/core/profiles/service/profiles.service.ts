@@ -10,6 +10,9 @@ import { PROFILE_NOT_FOUND } from '../messages';
 import { PaginationMessage } from '../../../common/interface/pagination-message.interface';
 import { AppService } from 'src/app.service';
 import { Console } from 'console';
+import { CreateContactDto } from '../dto/createContact.dto';
+import { ContactMethod } from '../entities/contact-method.entity';
+import { UpdateContactMethodDto } from '../dto/updateContact.dto';
 
 @Injectable()
 export class ProfilesService {
@@ -22,7 +25,10 @@ export class ProfilesService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+
+    @InjectRepository(ContactMethod)
+    private readonly ContactMethodRepository: Repository<ContactMethod>,
+  ) { }
 
   async findAll({ page, limit, random }) {
     const skip = (page - 1) * limit;
@@ -219,5 +225,62 @@ export class ProfilesService {
     if (!profile) throw new NotFoundException(PROFILE_NOT_FOUND);
 
     return profile;
+  }
+
+  async getContactMethods(userId: number): Promise<ContactMethod[]> {
+    const profile = await this.profileRepository.findOne({ where: { id: userId }, relations: ['contactMethods'] });
+
+    if (!profile) {
+      throw new NotFoundException('Perfil no encontrado');
+    }
+
+    return profile.contactMethods;
+  }
+  async addContactMethod(
+    user: UserActiveInterface,
+    createContactMethodDto: CreateContactDto,
+  ): Promise<ContactMethod> {
+    const profile = await this.profileRepository.findOne({ where: { id: user.id } });
+
+    if (!profile) {
+      throw new NotFoundException('Perfil no se encuentra');
+    }
+
+    const contactMethod = new ContactMethod();
+    contactMethod.type = createContactMethodDto.type;
+    contactMethod.value = createContactMethodDto.value;
+    contactMethod.profile = profile;
+
+    await this.ContactMethodRepository.save(contactMethod);
+
+    return contactMethod;
+  }
+
+  async updateContactMethod(
+    user: UserActiveInterface,
+    updateContactMethodDto: UpdateContactMethodDto,
+  ): Promise<ContactMethod> {
+    const contactMethod = await this.ContactMethodRepository.findOne({ where: { id: user.id } })
+
+    if (!contactMethod) {
+      throw new NotFoundException('Método de contacto no encontrado');
+    }
+
+    contactMethod.type = updateContactMethodDto.type || contactMethod.type;
+    contactMethod.value = updateContactMethodDto.value || contactMethod.value;
+
+    await this.ContactMethodRepository.save(contactMethod);
+
+    return contactMethod;
+  }
+
+  async deleteContactMethod(id: number): Promise<void> {
+    const contactMethod = await this.ContactMethodRepository.findOne({ where: { id } });
+
+    if (!contactMethod) {
+      throw new NotFoundException('Método de contacto no encontrado');
+    }
+
+    await this.ContactMethodRepository.remove(contactMethod);
   }
 }

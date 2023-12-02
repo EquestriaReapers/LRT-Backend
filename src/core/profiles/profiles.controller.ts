@@ -10,6 +10,7 @@ import {
   Response,
   InternalServerErrorException,
   Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ProfilesService } from './service/profiles.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -30,10 +31,11 @@ import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator
 import { AddSkillResponse, ResponseProfile } from './dto/responses.dto';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
+import { CreateContactDto } from './dto/createContact.dto';
 
 @Controller('profiles')
 export class ProfilesController {
-  constructor(private readonly profilesService: ProfilesService) {}
+  constructor(private readonly profilesService: ProfilesService) { }
 
   @ApiTags('profile')
   @Auth(UserRole.GRADUATE)
@@ -205,5 +207,29 @@ export class ProfilesController {
   })
   remove(@Param('id') id: string) {
     return this.profilesService.remove(+id);
+  }
+
+  @ApiTags('profile')
+  @Auth(UserRole.GRADUATE)
+  @Post('/my-profile/contact-methods')
+  async addContactMethod(
+    @ActiveUser() user: UserActiveInterface,
+    @Body() createContactMethodDto: CreateContactDto,
+  ) {
+    return this.profilesService.addContactMethod(user, createContactMethodDto);
+  }
+
+  @ApiTags('profile')
+  @Auth(UserRole.GRADUATE)
+  @Get('/my-profile/contact-methods')
+  async getContactMethods(@Param('id', ParseIntPipe) id: number) {
+    return this.profilesService.getContactMethods(id);
+  }
+
+  @ApiTags('profile')
+  @Auth(UserRole.GRADUATE)
+  @Delete('contact-methods/:id')
+  async deleteContactMethod(@Param('id', ParseIntPipe) id: number) {
+    return this.profilesService.deleteContactMethod(id);
   }
 }

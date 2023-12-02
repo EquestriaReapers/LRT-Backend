@@ -19,6 +19,7 @@ import {
   SkillData,
   UserProfileData,
 } from '../dto/responses.dto';
+import { ContactMethod } from './contact-method.entity';
 
 @Entity()
 export class Profile {
@@ -65,4 +66,8 @@ export class Profile {
   @ApiProperty()
   @DeleteDateColumn()
   deletedAt: Date;
+
+  @ApiProperty({ type: () => [ContactMethod] })
+  @OneToMany(() => ContactMethod, contactMethod => contactMethod.profile, { cascade: true })
+  contactMethods: ContactMethod[];
 }
