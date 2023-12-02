@@ -27,6 +27,14 @@ export class ProfilesService {
   ) {}
 
   async findAll({ page, limit, random }) {
+    if (!page) {
+      page = 1;
+    }
+
+    if (!limit) {
+      limit = 10;
+    }
+
     const skip = (page - 1) * limit;
 
     if (!random) {
@@ -42,7 +50,7 @@ export class ProfilesService {
 
     const queryBuilder = await this.profileRepository.query(
       `
-    SELECT "profile"."id" AS "profile_id", "profile"."userId" AS "profile_userId", "profile"."description" AS "profile_description", "profile"."mainTitle" AS "profile_mainTitle", "profile"."countryResidence" AS "profile_countryResidence", "profile"."deletedAt" AS "profile_deletedAt", "user"."id" AS "user_id", "user"."name" AS "user_name", "user"."lastname" AS "user_lastname", "user"."email" AS "user_email", "skills"."id" AS "skills_id", "skills"."name" AS "skills_name", "experience"."id" AS "experience_id", "experience"."profileId" AS "experience_profileId", "experience"."name" AS "experience_name", "experience"."role" AS "experience_role", "experience"."startDate" AS "experience_startDate", "experience"."endDate" AS "experience_endDate" FROM "profile" "profile" LEFT JOIN "user" "user" ON "user"."id"="profile"."userId" AND ("user"."deletedAt" IS NULL)  LEFT JOIN "profile_skills_skill" "profile_skills" ON "profile_skills"."profileId"="profile"."id" LEFT JOIN "skill" "skills" ON "skills"."id"="profile_skills"."skillId"  LEFT JOIN "experience" "experience" ON "experience"."profileId"="profile"."id" WHERE "profile"."deletedAt" IS NULL ORDER BY RANDOM() ASC LIMIT ${limit} OFFSET ${skip} 
+    SELECT "profile"."id" AS "profile_id", "profile"."userId" AS "profile_userId", "profile"."description" AS "profile_description", "profile"."mainTitle" AS "profile_mainTitle", "profile"."countryResidence" AS "profile_countryResidence", "profile"."deletedAt" AS "profile_deletedAt", "user"."id" AS "user_id", "user"."name" AS "user_name", "user"."lastname" AS "user_lastname", "user"."email" AS "user_email", "skills"."id" AS "skills_id", "skills"."name" AS "skills_name", "experience"."id" AS "experience_id", "experience"."profileId" AS "experience_profileId", "experience"."businessName" AS "experience_businessName", "experience"."location" AS "experience_location", "experience"."role" AS "experience_role", "experience"."startDate" AS "experience_startDate", "experience"."endDate" AS "experience_endDate" FROM "profile" "profile" LEFT JOIN "user" "user" ON "user"."id"="profile"."userId" AND ("user"."deletedAt" IS NULL)  LEFT JOIN "profile_skills_skill" "profile_skills" ON "profile_skills"."profileId"="profile"."id" LEFT JOIN "skill" "skills" ON "skills"."id"="profile_skills"."skillId"  LEFT JOIN "experience" "experience" ON "experience"."profileId"="profile"."id" WHERE "profile"."deletedAt" IS NULL ORDER BY RANDOM() ASC LIMIT ${limit} OFFSET ${skip} 
     `,
     );
 
@@ -62,7 +70,8 @@ export class ProfilesService {
         {
           id: row.experience_id,
           profileId: row.experience_profileId,
-          name: row.experience_name,
+          businessName: row.experience_businessName,
+          location: row.experience_location,
           role: row.experience_role,
           startDate: row.experience_startDate,
           endDate: row.experience_endDate,
