@@ -50,8 +50,36 @@ export class ProfilesService {
 
     const queryBuilder = await this.profileRepository.query(
       `
-    SELECT "profile"."id" AS "profile_id", "profile"."userId" AS "profile_userId", "profile"."description" AS "profile_description", "profile"."mainTitle" AS "profile_mainTitle", "profile"."countryResidence" AS "profile_countryResidence", "profile"."deletedAt" AS "profile_deletedAt", "user"."id" AS "user_id", "user"."name" AS "user_name", "user"."lastname" AS "user_lastname", "user"."email" AS "user_email", "skills"."id" AS "skills_id", "skills"."name" AS "skills_name", "experience"."id" AS "experience_id", "experience"."profileId" AS "experience_profileId", "experience"."businessName" AS "experience_businessName", "experience"."location" AS "experience_location", "experience"."role" AS "experience_role", "experience"."startDate" AS "experience_startDate", "experience"."endDate" AS "experience_endDate" FROM "profile" "profile" LEFT JOIN "user" "user" ON "user"."id"="profile"."userId" AND ("user"."deletedAt" IS NULL)  LEFT JOIN "profile_skills_skill" "profile_skills" ON "profile_skills"."profileId"="profile"."id" LEFT JOIN "skill" "skills" ON "skills"."id"="profile_skills"."skillId"  LEFT JOIN "experience" "experience" ON "experience"."profileId"="profile"."id" WHERE "profile"."deletedAt" IS NULL ORDER BY RANDOM() ASC LIMIT ${limit} OFFSET ${skip} 
-    `,
+      SELECT "profile"."id" AS "profile_id", "profile"."userId" AS "profile_userId", "profile"."description" AS "profile_description", "profile"."mainTitle" AS "profile_mainTitle", "profile"."countryResidence" AS "profile_countryResidence", "profile"."deletedAt" AS "profile_deletedAt", "user"."id" AS "user_id", "user"."name" AS "user_name", "user"."lastname" AS "user_lastname", "user"."email" AS "user_email",
+      ARRAY(
+        SELECT DISTINCT ON ("experience"."id") json_build_object(
+          'id', "experience"."id",
+          'profileId', "experience"."profileId",
+          'businessName', "experience"."businessName",
+          'location', "experience"."location",
+          'role', "experience"."role",
+          'startDate', "experience"."startDate",
+          'endDate', "experience"."endDate"
+        )::text
+        FROM "experience"
+        WHERE "experience"."profileId" = "profile"."id"
+      ) AS "experiences",
+      ARRAY(
+        SELECT DISTINCT ON ("skills"."id") json_build_object(
+          'id', "skills"."id",
+          'name', "skills"."name"
+        )::text
+        FROM "profile_skills_skill" "profile_skills"
+        JOIN "skill" "skills" ON "skills"."id"="profile_skills"."skillId"
+        WHERE "profile_skills"."profileId" = "profile"."id"
+      ) AS "skills"
+      FROM "profile" "profile"
+      LEFT JOIN "user" "user" ON "user"."id"="profile"."userId" AND ("user"."deletedAt" IS NULL)
+      WHERE "profile"."deletedAt" IS NULL
+      GROUP BY "profile"."id", "user"."id"
+      ORDER BY RANDOM()
+      LIMIT ${limit} OFFSET ${skip}
+      `,
     );
 
     const formattedResult = queryBuilder.map((row) => ({
@@ -66,23 +94,8 @@ export class ProfilesService {
       description: row.profile_description,
       mainTitle: row.profile_mainTitle,
       countryResidence: row.profile_countryResidence,
-      experience: [
-        {
-          id: row.experience_id,
-          profileId: row.experience_profileId,
-          businessName: row.experience_businessName,
-          location: row.experience_location,
-          role: row.experience_role,
-          startDate: row.experience_startDate,
-          endDate: row.experience_endDate,
-        },
-      ],
-      skills: [
-        {
-          id: row.skills_id,
-          name: row.skills_name,
-        },
-      ],
+      experience: row.experiences.map(JSON.parse),
+      skills: row.skills.map(JSON.parse),
       deletedAt: row.profile_deletedAt,
     }));
 
