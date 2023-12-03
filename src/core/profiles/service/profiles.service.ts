@@ -8,11 +8,10 @@ import { Skill } from '../../skills/entities/skill.entity';
 import { User } from '../../users/entities/user.entity';
 import { PROFILE_NOT_FOUND } from '../messages';
 import { PaginationMessage } from '../../../common/interface/pagination-message.interface';
-import { AppService } from 'src/app.service';
-import { Console } from 'console';
+import { USER_NOT_FOUND } from 'src/core/users/messages';
+import { SKILL_NOT_FOUND } from 'src/core/skills/messages';
 import { CreateContactDto } from '../dto/createContact.dto';
 import { ContactMethod } from '../entities/contact-method.entity';
-import { UpdateContactMethodDto } from '../dto/updateContact.dto';
 
 @Injectable()
 export class ProfilesService {
@@ -28,9 +27,17 @@ export class ProfilesService {
 
     @InjectRepository(ContactMethod)
     private readonly ContactMethodRepository: Repository<ContactMethod>,
-  ) { }
+  ) {}
 
   async findAll({ page, limit, random }) {
+    if (!page) {
+      page = 1;
+    }
+
+    if (!limit) {
+      limit = 10;
+    }
+
     const skip = (page - 1) * limit;
 
     if (!random) {
@@ -46,8 +53,36 @@ export class ProfilesService {
 
     const queryBuilder = await this.profileRepository.query(
       `
-    SELECT "profile"."id" AS "profile_id", "profile"."userId" AS "profile_userId", "profile"."description" AS "profile_description", "profile"."mainTitle" AS "profile_mainTitle", "profile"."countryResidence" AS "profile_countryResidence", "profile"."deletedAt" AS "profile_deletedAt", "user"."id" AS "user_id", "user"."name" AS "user_name", "user"."lastname" AS "user_lastname", "user"."email" AS "user_email", "skills"."id" AS "skills_id", "skills"."name" AS "skills_name", "experience"."id" AS "experience_id", "experience"."profileId" AS "experience_profileId", "experience"."name" AS "experience_name", "experience"."role" AS "experience_role", "experience"."startDate" AS "experience_startDate", "experience"."endDate" AS "experience_endDate" FROM "profile" "profile" LEFT JOIN "user" "user" ON "user"."id"="profile"."userId" AND ("user"."deletedAt" IS NULL)  LEFT JOIN "profile_skills_skill" "profile_skills" ON "profile_skills"."profileId"="profile"."id" LEFT JOIN "skill" "skills" ON "skills"."id"="profile_skills"."skillId"  LEFT JOIN "experience" "experience" ON "experience"."profileId"="profile"."id" WHERE "profile"."deletedAt" IS NULL ORDER BY RANDOM() ASC LIMIT ${limit} OFFSET ${skip} 
-    `,
+      SELECT "profile"."id" AS "profile_id", "profile"."userId" AS "profile_userId", "profile"."description" AS "profile_description", "profile"."mainTitle" AS "profile_mainTitle", "profile"."countryResidence" AS "profile_countryResidence", "profile"."deletedAt" AS "profile_deletedAt", "user"."id" AS "user_id", "user"."name" AS "user_name", "user"."lastname" AS "user_lastname", "user"."email" AS "user_email",
+      ARRAY(
+        SELECT DISTINCT ON ("experience"."id") json_build_object(
+          'id', "experience"."id",
+          'profileId', "experience"."profileId",
+          'businessName', "experience"."businessName",
+          'location', "experience"."location",
+          'role', "experience"."role",
+          'startDate', "experience"."startDate",
+          'endDate', "experience"."endDate"
+        )::text
+        FROM "experience"
+        WHERE "experience"."profileId" = "profile"."id"
+      ) AS "experiences",
+      ARRAY(
+        SELECT DISTINCT ON ("skills"."id") json_build_object(
+          'id', "skills"."id",
+          'name', "skills"."name"
+        )::text
+        FROM "profile_skills_skill" "profile_skills"
+        JOIN "skill" "skills" ON "skills"."id"="profile_skills"."skillId"
+        WHERE "profile_skills"."profileId" = "profile"."id"
+      ) AS "skills"
+      FROM "profile" "profile"
+      LEFT JOIN "user" "user" ON "user"."id"="profile"."userId" AND ("user"."deletedAt" IS NULL)
+      WHERE "profile"."deletedAt" IS NULL
+      GROUP BY "profile"."id", "user"."id"
+      ORDER BY RANDOM()
+      LIMIT ${limit} OFFSET ${skip}
+      `,
     );
 
     const formattedResult = queryBuilder.map((row) => ({
@@ -62,22 +97,8 @@ export class ProfilesService {
       description: row.profile_description,
       mainTitle: row.profile_mainTitle,
       countryResidence: row.profile_countryResidence,
-      experience: [
-        {
-          id: row.experience_id,
-          profileId: row.experience_profileId,
-          name: row.experience_name,
-          role: row.experience_role,
-          startDate: row.experience_startDate,
-          endDate: row.experience_endDate,
-        },
-      ],
-      skills: [
-        {
-          id: row.skills_id,
-          name: row.skills_name,
-        },
-      ],
+      experience: row.experiences.map(JSON.parse),
+      skills: row.skills.map(JSON.parse),
       deletedAt: row.profile_deletedAt,
     }));
 
@@ -115,7 +136,7 @@ export class ProfilesService {
     });
 
     if (!profile) {
-      throw new NotFoundException('Perfil no se encuentra');
+      throw new NotFoundException(PROFILE_NOT_FOUND);
     }
 
     return profile;
@@ -127,10 +148,12 @@ export class ProfilesService {
   ): Promise<void> {
     const profile = await this.profileRepository.update(user.id, {
       description: updateProfileDto.description,
+      mainTitle: updateProfileDto.mainTitle,
+      countryResidence: updateProfileDto.countryResidence,
     });
 
     if (profile.affected === 0) {
-      throw new NotFoundException('Perfil no se encuentra');
+      throw new NotFoundException(PROFILE_NOT_FOUND);
     }
 
     if (updateProfileDto.name) {
@@ -139,7 +162,7 @@ export class ProfilesService {
       });
 
       if (userUpdated.affected === 0) {
-        throw new NotFoundException('Usuario no se encuentra');
+        throw new NotFoundException(USER_NOT_FOUND);
       }
     }
 
@@ -177,13 +200,13 @@ export class ProfilesService {
     });
 
     if (!profile) {
-      throw new NotFoundException('Perfil no se encuentra');
+      throw new NotFoundException(PROFILE_NOT_FOUND);
     }
 
     const skill = await this.skillRepository.findOneBy({ id: skillId });
 
     if (!skill) {
-      throw new NotFoundException('Habilidad no se encuentra');
+      throw new NotFoundException(SKILL_NOT_FOUND);
     }
 
     const updatedSkillList = profile.skills.filter(
@@ -201,7 +224,9 @@ export class ProfilesService {
     updateProfileDto: UpdateProfileDto,
   ): Promise<void> {
     const profile = await this.profileRepository.update(userId, {
-      ...updateProfileDto,
+      description: updateProfileDto.description,
+      mainTitle: updateProfileDto.mainTitle,
+      countryResidence: updateProfileDto.countryResidence,
     });
 
     if (profile.affected === 0) throw new NotFoundException(PROFILE_NOT_FOUND);
@@ -212,7 +237,7 @@ export class ProfilesService {
       });
 
       if (userUpdateResult.affected === 0) {
-        throw new NotFoundException('Usuario no se encuentra');
+        throw new NotFoundException(USER_NOT_FOUND);
       }
     }
 
@@ -228,7 +253,10 @@ export class ProfilesService {
   }
 
   async getContactMethods(userId: number): Promise<ContactMethod[]> {
-    const profile = await this.profileRepository.findOne({ where: { id: userId }, relations: ['contactMethods'] });
+    const profile = await this.profileRepository.findOne({
+      where: { id: userId },
+      relations: ['contactMethods'],
+    });
 
     if (!profile) {
       throw new NotFoundException('Perfil no encontrado');
@@ -240,7 +268,9 @@ export class ProfilesService {
     user: UserActiveInterface,
     createContactMethodDto: CreateContactDto,
   ): Promise<ContactMethod> {
-    const profile = await this.profileRepository.findOne({ where: { id: user.id } });
+    const profile = await this.profileRepository.findOne({
+      where: { id: user.id },
+    });
 
     if (!profile) {
       throw new NotFoundException('Perfil no se encuentra');
@@ -249,25 +279,6 @@ export class ProfilesService {
     const contactMethod = new ContactMethod();
     contactMethod.type = createContactMethodDto.type;
     contactMethod.value = createContactMethodDto.value;
-    contactMethod.profile = profile;
-
-    await this.ContactMethodRepository.save(contactMethod);
-
-    return contactMethod;
-  }
-
-  async updateContactMethod(
-    user: UserActiveInterface,
-    updateContactMethodDto: UpdateContactMethodDto,
-  ): Promise<ContactMethod> {
-    const contactMethod = await this.ContactMethodRepository.findOne({ where: { id: user.id } })
-
-    if (!contactMethod) {
-      throw new NotFoundException('Método de contacto no encontrado');
-    }
-
-    contactMethod.type = updateContactMethodDto.type || contactMethod.type;
-    contactMethod.value = updateContactMethodDto.value || contactMethod.value;
 
     await this.ContactMethodRepository.save(contactMethod);
 
@@ -275,7 +286,9 @@ export class ProfilesService {
   }
 
   async deleteContactMethod(id: number): Promise<void> {
-    const contactMethod = await this.ContactMethodRepository.findOne({ where: { id } });
+    const contactMethod = await this.ContactMethodRepository.findOne({
+      where: { id },
+    });
 
     if (!contactMethod) {
       throw new NotFoundException('Método de contacto no encontrado');
