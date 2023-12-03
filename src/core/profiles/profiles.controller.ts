@@ -11,7 +11,7 @@ import {
   InternalServerErrorException,
   Query,
 } from '@nestjs/common';
-import { ProfilesService } from './service/profiles.service';
+import ProfilesService from './service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ApiOkResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Auth } from '../auth/decorators/auth.decorator';
@@ -67,7 +67,7 @@ export class ProfilesController {
   ) {
     limit = limit > 100 ? 100 : limit;
 
-    return this.profilesService.findAll({
+    return this.profilesService.findAllPaginate({
       page,
       limit,
       random,
