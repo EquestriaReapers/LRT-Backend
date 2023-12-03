@@ -11,7 +11,7 @@ import {
   InternalServerErrorException,
   Query,
 } from '@nestjs/common';
-import { ProfilesService } from './service/profiles.service';
+import ProfilesService from './service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ApiOkResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Auth } from '../auth/decorators/auth.decorator';
@@ -27,7 +27,11 @@ import {
   PROFILE_SUCCESFULLY_UPDATED,
 } from './messages';
 import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator';
-import { AddSkillResponse, ResponseProfile } from './dto/responses.dto';
+import {
+  AddSkillResponse,
+  ResponsePaginationProfile,
+  ResponseProfile,
+} from './dto/responses.dto';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
 
@@ -40,19 +44,7 @@ export class ProfilesController {
   @Get()
   @ApiOkResponse({
     description: 'Returns an array of ALL profiles',
-    type: [ResponseProfile],
-  })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
-
-  // ...
-  @ApiTags('profile')
-  @Auth(UserRole.GRADUATE)
-  @Get()
-  @ApiOkResponse({
-    description: 'Returns an array of ALL profiles',
-    type: [ResponseProfile],
+    type: ResponsePaginationProfile,
   })
   @ApiException(() => InternalServerErrorException, {
     description: INTERNAL_SERVER_ERROR,
@@ -67,7 +59,7 @@ export class ProfilesController {
   ) {
     limit = limit > 100 ? 100 : limit;
 
-    return this.profilesService.findAll({
+    return this.profilesService.findAllPaginate({
       page,
       limit,
       random,
