@@ -27,7 +27,11 @@ import {
   PROFILE_SUCCESFULLY_UPDATED,
 } from './messages';
 import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator';
-import { AddSkillResponse, ResponseProfile } from './dto/responses.dto';
+import {
+  AddSkillResponse,
+  ResponsePaginationProfile,
+  ResponseProfile,
+} from './dto/responses.dto';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
 
@@ -40,19 +44,7 @@ export class ProfilesController {
   @Get()
   @ApiOkResponse({
     description: 'Returns an array of ALL profiles',
-    type: [ResponseProfile],
-  })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
-
-  // ...
-  @ApiTags('profile')
-  @Auth(UserRole.GRADUATE)
-  @Get()
-  @ApiOkResponse({
-    description: 'Returns an array of ALL profiles',
-    type: [ResponseProfile],
+    type: ResponsePaginationProfile,
   })
   @ApiException(() => InternalServerErrorException, {
     description: INTERNAL_SERVER_ERROR,
