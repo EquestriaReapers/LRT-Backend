@@ -1,22 +1,18 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Profile } from "./profile.entity";
+import { ApiProperty } from '@nestjs/swagger';
+import { TypeContact } from 'src/constants/enum/contact/contact';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class ContactMethod {
   @ApiProperty()
-  @PrimaryGeneratedColumn('increment')
+  @PrimaryColumn()
   id: number;
 
   @ApiProperty()
-  @Column()
-  type: string;
+  @Column({ type: 'enum', enum: TypeContact })
+  type: TypeContact;
 
   @ApiProperty()
   @Column()
   value: string;
-
-  @ApiProperty({ type: () => Profile })
-  @ManyToOne(() => Profile, profile => profile.contactMethods)
-  profile: Profile;
 }

@@ -67,7 +67,7 @@ export class Profile {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @ApiProperty({ type: () => [ContactMethod] })
-  @OneToMany(() => ContactMethod, contactMethod => contactMethod.profile, { cascade: true })
+  @ApiProperty({ type: () => ContactMethod, isArray: true })
+  @Column({ type: 'jsonb', nullable: true, default: () => "'[]'" })
   contactMethods: ContactMethod[];
 }

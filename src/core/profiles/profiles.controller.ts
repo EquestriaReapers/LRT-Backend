@@ -14,7 +14,12 @@ import {
 } from '@nestjs/common';
 import { ProfilesService } from './service/profiles.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { ApiOkResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { UserRole } from '../../constants';
 import { ActiveUser } from '../../common/decorator/active-user-decorator';
@@ -25,17 +30,22 @@ import { MessageDTO } from 'src/common/dto/response.dto';
 import * as express from 'express';
 import {
   PROFILE_SUCCESFULLY_DELETED_SKILL,
+  PROFILE_SUCCESFULLY_DELETE_METHOD_CONTACT,
   PROFILE_SUCCESFULLY_UPDATED,
 } from './messages';
 import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator';
-import { AddSkillResponse, ResponseProfile } from './dto/responses.dto';
+import {
+  AddSkillResponse,
+  ResponseMethodContactDTO,
+  ResponseProfile,
+} from './dto/responses.dto';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
 import { CreateContactDto } from './dto/createContact.dto';
 
 @Controller('profiles')
 export class ProfilesController {
-  constructor(private readonly profilesService: ProfilesService) { }
+  constructor(private readonly profilesService: ProfilesService) {}
 
   @ApiTags('profile')
   @Auth(UserRole.GRADUATE)
@@ -211,6 +221,10 @@ export class ProfilesController {
 
   @ApiTags('profile')
   @Auth(UserRole.GRADUATE)
+  @ApiCreatedResponse({
+    description: 'Add contact method to my profile',
+    type: ResponseMethodContactDTO,
+  })
   @Post('/my-profile/contact-methods')
   async addContactMethod(
     @ActiveUser() user: UserActiveInterface,
@@ -228,8 +242,20 @@ export class ProfilesController {
 
   @ApiTags('profile')
   @Auth(UserRole.GRADUATE)
-  @Delete('contact-methods/:id')
-  async deleteContactMethod(@Param('id', ParseIntPipe) id: number) {
-    return this.profilesService.deleteContactMethod(id);
+  @ApiOkResponse({
+    description: 'Delete contact method from my profile',
+    type: MessageDTO,
+  })
+  @Delete('/my-profile/contact-methods/:id')
+  async deleteContactMethod(
+    @Param('id', ParseIntPipe) id: number,
+    @ActiveUser() user: UserActiveInterface,
+    @Response() response: express.Response,
+  ) {
+    await this.profilesService.removeContactMethod(id, user);
+
+    return response.status(200).json({
+      message: PROFILE_SUCCESFULLY_DELETE_METHOD_CONTACT,
+    });
   }
 }

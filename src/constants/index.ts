@@ -1,5 +1,6 @@
 export { CORS } from './cors/cors';
-export { UserRole } from './roles/roles';
+export { UserRole } from './enum/roles/roles';
+export { TypeContact } from './enum/contact/contact';
 export { transporter } from './nodemailer/email-constants';
 /* export { multerOptions } from './multer/storage';
  */
