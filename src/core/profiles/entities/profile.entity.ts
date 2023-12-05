@@ -38,15 +38,21 @@ export class Profile {
   user: User;
 
   @ApiProperty()
-  @Column()
+  @Column({
+    nullable: true,
+  })
   description: string;
 
   @ApiProperty()
-  @Column()
+  @Column({
+    nullable: true,
+  })
   mainTitle: string;
 
   @ApiProperty()
-  @Column()
+  @Column({
+    nullable: true,
+  })
   countryResidence: string;
 
   @ApiProperty({

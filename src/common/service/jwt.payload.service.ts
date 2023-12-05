@@ -1,6 +1,8 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from '../../core/auth/interface/jwt-payload.interface';
+import e from 'express';
+import { ERROR_ON_DECODE_JWT_CODE_MESSAGE } from 'src/core/auth/message';
 
 @Injectable()
 export class JwtPayloadService {
@@ -17,7 +19,7 @@ export class JwtPayloadService {
       jwt = this.jwtService.sign(data);
     } catch (error) {
       throw new HttpException(
-        'Internal Server error',
+        ERROR_ON_DECODE_JWT_CODE_MESSAGE,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

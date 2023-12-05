@@ -5,7 +5,6 @@ import {
   Body,
   Param,
   Response,
-  InternalServerErrorException,
   BadRequestException,
   UnauthorizedException,
   ForbiddenException,
@@ -20,12 +19,12 @@ import {
   SuccessfullyLoginDTO,
   SuccessfullyRegisterDTO,
 } from './dto/responses.dto';
-import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { MessageDTO } from 'src/common/dto/response.dto';
 import {
   INVALID_TOKEN_EMAIL_MESSAGE,
   SUCCESSFULY_VERIFIED_EMAIL_MESSAGE,
 } from './message';
+import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
@@ -39,9 +38,7 @@ export class AuthController {
   @ApiException(() => BadRequestException, {
     description: 'User already exists',
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   async register(@Body() registerDto: RegisterDto) {
     const response = await this.authService.register(registerDto);
     await this.authService.createEmailToken(registerDto.email);
@@ -63,9 +60,7 @@ export class AuthController {
   @ApiException(() => UnauthorizedException, {
     description: 'Email or password incorrect',
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
@@ -78,9 +73,7 @@ export class AuthController {
   @ApiException(() => ForbiddenException, {
     description: 'user not found',
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   async sendEmailVerification(@Param('email') email: string) {
     await this.authService.createEmailToken(email);
     return await this.authService.sendEmailVerification(email);
@@ -95,9 +88,7 @@ export class AuthController {
   @ApiException(() => UnauthorizedException, {
     description: 'Token invalid',
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   async verifyEmail(
     @Param('token') token: string,
     @Response() response: express.Response,
