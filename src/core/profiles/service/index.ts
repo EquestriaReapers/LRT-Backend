@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { UserActiveInterface } from '../../../common/interface/user-active-interface';
 import { Skill } from '../../skills/entities/skill.entity';
 import { User } from '../../users/entities/user.entity';
-import { PROFILE_NOT_FOUND } from '../messages';
+import { ERROR_PROFILE_SKILL_NOT_FOUND, PROFILE_NOT_FOUND } from '../messages';
 import { USER_NOT_FOUND } from 'src/core/users/messages';
 import { SKILL_NOT_FOUND } from 'src/core/skills/messages';
 import FindAllPaginateAction from './find-all-paginate.action';
@@ -94,7 +94,7 @@ export default class ProfilesService {
     });
 
     if (!profile || !skill) {
-      throw new NotFoundException('Perfil o habilidades no se encuentra');
+      throw new NotFoundException(ERROR_PROFILE_SKILL_NOT_FOUND);
     }
 
     if (!profile.skills) {
