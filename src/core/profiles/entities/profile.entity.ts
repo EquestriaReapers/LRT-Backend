@@ -19,6 +19,7 @@ import {
   SkillData,
   UserProfileData,
 } from '../dto/responses.dto';
+import { Language } from 'src/languages/entities/language.entity';
 
 @Entity()
 export class Profile {
@@ -61,6 +62,10 @@ export class Profile {
   @ManyToMany(() => Skill, (skill) => skill.profiles)
   @JoinTable()
   skills: Skill[];
+
+  @ManyToMany(() => Language, (language) => language.profiles)
+  @JoinTable()
+  languages: Language[];
 
   @ApiProperty()
   @DeleteDateColumn()
