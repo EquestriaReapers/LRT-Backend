@@ -1,4 +1,4 @@
-import { DataSource, DataSourceOptions } from 'typeorm';
+import { DataSource, DataSourceOptions, createConnection } from 'typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 ConfigModule.forRoot({
@@ -16,9 +16,11 @@ export const DataSourceConfig: DataSourceOptions = {
   password: configService.get('DB_PASSWORD') as string,
   database: configService.get('DB_NAME') as string,
   entities: ['dist/**/*.entity.js'],
-  migrations: ['dist/../migrations/*{.ts,.js}'],
-  synchronize: true,
   migrationsRun: true,
+  migrationsTableName: 'migrations',
+  migrations: ['src/config/migrations/*.ts'],
+  subscribers: ['src/config/subscribers/**/*.js'],
+  synchronize: true,
   logging: false,
 };
 
