@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  InternalServerErrorException,
   NotFoundException,
   Response,
   Query,
@@ -18,7 +17,6 @@ import { Auth } from '../auth/decorators/auth.decorator';
 import { UserRole } from '../../constants';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator';
-import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { Skill } from './entities/skill.entity';
 import { MessageDTO } from 'src/common/dto/response.dto';
 import * as express from 'express';
@@ -26,6 +24,7 @@ import {
   SKILL_SUCCESFULLY_DELETED,
   SKILL_SUCCESFULLY_UPDATED,
 } from './messages';
+import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
 
 @Controller('skills')
 export class SkillsController {
@@ -38,9 +37,7 @@ export class SkillsController {
     description: 'Returns the created skill',
     type: Skill,
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   create(@Body() createSkillDto: CreateSkillDto) {
     return this.skillsService.create(createSkillDto);
   }
@@ -51,9 +48,7 @@ export class SkillsController {
     description: 'Returns an array of ALL skills',
     type: [Skill],
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   findAll(@Query('name') name: string) {
     return this.skillsService.findAll(name);
   }
@@ -64,9 +59,7 @@ export class SkillsController {
     description: 'Return one skill',
     type: Skill,
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   @ApiException(() => NotFoundException, {
     description: 'Skill not found',
   })
@@ -81,9 +74,7 @@ export class SkillsController {
     description: 'Update one skill successfully',
     type: MessageDTO,
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   @ApiException(() => NotFoundException, {
     description: 'Skill not found',
   })
@@ -106,9 +97,7 @@ export class SkillsController {
     description: 'Delete one skill successfully',
     type: MessageDTO,
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   @ApiException(() => NotFoundException, {
     description: 'Skill not found',
   })

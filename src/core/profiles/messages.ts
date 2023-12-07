@@ -4,7 +4,6 @@ export const MY_PROFILE_SUCCESFULLY_UPDATED =
   'Tu perfil se ha actualizado exitosamente!';
 export const PROFILE_SUCCESFULLY_DELETED_SKILL =
   'Skill eliminado de tu perfil exitosamente';
-export const PROFILE_SUCCESFULLY_ADDED_SKILL = 'Skill agregado exitosamente';
-export const PROFILE_SUCCESFULLY_DELETED = 'Perfil eliminado exitosamente';
+export const ERROR_PROFILE_SKILL_NOT_FOUND = 'Perfil o skill no se encontraron';
 export const PROFILE_SUCCESFULLY_DELETE_METHOD_CONTACT =
-  'Método de contacto eliminado exitosamente';
+  'Contacto eliminado con exito';

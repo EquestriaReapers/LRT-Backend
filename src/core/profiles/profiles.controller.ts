@@ -12,7 +12,7 @@ import {
   Query,
   ParseIntPipe,
 } from '@nestjs/common';
-import { ProfilesService } from './service/profiles.service';
+import ProfilesService from './service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import {
   ApiCreatedResponse,
@@ -37,10 +37,11 @@ import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator
 import {
   AddSkillResponse,
   ResponseMethodContactDTO,
-  ResponseProfile,
+  ResponsePaginationProfile,
 } from './dto/responses.dto';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
+import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
 import { CreateContactDto } from './dto/createContact.dto';
 
 @Controller('profiles')
@@ -52,23 +53,9 @@ export class ProfilesController {
   @Get()
   @ApiOkResponse({
     description: 'Returns an array of ALL profiles',
-    type: [ResponseProfile],
+    type: ResponsePaginationProfile,
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
-
-  // ...
-  @ApiTags('profile')
-  @Auth(UserRole.GRADUATE)
-  @Get()
-  @ApiOkResponse({
-    description: 'Returns an array of ALL profiles',
-    type: [ResponseProfile],
-  })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'random', required: false })
@@ -79,7 +66,7 @@ export class ProfilesController {
   ) {
     limit = limit > 100 ? 100 : limit;
 
-    return this.profilesService.findAll({
+    return this.profilesService.findAllPaginate({
       page,
       limit,
       random,
@@ -89,9 +76,7 @@ export class ProfilesController {
   @ApiTags('profile')
   @Auth(UserRole.GRADUATE)
   @Get(':id')
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   @ApiResponse({
     status: 200,
     description: 'Return the profile',
@@ -117,9 +102,7 @@ export class ProfilesController {
   @ApiException(() => NotFoundException, {
     description: 'User not found',
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   async updateMyProfile(
     @Body() updateProfileDto: UpdateProfileDto,
     @ActiveUser() user: UserActiveInterface,
@@ -149,6 +132,7 @@ export class ProfilesController {
   @ApiException(() => NotFoundException, {
     description: 'Profile not found',
   })
+  @ApiInternalServerError()
   async update(
     @Param('userId') userId: number,
     @Body() updateProfileDto: UpdateProfileDto,
@@ -171,9 +155,7 @@ export class ProfilesController {
   @ApiException(() => NotFoundException, {
     description: 'Profile not found or skill not found',
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   addSkillProfile(
     @Body() addSkillDto: AddSkillDto,
     @ActiveUser() user: UserActiveInterface,
@@ -191,9 +173,7 @@ export class ProfilesController {
   @ApiException(() => NotFoundException, {
     description: 'Profile not found or skill not found',
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   async removeSkillProfile(
     @Param('skillId') skillId: number,
     @ActiveUser() user: UserActiveInterface,
@@ -209,9 +189,7 @@ export class ProfilesController {
   @ApiTags('admin-profile')
   @Auth(UserRole.ADMIN)
   @Delete(':id')
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   @ApiException(() => NotFoundException, {
     description: 'Profile not found',
   })
