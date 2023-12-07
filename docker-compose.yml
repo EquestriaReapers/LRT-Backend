@@ -1,25 +1,29 @@
-version: "3.8"
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: mysql_db1
+  db:
+    image: postgres
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: db_equestria
-      MYSQL_USER: user_equestria
-      MYSQL_PASSWORD: root
+      - POSTGRES_PASSWORD=postgres
+    container_name: postgres
     volumes:
-      - ./mysql:/var/lib/mysql
+      - local_pgdata:/var/lib/postgresql/data
     ports:
-      - "3307:3306" 
-    
-  phpmyadmin:
-    image: phpmyadmin
+      - '5433:5432'
+
+  pgadmin:
+    image: dpage/pgadmin4
     restart: always
-    ports:
-      - 8080:80
+    container_name: nest-pgadmin4
     environment:
-      - PMA_HOST=mysql
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=pgadmin4
+    ports:
+      - '5050:80'
     depends_on:
-      - mysql
+      - db
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+volumes:
+  local_pgdata:
+  pgadmin-data:

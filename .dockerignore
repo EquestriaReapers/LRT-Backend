@@ -1,0 +1,13 @@
+# Ignora archivos y carpetas que no deseas copiar al contenedor
+
+# Node.js
+node_modules
+npm-debug.log
+dist
+
+# Editor-specific
+.vscode/
+.idea/
+
+# Dependencias de desarrollo (puedes personalizar esta lista)
+package-lock.json
