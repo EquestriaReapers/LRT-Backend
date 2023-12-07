@@ -26,6 +26,7 @@ import { USER_NOT_FOUND } from 'src/core/users/messages';
 import {
   INVALID_TOKEN_EMAIL_MESSAGE,
   SUCCESSFULY_SEND_EMAIL_VERIFICATION_MESSAGE,
+  UNAUTHROIZED_BAD_REQUEST_MESSAGE,
   USER_ALREADY_EXISTS_MESSAGE,
 } from '../message';
 
@@ -66,17 +67,17 @@ export class AuthService {
   async login({ email, password }: LoginDto) {
     const user = await this.usersService.findByEmailWithPassword(email);
     if (!user) {
-      throw new UnauthorizedException('Correo incorrecto');
+      throw new UnauthorizedException(UNAUTHROIZED_BAD_REQUEST_MESSAGE);
     }
 
     const isPasswordValid = await bcryptjs.compare(password, user.password);
 
     if (!user.verified) {
-      throw new UnauthorizedException('Correo no verificado');
+      throw new UnauthorizedException(UNAUTHROIZED_BAD_REQUEST_MESSAGE);
     }
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Contraseña incorrecta');
+      throw new UnauthorizedException(UNAUTHROIZED_BAD_REQUEST_MESSAGE);
     }
 
     const payload = { email: user.email, id: user.id, role: user.role };
@@ -97,12 +98,12 @@ export class AuthService {
       where: { email: email },
     });
 
-    const SOME_TIME = Math.floor(Math.random() * 9000000) + 1000000; // 000 days
+    const RANDOM_NUMBER = Math.floor(Math.random() * 9000000) + 1000000;
 
     if (!emailVerification) {
       const emailVerificationToken = await this.emailVerification.save({
         email,
-        emailToken: SOME_TIME.toString(),
+        emailToken: RANDOM_NUMBER.toString(),
         timestamp: new Date(),
       });
       return emailVerificationToken;

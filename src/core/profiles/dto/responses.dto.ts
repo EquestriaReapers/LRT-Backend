@@ -108,6 +108,13 @@ export class ResponseProfile {
 
   @ApiProperty()
   deletedAt: Date;
+}
+
+export class ResponsePaginationProfile {
+  @ApiProperty({
+    type: Profile,
+  })
+  profiles: ResponseProfile[];
 
   @ApiProperty({
     type: PaginationMessage,

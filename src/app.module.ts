@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { DataSourceConfig } from './config/datasource';
@@ -31,6 +30,6 @@ import { LanguagesModule } from './languages/languages.module';
     LanguagesModule,
   ],
   controllers: [AppController, UsersController],
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule {}

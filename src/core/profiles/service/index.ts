@@ -6,15 +6,15 @@ import { Repository } from 'typeorm';
 import { UserActiveInterface } from '../../../common/interface/user-active-interface';
 import { Skill } from '../../skills/entities/skill.entity';
 import { User } from '../../users/entities/user.entity';
-import { PROFILE_NOT_FOUND } from '../messages';
-import { PaginationMessage } from '../../../common/interface/pagination-message.interface';
-import { AppService } from 'src/app.service';
-import { Console } from 'console';
+import { ERROR_PROFILE_SKILL_NOT_FOUND, PROFILE_NOT_FOUND } from '../messages';
 import { USER_NOT_FOUND } from 'src/core/users/messages';
 import { SKILL_NOT_FOUND } from 'src/core/skills/messages';
+import FindAllPaginateAction from './find-all-paginate.action';
+import { ResponsePaginationProfile } from '../dto/responses.dto';
+import { FindAllPayload } from '../dto/find-all-payload.interface';
 
 @Injectable()
-export class ProfilesService {
+export default class ProfilesService {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
@@ -24,95 +24,14 @@ export class ProfilesService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+
+    private readonly findAllPaginateAction: FindAllPaginateAction,
   ) {}
 
-  async findAll({ page, limit, random }) {
-    if (!page) {
-      page = 1;
-    }
-
-    if (!limit) {
-      limit = 10;
-    }
-
-    const skip = (page - 1) * limit;
-
-    if (!random) {
-      random = Math.random();
-    }
-
-    await this.profileRepository.query(
-      `SELECT 0
-    FROM (
-          SELECT setseed(${random})
-        ) AS randomization_seed;`,
-    );
-
-    const queryBuilder = await this.profileRepository.query(
-      `
-      SELECT "profile"."id" AS "profile_id", "profile"."userId" AS "profile_userId", "profile"."description" AS "profile_description", "profile"."mainTitle" AS "profile_mainTitle", "profile"."countryResidence" AS "profile_countryResidence", "profile"."deletedAt" AS "profile_deletedAt", "user"."id" AS "user_id", "user"."name" AS "user_name", "user"."lastname" AS "user_lastname", "user"."email" AS "user_email",
-      ARRAY(
-        SELECT DISTINCT ON ("experience"."id") json_build_object(
-          'id', "experience"."id",
-          'profileId', "experience"."profileId",
-          'businessName', "experience"."businessName",
-          'location', "experience"."location",
-          'role', "experience"."role",
-          'startDate', "experience"."startDate",
-          'endDate', "experience"."endDate"
-        )::text
-        FROM "experience"
-        WHERE "experience"."profileId" = "profile"."id"
-      ) AS "experiences",
-      ARRAY(
-        SELECT DISTINCT ON ("skills"."id") json_build_object(
-          'id', "skills"."id",
-          'name', "skills"."name"
-        )::text
-        FROM "profile_skills_skill" "profile_skills"
-        JOIN "skill" "skills" ON "skills"."id"="profile_skills"."skillId"
-        WHERE "profile_skills"."profileId" = "profile"."id"
-      ) AS "skills"
-      FROM "profile" "profile"
-      LEFT JOIN "user" "user" ON "user"."id"="profile"."userId" AND ("user"."deletedAt" IS NULL)
-      WHERE "profile"."deletedAt" IS NULL
-      GROUP BY "profile"."id", "user"."id"
-      ORDER BY RANDOM()
-      LIMIT ${limit} OFFSET ${skip}
-      `,
-    );
-
-    const formattedResult = queryBuilder.map((row) => ({
-      id: row.profile_id,
-      userId: row.profile_userId,
-      user: {
-        id: row.user_id,
-        name: row.user_name,
-        lastname: row.user_lastname,
-        email: row.user_email,
-      },
-      description: row.profile_description,
-      mainTitle: row.profile_mainTitle,
-      countryResidence: row.profile_countryResidence,
-      experience: row.experiences.map(JSON.parse),
-      skills: row.skills.map(JSON.parse),
-      deletedAt: row.profile_deletedAt,
-    }));
-
-    const totalCount = await this.profileRepository.count();
-
-    const pagination: PaginationMessage = {
-      itemCount: formattedResult.length,
-      totalItems: totalCount,
-      itemsPerPage: limit,
-      totalPages: Math.ceil(totalCount / limit),
-      currentPage: page,
-      randomSeed: random,
-    };
-
-    const response = { profiles: formattedResult, pagination };
-
-    return response;
+  async findAllPaginate(
+    opt: FindAllPayload,
+  ): Promise<ResponsePaginationProfile> {
+    return await this.findAllPaginateAction.execute(opt);
   }
 
   async findOne(id: number) {
@@ -175,7 +94,7 @@ export class ProfilesService {
     });
 
     if (!profile || !skill) {
-      throw new NotFoundException('Perfil o habilidades no se encuentra');
+      throw new NotFoundException(ERROR_PROFILE_SKILL_NOT_FOUND);
     }
 
     if (!profile.skills) {

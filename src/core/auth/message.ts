@@ -7,3 +7,6 @@ export const SUCCESSFULY_SEND_EMAIL_VERIFICATION_MESSAGE =
   'Correo enviado con exito';
 export const NO_TOKEN_PROVIDED_MESSAGE = 'No proporciono un token';
 export const INVALID_TOKEN = 'Token invalido';
+export const UNAUTHROIZED_BAD_REQUEST_MESSAGE =
+  'Correo o contraseña incorrecta';
+export const ERROR_ON_DECODE_JWT_CODE_MESSAGE = 'Error al decodificar el token';

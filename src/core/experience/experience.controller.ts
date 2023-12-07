@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  InternalServerErrorException,
   NotFoundException,
   Response,
 } from '@nestjs/common';
@@ -27,7 +26,7 @@ import {
   EXPERIENCE_SUCCESFULLY_DELETED,
   EXPERIENCE_SUCCESFULLY_UPDATED,
 } from './messages';
-import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
+import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
 
 @Controller('experience')
 export class ExperienceController {
@@ -39,9 +38,7 @@ export class ExperienceController {
     description: 'Returns an array of ALL experiences',
     type: [ExperienceCreateResponse],
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   findAll() {
     return this.experienceService.findAll();
   }
@@ -52,9 +49,7 @@ export class ExperienceController {
     description: 'Return one experience',
     type: ExperienceCreateResponse,
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   @ApiException(() => NotFoundException, {
     description: 'Experience not found',
   })
@@ -68,9 +63,7 @@ export class ExperienceController {
     description: 'Return one experience',
     type: Experience,
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   createMyExperiencia(
     @Body() createExperienceDto: ExperienceCreateResponseDTO,
     @ActiveUser() user: UserActiveInterface,
@@ -84,9 +77,7 @@ export class ExperienceController {
     description: 'Return one experience',
     type: Experience,
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   create(@Body() createExperienceDto: ExperienceCreateResponseDTO) {
     return this.experienceService.create(createExperienceDto);
   }
@@ -100,9 +91,7 @@ export class ExperienceController {
   @ApiException(() => NotFoundException, {
     description: 'Experience not found',
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   async updateMyExperiencia(
     @Param('id') id: number,
     @Body() updateExperienceDto: UpdateExperienceDto,
@@ -129,9 +118,7 @@ export class ExperienceController {
   @ApiException(() => NotFoundException, {
     description: 'Experience not found',
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   async update(
     @Param('id') id: number,
     @Body() updateExperienceDto: UpdateExperienceDto,
@@ -154,9 +141,7 @@ export class ExperienceController {
   @ApiException(() => NotFoundException, {
     description: 'Experience not found',
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   async remove(
     @Param('id') id: string,
     @Response() response: express.Response,

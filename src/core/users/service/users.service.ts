@@ -30,19 +30,18 @@ export class UsersService {
       where: { email: createUserDto.email },
     });
 
-    const perfil = await this.profileRepository.create({
+    const profile = await this.profileRepository.save({
       userId: _user.id,
-      description: 'default',
-      mainTitle: 'default',
-      countryResidence: 'default',
+      description: null,
+      mainTitle: null,
+      countryResidence: null,
     });
-    await this.profileRepository.save(perfil);
 
     const token = await this.jwtPayloadService.createJwtPayload(user);
 
     const response = {
       user: _user,
-      perfil,
+      profile,
       token,
     };
 
@@ -67,7 +66,7 @@ export class UsersService {
     return await this.userRepository.findOneBy({ email });
   }
 
-  async findByEmailWithPassword(email: string) {
+  async findByEmailWithPassword(email: string): Promise<User> {
     return await this.userRepository.findOne({
       where: { email },
       select: [
