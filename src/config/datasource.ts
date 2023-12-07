@@ -18,8 +18,8 @@ export const DataSourceConfig: DataSourceOptions = {
   entities: ['dist/**/*.entity.js'],
   migrationsRun: true,
   migrationsTableName: 'migrations',
-  migrations: ['src/config/migrations/*.ts'],
-  subscribers: ['src/config/subscribers/**/*.js'],
+  migrations: ['dist/config/migrations/*.ts'],
+  subscribers: ['dist/config/subscribers/**/*.js'],
   synchronize: true,
   logging: false,
 };
