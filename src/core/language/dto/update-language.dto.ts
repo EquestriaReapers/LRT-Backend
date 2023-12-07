@@ -7,9 +7,4 @@ export class UpdateLanguageDto extends PartialType(CreateLanguageDto) {
   @ApiProperty({ example: 'Mandarin' })
   @IsOptional()
   name: string;
-
-  @ApiProperty({ example: '10' })
-  @IsNumber()
-  @IsNotEmpty()
-  level: number;
 }

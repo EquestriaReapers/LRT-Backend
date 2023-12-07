@@ -15,11 +15,10 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import {
   ExperienceData,
-  PaginationMessage,
   SkillData,
   UserProfileData,
 } from '../dto/responses.dto';
-import { Language } from 'src/languages/entities/language.entity';
+import { LanguageProfile } from './language-profile.entity';
 
 @Entity()
 export class Profile {
@@ -69,9 +68,11 @@ export class Profile {
   @JoinTable()
   skills: Skill[];
 
-  @ManyToMany(() => Language, (language) => language.profiles)
-  @JoinTable()
-  languages: Language[];
+  @OneToMany(
+    () => LanguageProfile,
+    (languageProfile) => languageProfile.profile,
+  )
+  languageProfile: LanguageProfile[];
 
   @ApiProperty()
   @DeleteDateColumn()

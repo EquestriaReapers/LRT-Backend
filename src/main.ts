@@ -48,6 +48,7 @@ async function bootstrap() {
     .addTag('profile')
     .addTag('experience')
     .addTag('skill')
+    .addTag('admin-language')
     .build();
 
   const document = SwaggerModule.createDocument(app, config); // Documentación

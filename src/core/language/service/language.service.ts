@@ -2,16 +2,16 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateLanguageDto } from '../dto/create-language.dto';
 import { UpdateLanguageDto } from '../dto/update-language.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Language } from '../entities/language.entity';
 import { Repository } from 'typeorm';
+import { Language } from '../entities/language.entity';
 import { LANGUAGE_NOT_FOUND } from '../messages';
 
 @Injectable()
-export class LanguagesService {
+export class LanguageService {
   constructor(
     @InjectRepository(Language)
     private readonly languageRepository: Repository<Language>,
-  ) { }
+  ) {}
 
   async create(createLanguageDto: CreateLanguageDto): Promise<Language> {
     const language = this.languageRepository.create(createLanguageDto);
@@ -31,7 +31,10 @@ export class LanguagesService {
     return language;
   }
 
-  async update(id: number, updateLanguageDto: UpdateLanguageDto): Promise<Language> {
+  async update(
+    id: number,
+    updateLanguageDto: UpdateLanguageDto,
+  ): Promise<Language> {
     const language = await this.languageRepository.preload({
       id,
       ...updateLanguageDto,

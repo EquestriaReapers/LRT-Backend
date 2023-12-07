@@ -10,7 +10,7 @@ import { ServeStaticModule } from '@nestjs/serve-static/dist/serve-static.module
 import { AuthModule } from './core/auth/auth.module';
 import { ExperienceModule } from './core/experience/experience.module';
 import { SkillsModule } from './core/skills/skills.module';
-import { LanguagesModule } from './languages/languages.module';
+import { LanguageModule } from './core/language/language.module';
 
 @Module({
   imports: [
@@ -27,7 +27,7 @@ import { LanguagesModule } from './languages/languages.module';
     AuthModule,
     ExperienceModule,
     SkillsModule,
-    LanguagesModule,
+    LanguageModule,
   ],
   controllers: [AppController, UsersController],
   providers: [],

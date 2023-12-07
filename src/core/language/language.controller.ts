@@ -1,18 +1,29 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, InternalServerErrorException, NotFoundException, ParseIntPipe } from '@nestjs/common';
-import { LanguagesService } from './service/languages.service';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  NotFoundException,
+  ParseIntPipe,
+} from '@nestjs/common';
+import { LanguageService } from './service/language.service';
 import { CreateLanguageDto } from './dto/create-language.dto';
 import { UpdateLanguageDto } from './dto/update-language.dto';
+import { Auth } from '../auth/decorators/auth.decorator';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { Auth } from 'src/core/auth/decorators/auth.decorator';
-import { UserRole } from 'src/constants';
 import { Language } from './entities/language.entity';
+import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
 import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator';
-import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { MessageDTO } from 'src/common/dto/response.dto';
+import { UserRole } from 'src/constants';
 
-@Controller('languages')
-export class LanguagesController {
-  constructor(private readonly languagesService: LanguagesService) { }
+@ApiTags('admin-language')
+@Controller('language')
+export class LanguageController {
+  constructor(private readonly languageService: LanguageService) {}
 
   @Post()
   @Auth(UserRole.ADMIN)
@@ -20,11 +31,9 @@ export class LanguagesController {
     description: 'Create a new language successfully',
     type: Language,
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   create(@Body() createLanguageDto: CreateLanguageDto) {
-    return this.languagesService.create(createLanguageDto);
+    return this.languageService.create(createLanguageDto);
   }
 
   @Get()
@@ -33,11 +42,9 @@ export class LanguagesController {
     description: 'Returns an array of ALL languages',
     type: [Language],
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   findAll() {
-    return this.languagesService.findAll();
+    return this.languageService.findAll();
   }
 
   @Get(':id')
@@ -46,14 +53,12 @@ export class LanguagesController {
     description: 'Return one language',
     type: Language,
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
   @ApiException(() => NotFoundException, {
     description: 'Language not found',
   })
+  @ApiInternalServerError()
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.languagesService.findOne(id);
+    return this.languageService.findOne(id);
   }
 
   @Patch(':id')
@@ -62,14 +67,15 @@ export class LanguagesController {
     description: 'Update one language successfully',
     type: MessageDTO,
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   @ApiException(() => NotFoundException, {
     description: 'Language not found',
   })
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateLanguageDto: UpdateLanguageDto) {
-    return this.languagesService.update(id, updateLanguageDto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateLanguageDto: UpdateLanguageDto,
+  ) {
+    return this.languageService.update(id, updateLanguageDto);
   }
 
   @Delete(':id')
@@ -78,14 +84,11 @@ export class LanguagesController {
     description: 'Delete one language successfully',
     type: MessageDTO,
   })
-  @ApiException(() => InternalServerErrorException, {
-    description: INTERNAL_SERVER_ERROR,
-  })
+  @ApiInternalServerError()
   @ApiException(() => NotFoundException, {
     description: 'Language not found',
   })
   remove(@Param('id', ParseIntPipe) id: number) {
-    return this.languagesService.remove(id);
+    return this.languageService.remove(id);
   }
 }
-
