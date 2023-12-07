@@ -3,6 +3,7 @@ import { Profile } from '../entities/profile.entity';
 import { Skill } from 'src/core/skills/entities/skill.entity';
 import { Experience } from 'src/core/experience/entities/experience.entity';
 import { User } from 'src/core/users/entities/user.entity';
+import { ProfileI } from '../entities/profile.interface';
 
 export class UserProfileData {
   @ApiProperty()
@@ -120,4 +121,49 @@ export class ResponsePaginationProfile {
     type: PaginationMessage,
   })
   pagination: PaginationMessage;
+}
+
+export class ProfileData {
+  @ApiProperty()
+  id: number;
+  @ApiProperty()
+  userId: number;
+  @ApiProperty()
+  description: string;
+  @ApiProperty()
+  mainTitle: string;
+  @ApiProperty()
+  countryResidence: string;
+  @ApiProperty()
+  deletedAt: Date;
+  @ApiProperty({
+    type: [ExperienceData],
+  })
+  experience: Experience[];
+  @ApiProperty({
+    type: [SkillData],
+  })
+  skills: Skill[];
+}
+
+export class MethodContact {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  type: string;
+
+  @ApiProperty()
+  value: string;
+}
+
+export class ResponseMethodContactDTO {
+  @ApiProperty({
+    type: ProfileData,
+  })
+  profile: ProfileData;
+  @ApiProperty({
+    type: [MethodContact],
+  })
+  contactMethods: MethodContact[];
 }
