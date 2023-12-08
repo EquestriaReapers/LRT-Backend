@@ -15,3 +15,5 @@ export const ERROR_EXIST_LANGUAGE_IN_PROFILE =
   'Este idioma ya esta registrado en el perfil';
 export const ERROR_NOT_FOUND_LANGUAGE_IN_PROFILE =
   'Idioma no encontrado en el perfil';
+export const ERROR_UNKOWN_GENERATING_PDF =
+  'Error desconocido al generar el PDF';

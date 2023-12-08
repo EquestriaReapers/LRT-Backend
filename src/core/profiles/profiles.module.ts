@@ -9,6 +9,7 @@ import { LanguageProfile } from './entities/language-profile.entity';
 import LanguageAction from './service/language.action';
 import { Language } from '../language/entities/language.entity';
 import { LanguageModule } from '../language/language.module';
+import ExportPDFProfileAction from './service/export-pdf.action';
 
 @Module({
   imports: [
@@ -17,7 +18,12 @@ import { LanguageModule } from '../language/language.module';
     TypeOrmModule.forFeature([Skill, LanguageProfile, Language]),
   ],
   controllers: [ProfilesController],
-  providers: [ProfilesService, FindAllPaginateAction, LanguageAction],
+  providers: [
+    ProfilesService,
+    FindAllPaginateAction,
+    LanguageAction,
+    ExportPDFProfileAction,
+  ],
   exports: [ProfilesService],
 })
 export class ProfilesModule {}

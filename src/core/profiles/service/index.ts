@@ -14,6 +14,8 @@ import { ResponsePaginationProfile } from '../dto/responses.dto';
 import { FindAllPayload } from '../dto/find-all-payload.interface';
 import { ContactMethod } from '../entities/contact-method.entity';
 import { CreateContactDto } from '../dto/createContact.dto';
+import ProfileExportPDFAction from './export-pdf.action';
+import { Buffer } from 'buffer';
 
 @Injectable()
 export default class ProfilesService {
@@ -28,12 +30,17 @@ export default class ProfilesService {
     private readonly userRepository: Repository<User>,
 
     private readonly findAllPaginateAction: FindAllPaginateAction,
+    private readonly exportPdfProfileAction: ProfileExportPDFAction,
   ) {}
 
   async findAllPaginate(
     opt: FindAllPayload,
   ): Promise<ResponsePaginationProfile> {
     return await this.findAllPaginateAction.execute(opt);
+  }
+
+  async exportPdf(): Promise<Buffer> {
+    return await this.exportPdfProfileAction.execute();
   }
 
   async findOne(id: number) {

@@ -11,6 +11,7 @@ import {
   InternalServerErrorException,
   Query,
   ParseIntPipe,
+  Res,
 } from '@nestjs/common';
 import ProfilesService from './service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -29,6 +30,7 @@ import { MessageDTO } from 'src/common/dto/response.dto';
 import * as express from 'express';
 import {
   PROFILE_SUCCESFULLY_DELETED_LANGUAGE,
+  ERROR_UNKOWN_GENERATING_PDF,
   PROFILE_SUCCESFULLY_DELETED_SKILL,
   PROFILE_SUCCESFULLY_DELETE_METHOD_CONTACT,
   PROFILE_SUCCESFULLY_UPDATED,
@@ -56,6 +58,30 @@ export class ProfilesController {
   ) {}
 
   @ApiTags('profile')
+  @Get('export-pdf')
+  @ApiInternalServerError()
+  async generatePdf(@Res() res) {
+    const buffer = await this.profilesService.exportPdf();
+
+    if (!buffer) {
+      throw new InternalServerErrorException(ERROR_UNKOWN_GENERATING_PDF);
+    }
+
+    res.set({
+      // pdf
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename=profile.pdf`,
+      'Content-Length': buffer.length,
+      // prevent cache
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Pragma: 'no-cache',
+      Expires: 0,
+    });
+    res.end(buffer);
+  }
+
+  @ApiTags('profile')
+  @Auth(UserRole.GRADUATE)
   @Get()
   @ApiOkResponse({
     description: 'Returns an array of ALL profiles',
