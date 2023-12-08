@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { LanguageProfile } from 'src/core/profiles/entities/language-profile.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Language {
@@ -12,8 +12,7 @@ export class Language {
   @Column()
   name: string;
 
-  @ApiProperty()
-  @ManyToOne(
+  @OneToMany(
     () => LanguageProfile,
     (languageProfile) => languageProfile.language,
   )

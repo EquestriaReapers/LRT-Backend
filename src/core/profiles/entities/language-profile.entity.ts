@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Profile } from './profile.entity';
 import { Language } from 'src/core/language/entities/language.entity';
 
@@ -21,11 +27,9 @@ export class LanguageProfile {
   @Column()
   level: string;
 
-  @ApiProperty()
-  @OneToMany(() => Profile, (profile) => profile.languageProfile)
+  @ManyToOne(() => Profile, (profile) => profile.languageProfile)
   profile: Profile;
 
-  @ApiProperty()
-  @OneToMany(() => Language, (language) => language.languageProfile)
+  @ManyToOne(() => Language, (language) => language.languageProfile)
   language: Language;
 }

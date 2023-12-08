@@ -15,6 +15,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import {
   ExperienceData,
+  LanguageProfileData,
   SkillData,
   UserProfileData,
 } from '../dto/responses.dto';
@@ -68,6 +69,9 @@ export class Profile {
   @JoinTable()
   skills: Skill[];
 
+  @ApiProperty({
+    type: [LanguageProfileData],
+  })
   @OneToMany(
     () => LanguageProfile,
     (languageProfile) => languageProfile.profile,
