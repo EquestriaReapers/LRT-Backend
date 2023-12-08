@@ -10,6 +10,7 @@ import {
   Response,
   InternalServerErrorException,
   Query,
+  Res,
 } from '@nestjs/common';
 import ProfilesService from './service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -23,6 +24,7 @@ import { Profile } from './entities/profile.entity';
 import { MessageDTO } from 'src/common/dto/response.dto';
 import * as express from 'express';
 import {
+  ERROR_UNKOWN_GENERATING_PDF,
   PROFILE_SUCCESFULLY_DELETED_SKILL,
   PROFILE_SUCCESFULLY_UPDATED,
 } from './messages';
@@ -38,6 +40,29 @@ import { ApiInternalServerError } from 'src/common/decorator/internal-server-err
 @Controller('profiles')
 export class ProfilesController {
   constructor(private readonly profilesService: ProfilesService) {}
+
+  @ApiTags('profile')
+  @Get('export-pdf')
+  @ApiInternalServerError()
+  async generatePdf(@Res() res) {
+    const buffer = await this.profilesService.exportPdf();
+
+    if (!buffer) {
+      throw new InternalServerErrorException(ERROR_UNKOWN_GENERATING_PDF);
+    }
+
+    res.set({
+      // pdf
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename=profile.pdf`,
+      'Content-Length': buffer.length,
+      // prevent cache
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Pragma: 'no-cache',
+      Expires: 0,
+    });
+    res.end(buffer);
+  }
 
   @ApiTags('profile')
   @Auth(UserRole.GRADUATE)

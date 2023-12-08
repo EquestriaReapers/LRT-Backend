@@ -5,11 +5,12 @@ import { UsersModule } from '../users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Skill } from '../skills/entities/skill.entity';
 import FindAllPaginateAction from './service/find-all-paginate.action';
+import ExportPDFProfileAction from './service/export-pdf.action';
 
 @Module({
   imports: [UsersModule, TypeOrmModule.forFeature([Skill])],
   controllers: [ProfilesController],
-  providers: [ProfilesService, FindAllPaginateAction],
+  providers: [ProfilesService, FindAllPaginateAction, ExportPDFProfileAction],
   exports: [ProfilesService],
 })
 export class ProfilesModule {}
