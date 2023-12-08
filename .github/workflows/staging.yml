@@ -24,6 +24,8 @@ jobs:
               git pull
               npm install
               npm run build
+              npm run typeorm migration:generate
+              npm run typeorm migration:run
               pm2 restart ucab-profile
               pm2 save   
               echo 'Repository cloned successfully to digital ocean'
@@ -34,6 +36,8 @@ jobs:
               git pull
               npm install
               npm run build
+              npm run typeorm migration:generate
+              npm run typeorm migration:run
               pm2 restart ucab-profile
               pm2 save
               echo 'Repository already exists previously, pulling changes'
