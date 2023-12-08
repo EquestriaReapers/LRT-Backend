@@ -14,7 +14,13 @@ import { Transform } from 'class-transformer';
 export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty({ example: 'John' })
   @IsOptional()
+  @IsString()
   name: string;
+
+  @ApiProperty({ example: 'V30109748' })
+  @IsOptional()
+  @IsString()
+  document: string;
 
   @ApiProperty({ example: 'Winchester' })
   @IsOptional()

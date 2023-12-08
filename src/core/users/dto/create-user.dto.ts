@@ -17,8 +17,13 @@ export class CreateUserDto {
   @IsString()
   name: string;
 
+  @ApiProperty({ example: 'V30109748' })
+  @IsString()
+  @IsNotEmpty()
+  document: string;
+
   @ApiProperty({ example: 'Winchester' })
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   lastname: string;
 

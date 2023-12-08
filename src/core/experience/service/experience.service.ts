@@ -72,6 +72,22 @@ export class ExperienceService {
     return;
   }
 
+  async removeMyExperience(
+    id: number,
+    user: UserActiveInterface,
+  ): Promise<void> {
+    const experience = await this.experienceRepository.softDelete({
+      profileId: user.id,
+      id,
+    });
+
+    if (!experience) {
+      throw new NotFoundException(EXPERIENCE_NOT_FOUND);
+    }
+
+    return;
+  }
+
   async update(
     id: number,
     updateExperienciaDto: UpdateExperienceDto,

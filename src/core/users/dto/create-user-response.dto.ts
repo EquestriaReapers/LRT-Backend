@@ -11,6 +11,9 @@ export class UserData {
   name: string;
 
   @ApiProperty()
+  document: string;
+
+  @ApiProperty()
   lastname: string;
 
   @ApiProperty()
