@@ -108,6 +108,30 @@ export class ExperienceController {
       message: EXPERIENCE_SUCCESFULLY_UPDATED,
     });
   }
+
+  @ApiTags('experience')
+  @Auth(UserRole.GRADUATE)
+  @Delete('/my-experience/:id')
+  @ApiOkResponse({
+    description: 'Delete my experience successfully',
+    type: MessageDTO,
+  })
+  @ApiException(() => NotFoundException, {
+    description: 'Experience not found',
+  })
+  @ApiInternalServerError()
+  async removeMyExperiencia(
+    @Param('id') id: number,
+    @ActiveUser() user: UserActiveInterface,
+    @Response() response: express.Response,
+  ) {
+    await this.experienceService.removeMyExperience(id, user);
+
+    return response.status(200).json({
+      message: EXPERIENCE_SUCCESFULLY_DELETED,
+    });
+  }
+
   @ApiTags('admin-experience')
   @Auth(UserRole.ADMIN)
   @Patch(':id')
