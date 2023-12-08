@@ -10,6 +10,7 @@
 .env.development.local
 uploads/**
 /src/config/migrations
+
 # Logs
 logs
 *.log
@@ -115,4 +116,3 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-.github/workflows/main.yml
