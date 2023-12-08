@@ -9,6 +9,8 @@
 .production.env
 .env.development.local
 uploads/**
+/src/config/migrations
+
 # Logs
 logs
 *.log

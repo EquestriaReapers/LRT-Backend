@@ -25,10 +25,10 @@ import { UserRole } from '../../constants';
 import { ActiveUser } from '../../common/decorator/active-user-decorator';
 import { UserActiveInterface } from '../../common/interface/user-active-interface';
 import { AddSkillDto } from './dto/add-skill.dto';
-import { Profile } from './entities/profile.entity';
 import { MessageDTO } from 'src/common/dto/response.dto';
 import * as express from 'express';
 import {
+  PROFILE_SUCCESFULLY_DELETED_LANGUAGE,
   PROFILE_SUCCESFULLY_DELETED_SKILL,
   PROFILE_SUCCESFULLY_DELETE_METHOD_CONTACT,
   PROFILE_SUCCESFULLY_UPDATED,
@@ -37,23 +37,29 @@ import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator
 import {
   AddSkillResponse,
   ResponseMethodContactDTO,
-  ResponsePaginationProfile,
+  ResponseProfileGet,
+  SwaggerResponsePagination,
 } from './dto/responses.dto';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
 import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
 import { CreateContactDto } from './dto/createContact.dto';
+import LanguageAction from './service/language.action';
+import { LanguageProfile } from './entities/language-profile.entity';
+import { AddLanguageDto } from './dto/add-language.dto';
 
 @Controller('profiles')
 export class ProfilesController {
-  constructor(private readonly profilesService: ProfilesService) {}
+  constructor(
+    private readonly profilesService: ProfilesService,
+    private readonly languageAction: LanguageAction,
+  ) {}
 
   @ApiTags('profile')
-  @Auth(UserRole.GRADUATE)
   @Get()
   @ApiOkResponse({
     description: 'Returns an array of ALL profiles',
-    type: ResponsePaginationProfile,
+    type: SwaggerResponsePagination,
   })
   @ApiInternalServerError()
   @ApiQuery({ name: 'page', required: false })
@@ -74,13 +80,12 @@ export class ProfilesController {
   }
 
   @ApiTags('profile')
-  @Auth(UserRole.GRADUATE)
   @Get(':id')
   @ApiInternalServerError()
   @ApiResponse({
     status: 200,
     description: 'Return the profile',
-    type: Profile,
+    type: ResponseProfileGet,
   })
   @ApiException(() => NotFoundException, {
     description: 'Profile not found',
@@ -183,6 +188,47 @@ export class ProfilesController {
 
     return response.status(200).json({
       message: PROFILE_SUCCESFULLY_DELETED_SKILL,
+    });
+  }
+
+  @ApiTags('profile')
+  @Auth(UserRole.GRADUATE)
+  @Post('/my-profile/language')
+  @ApiOkResponse({
+    description: 'Return my profile with languages',
+    type: LanguageProfile,
+  })
+  @ApiException(() => NotFoundException, {
+    description: 'Profile not found or language not found',
+  })
+  @ApiInternalServerError()
+  addLanguageProfile(
+    @Body() addLanguageProfile: AddLanguageDto,
+    @ActiveUser() user: UserActiveInterface,
+  ) {
+    return this.languageAction.add(addLanguageProfile, user);
+  }
+
+  @ApiTags('profile')
+  @Auth(UserRole.GRADUATE)
+  @Delete('/my-profile/language/:languageId')
+  @ApiOkResponse({
+    description: 'Delete language from my profile',
+    type: MessageDTO,
+  })
+  @ApiException(() => NotFoundException, {
+    description: 'Profile not found or language not found',
+  })
+  @ApiInternalServerError()
+  async removeLanguageProfile(
+    @Param('languageId') languageId: number,
+    @ActiveUser() user: UserActiveInterface,
+    @Response() response: express.Response,
+  ) {
+    await this.languageAction.remove(languageId, user);
+
+    return response.status(200).json({
+      message: PROFILE_SUCCESFULLY_DELETED_LANGUAGE,
     });
   }
 

@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { Profile } from '../entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { UserActiveInterface } from '../../../common/interface/user-active-interface';
 import { Skill } from '../../skills/entities/skill.entity';
 import { User } from '../../users/entities/user.entity';
@@ -39,11 +39,13 @@ export default class ProfilesService {
   async findOne(id: number) {
     const profile = await this.profileRepository.findOne({
       where: { userId: id },
-      relations: {
-        user: true,
-        skills: true,
-        experience: true,
-      },
+      relations: [
+        'user',
+        'skills',
+        'experience',
+        'languageProfile',
+        'languageProfile.language',
+      ],
       select: {
         user: {
           name: true,
@@ -52,12 +54,19 @@ export default class ProfilesService {
         },
       },
     });
-
     if (!profile) {
       throw new NotFoundException(PROFILE_NOT_FOUND);
     }
 
-    return profile;
+    const mappedProfile = {
+      ...profile,
+      languageProfile: profile.languageProfile.map(({ language, ...lp }) => ({
+        ...lp,
+        name: language.name,
+      })),
+    };
+
+    return mappedProfile;
   }
 
   async updateMyProfile(
