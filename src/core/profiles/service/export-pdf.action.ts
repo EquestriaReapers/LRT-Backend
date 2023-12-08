@@ -15,7 +15,16 @@ export default class ProfileExportPDFAction {
         'templates',
         'pdf-profile.hbs',
       );
-      return createPdf(filePath);
+      return createPdf(filePath, {
+        format: 'a4',
+        printBackground: true,
+        margin: {
+          left: '0mm',
+          top: '0mm',
+          right: '0mm',
+          bottom: '0mm',
+        },
+      });
     } catch (error) {
       throw new InternalServerErrorException(ERROR_UNKOWN_GENERATING_PDF);
     }
