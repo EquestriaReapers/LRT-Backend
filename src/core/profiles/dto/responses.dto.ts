@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Carrera, Profile } from '../entities/profile.entity';
 import { Skill } from 'src/core/skills/entities/skill.entity';
 import { Experience } from 'src/core/experience/entities/experience.entity';
 import { User } from 'src/core/users/entities/user.entity';
+import { Carrera } from 'src/core/career/enum/career.enum';
 
 export class UserProfileData {
   @ApiProperty()

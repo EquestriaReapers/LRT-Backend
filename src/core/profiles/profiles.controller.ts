@@ -19,7 +19,6 @@ import { UserRole } from '../../constants';
 import { ActiveUser } from '../../common/decorator/active-user-decorator';
 import { UserActiveInterface } from '../../common/interface/user-active-interface';
 import { AddSkillDto } from './dto/add-skill.dto';
-import { Carrera, Profile } from './entities/profile.entity';
 import { MessageDTO } from 'src/common/dto/response.dto';
 import * as express from 'express';
 import {
@@ -39,6 +38,7 @@ import { ApiInternalServerError } from 'src/common/decorator/internal-server-err
 import LanguageAction from './service/language.action';
 import { LanguageProfile } from './entities/language-profile.entity';
 import { AddLanguageDto } from './dto/add-language.dto';
+import { Carrera } from '../career/enum/career.enum';
 
 @Controller('profiles')
 export class ProfilesController {

@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Carrera, Profile } from '../entities/profile.entity';
+import { Profile } from '../entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
@@ -11,6 +11,7 @@ import {
   ResponsePaginationProfile,
 } from '../dto/responses.dto';
 import { FindAllPayload } from '../dto/find-all-payload.interface';
+import { Carrera } from 'src/core/career/enum/career.enum';
 
 @Injectable()
 export default class FindAllPaginateAction {

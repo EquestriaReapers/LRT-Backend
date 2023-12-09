@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Carrera } from 'src/core/profiles/entities/profile.entity';
+import { Carrera } from '../enum/career.enum';
 
 @Injectable()
 export class CareerService {

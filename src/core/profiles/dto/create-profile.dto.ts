@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { Carrera } from '../entities/profile.entity';
+import { Carrera } from 'src/core/career/enum/career.enum';
 
 export class CreateProfileDTO {
   @ApiProperty()
