@@ -1,9 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Profile } from '../entities/profile.entity';
 import { Skill } from 'src/core/skills/entities/skill.entity';
 import { Experience } from 'src/core/experience/entities/experience.entity';
 import { User } from 'src/core/users/entities/user.entity';
-import { ProfileI } from '../entities/profile.interface';
+import { Carrera } from 'src/core/career/enum/career.enum';
 
 export class UserProfileData {
   @ApiProperty()
@@ -106,6 +105,9 @@ export class ResponseProfile {
   mainTitle: string;
 
   @ApiProperty()
+  career: Carrera;
+
+  @ApiProperty()
   countryResidence: string;
 
   @ApiProperty({
@@ -157,6 +159,9 @@ export class ResponseProfileGet {
 
   @ApiProperty()
   mainTitle: string;
+
+  @ApiProperty()
+  career: Carrera;
 
   @ApiProperty()
   countryResidence: string;

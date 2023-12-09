@@ -49,6 +49,7 @@ import { CreateContactDto } from './dto/createContact.dto';
 import LanguageAction from './service/language.action';
 import { LanguageProfile } from './entities/language-profile.entity';
 import { AddLanguageDto } from './dto/add-language.dto';
+import { Carrera } from '../career/enum/career.enum';
 
 @Controller('profiles')
 export class ProfilesController {
@@ -90,10 +91,12 @@ export class ProfilesController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'random', required: false })
+  @ApiQuery({ name: 'carrera', required: false })
   findAll(
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('random') random: number,
+    @Query('carrera') carrera: Carrera[],
   ) {
     limit = limit > 100 ? 100 : limit;
 
@@ -101,6 +104,7 @@ export class ProfilesController {
       page,
       limit,
       random,
+      carrera,
     });
   }
 
