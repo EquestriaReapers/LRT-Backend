@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Profile } from '../entities/profile.entity';
+import { Carrera, Profile } from '../entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
@@ -17,10 +17,11 @@ export default class FindAllPaginateAction {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-  ) {}
+  ) { }
 
   async execute({
     random,
+    carrera,
     ...opt
   }: FindAllPayload): Promise<ResponsePaginationProfile> {
     const { page, limit, skip } = this.getPaginationData(opt);
@@ -30,6 +31,7 @@ export default class FindAllPaginateAction {
       random,
       limit,
       skip,
+      carrera,
     );
     const totalCount = await this.profileRepository.count();
 
@@ -55,15 +57,21 @@ export default class FindAllPaginateAction {
     random: number,
     limit: number,
     skip: number,
+    carrera: Carrera,
   ): Promise<Profile[]> {
     await this.setProfileRepositorySeed(random);
 
-    const resultsRaw = await this.profileRepository.query(
-      RANDOM_PROFILES_PAGINATE_QUERY.replace('{{limit}}', limit + '').replace(
-        '{{skip}}',
-        skip + '',
-      ),
+    let query = RANDOM_PROFILES_PAGINATE_QUERY.replace('{{limit}}', limit + '').replace(
+      '{{skip}}',
+      skip + '',
     );
+
+    if (carrera) {
+      query += ` AND profile.carrera = '${carrera}'`;
+    }
+
+    const resultsRaw = await this.profileRepository.query(query);
+
 
     const formattedResult: Profile[] = resultsRaw.map((row) => ({
       id: row.profile_id,

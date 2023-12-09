@@ -19,7 +19,7 @@ import { UserRole } from '../../constants';
 import { ActiveUser } from '../../common/decorator/active-user-decorator';
 import { UserActiveInterface } from '../../common/interface/user-active-interface';
 import { AddSkillDto } from './dto/add-skill.dto';
-import { Profile } from './entities/profile.entity';
+import { Carrera, Profile } from './entities/profile.entity';
 import { MessageDTO } from 'src/common/dto/response.dto';
 import * as express from 'express';
 import {
@@ -37,7 +37,7 @@ import { ApiInternalServerError } from 'src/common/decorator/internal-server-err
 
 @Controller('profiles')
 export class ProfilesController {
-  constructor(private readonly profilesService: ProfilesService) {}
+  constructor(private readonly profilesService: ProfilesService) { }
 
   @ApiTags('profile')
   @Auth(UserRole.GRADUATE)
@@ -50,10 +50,12 @@ export class ProfilesController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'random', required: false })
+  @ApiQuery({ name: 'carrera', required: false })
   findAll(
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('random') random: number,
+    @Query('carrera') carrera: Carrera,
   ) {
     limit = limit > 100 ? 100 : limit;
 
@@ -61,6 +63,7 @@ export class ProfilesController {
       page,
       limit,
       random,
+      carrera,
     });
   }
 

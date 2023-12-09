@@ -4,7 +4,7 @@ export const SET_SEED_QUERY = `SELECT 0
         ) AS randomization_seed;`;
 
 export const RANDOM_PROFILES_PAGINATE_QUERY = `
-    SELECT "profile"."id" AS "profile_id", "profile"."userId" AS "profile_userId", "profile"."description" AS "profile_description", "profile"."mainTitle" AS "profile_mainTitle", "profile"."countryResidence" AS "profile_countryResidence", "profile"."deletedAt" AS "profile_deletedAt", "user"."id" AS "user_id", "user"."name" AS "user_name", "user"."lastname" AS "user_lastname", "user"."email" AS "user_email",
+    SELECT "profile"."id" AS "profile_id", "profile"."userId" AS "profile_userId", "profile"."description" AS "profile_description", "profile"."mainTitle" AS "profile_mainTitle", "profile"."countryResidence" AS "profile_countryResidence", "profile"."deletedAt" AS "profile_deletedAt", "user"."id" AS "user_id", "user"."name" AS "user_name", "user"."lastname" AS "user_lastname", "user"."email" AS "user_email","profile"."carrera" AS "profile_carrera",
       ARRAY(
         SELECT DISTINCT ON ("experience"."id") json_build_object(
           'id', "experience"."id",
@@ -29,7 +29,7 @@ export const RANDOM_PROFILES_PAGINATE_QUERY = `
       ) AS "skills"
     FROM "profile" "profile"
     LEFT JOIN "user" "user" ON "user"."id"="profile"."userId" AND ("user"."deletedAt" IS NULL)
-    WHERE "profile"."deletedAt" IS NULL
+    WHERE "profile"."deletedAt" IS NULL AND(:carrera IS NULL OR "profile"."carrera" = :carrera)
     GROUP BY "profile"."id", "user"."id"
     ORDER BY RANDOM()
     LIMIT {{limit}} OFFSET {{skip}}
