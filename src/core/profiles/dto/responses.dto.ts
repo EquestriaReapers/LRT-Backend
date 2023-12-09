@@ -142,49 +142,6 @@ export class LanguageProfileDataExtend {
   languageId: number;
 }
 
-export class ResponseProfileGet {
-  @ApiProperty()
-  id: number;
-
-  @ApiProperty()
-  userId: number;
-
-  @ApiProperty({
-    type: UserProfileData,
-  })
-  user: User;
-
-  @ApiProperty()
-  description: string;
-
-  @ApiProperty()
-  mainTitle: string;
-
-  @ApiProperty()
-  career: Carrera;
-
-  @ApiProperty()
-  countryResidence: string;
-
-  @ApiProperty({
-    type: [ExperienceData],
-  })
-  experience: Experience[];
-
-  @ApiProperty({
-    type: [SkillData],
-  })
-  skills: Skill[];
-
-  @ApiProperty({
-    type: [LanguageProfileDataExtend],
-  })
-  languageProfile: LanguageProfileDataExtend[];
-
-  @ApiProperty()
-  deletedAt: Date;
-}
-
 export class ResponsePaginationProfile {
   @ApiProperty({
     type: ResponseProfile,
@@ -229,6 +186,54 @@ export class MethodContact {
 
   @ApiProperty()
   value: string;
+}
+
+export class ResponseProfileGet {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  userId: number;
+
+  @ApiProperty({
+    type: UserProfileData,
+  })
+  user: User;
+
+  @ApiProperty()
+  description: string;
+
+  @ApiProperty()
+  mainTitle: string;
+
+  @ApiProperty()
+  career: Carrera;
+
+  @ApiProperty({
+    type: [MethodContact],
+  })
+  contactMethods: MethodContact[];
+
+  @ApiProperty()
+  countryResidence: string;
+
+  @ApiProperty({
+    type: [ExperienceData],
+  })
+  experience: Experience[];
+
+  @ApiProperty({
+    type: [SkillData],
+  })
+  skills: Skill[];
+
+  @ApiProperty({
+    type: [LanguageProfileDataExtend],
+  })
+  languageProfile: LanguageProfileDataExtend[];
+
+  @ApiProperty()
+  deletedAt: Date;
 }
 
 export class ResponseMethodContactDTO {
