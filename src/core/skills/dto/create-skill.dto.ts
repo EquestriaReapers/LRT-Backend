@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateSkillDto {
   @ApiProperty({ example: 'React', required: true })
@@ -9,6 +9,6 @@ export class CreateSkillDto {
 
   @ApiProperty({ example: '10', required: true })
   @IsNumber()
-  @IsNotEmpty()
+  @IsOptional()
   level: number;
 }
