@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Profile } from '../../profiles/entities/profile.entity';
 import {
   Column,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -47,4 +48,7 @@ export class Experience {
     default: null,
   })
   endDate: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

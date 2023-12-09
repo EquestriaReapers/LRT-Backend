@@ -76,11 +76,14 @@ export class ExperienceService {
     id: number,
     user: UserActiveInterface,
   ): Promise<void> {
-    const experienceToRemove = await this.experienceRepository.findOne({
-      where: { profileId: user.id, id },
+    const experienceToRemove = await this.experienceRepository.delete({
+      profileId: user.id,
+      id: id,
     });
 
-    await this.experienceRepository.remove(experienceToRemove);
+    if (experienceToRemove.affected === 0) {
+      throw new NotFoundException(EXPERIENCE_NOT_FOUND);
+    }
 
     return;
   }
