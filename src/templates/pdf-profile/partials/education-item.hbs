@@ -1,11 +1,20 @@
 <!-- partials/experiencie-item.hbs -->
 <div class="row mt-2">
     <div class="col-12">
-        <h2 class="mb-1">({{temporality}}) {{title}}</h2>
+        <h2 class="mb-1">
+            {{#if (is-not-empty temporality)}}
+                <span>
+                    ({{temporality}})
+                </span>
+            {{/if}}
+            {{title}}
+        </h2>
     </div>
-    <div class="col-12">
-        <span class="normal-text">
-            {{where}}
-        </span>
-    </div>
+    {{#if (is-not-empty where)}}    
+        <div class="col-12">
+            <span class="normal-text">
+                {{where}}
+            </span>
+        </div>
+    {{/if}}
 </div>

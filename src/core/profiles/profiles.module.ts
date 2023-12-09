@@ -9,7 +9,7 @@ import { LanguageProfile } from './entities/language-profile.entity';
 import LanguageAction from './service/language.action';
 import { Language } from '../language/entities/language.entity';
 import { LanguageModule } from '../language/language.module';
-import ExportPDFProfileAction from './service/export-pdf.action';
+import ExportPDFAction from './service/export-pdf';
 
 @Module({
   imports: [
@@ -22,7 +22,7 @@ import ExportPDFProfileAction from './service/export-pdf.action';
     ProfilesService,
     FindAllPaginateAction,
     LanguageAction,
-    ExportPDFProfileAction,
+    ExportPDFAction,
   ],
   exports: [ProfilesService],
 })

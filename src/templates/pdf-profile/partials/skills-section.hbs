@@ -1,0 +1,61 @@
+
+{{#if (eq skillSet.type "hard-soft")}}
+        <div class="row mt-4">
+            <div class="col-12">
+                <h1 class="color-primary">Habilidades</h1>
+            </div>
+        </div>
+        <div class="row">
+            {{#if (is-not-empty skillSet.hardSkills)}}
+                <div class="col-6">
+                    <div>
+                        <h2>Habilidades duras</h1>
+                            <ul class="vertical-list skills-list normal-text">
+                                {{#each skillSet.hardSkills}}
+                                <li>{{this}}</li>
+                                {{/each}}
+                            </ul>
+                    </div>
+                </div>
+            {{/if}}
+            {{#if (is-not-empty skillSet.softSkills)}}
+                <div class="col-6">
+                    <div>
+                        <h2>Habilidades blandas</h1>
+                                <ul class="vertical-list skills-list normal-text">
+                                    {{#each skillSet.softSkills}}
+                                    <li>{{this}}</li>
+                                    {{/each}}
+                                </ul>
+                    </div>
+                </div>
+            {{/if}}
+        </div>
+{{/if}}
+
+{{#if (eq skillSet.type "single")}}
+<div class="row mt-4">
+    <div class="col-12">
+        <h1 class="color-primary">Habilidades</h1>
+    </div>
+</div>
+<div class="row">
+    {{#if (is-not-empty skillSet.skills)}}
+    <div class="col-12">
+        <div>
+                <ul class="
+                        vertical-list
+                        skills-list
+                        horizontal-list
+                        normal-text
+                        "
+                >
+                    {{#each skillSet.skills}}
+                    <li>{{this}}</li>
+                    {{/each}}
+                </ul>
+        </div>
+    </div>
+    {{/if}}
+</div>
+{{/if}}

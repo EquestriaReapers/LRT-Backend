@@ -6,12 +6,20 @@
         </div>
         <div class="d-flex flex-row justify-content-between">
             <h2>{{role}}</h2>
-            <h2>{{location}} ({{temporality}})</h2>
+            <h2>
+                {{#if (is-not-empty location)}}
+                    <span>
+                        {{location}}&nbsp;
+                    </span>
+                {{/if}}
+                ({{temporality}})</h2>
         </div>
     </div>
-    <div class="col-12 mt-1">
-        <p class="normal-text">
-            {{description}}
-        </p>
-    </div>
+    {{#if (is-not-empty description)}}
+        <div class="col-12 mt-1">
+            <p class="normal-text">
+                {{description}}
+            </p>
+        </div>
+    {{/if}}
 </div>
