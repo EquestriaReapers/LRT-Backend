@@ -62,7 +62,7 @@ export class ProfilesController {
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('random') random: number,
-    @Query('carrera') carrera: Carrera,
+    @Query('carrera') carrera: Carrera[],
   ) {
     limit = limit > 100 ? 100 : limit;
 

@@ -28,11 +28,21 @@ export default class FindAllPaginateAction {
     if (!random) random = Math.random();
 
     if (carrera) {
-      carrera = carrera.toUpperCase() as Carrera;
-
-      if (!Object.values(Carrera).includes(carrera)) {
-        throw new BadRequestException(`Invalid value for Carrera: ${carrera}`);
+      if (!Array.isArray(carrera)) {
+        carrera = [carrera];
       }
+
+      carrera = carrera.map((c) => {
+        const carreraUpper = c.toUpperCase() as Carrera;
+
+        if (!Object.values(Carrera).includes(carreraUpper)) {
+          throw new BadRequestException(
+            `Invalid value for Carrera: ${carreraUpper}`,
+          );
+        }
+
+        return carreraUpper;
+      });
     } else {
       carrera = null;
     }
@@ -67,7 +77,7 @@ export default class FindAllPaginateAction {
     random: number,
     limit: number,
     skip: number,
-    carrera: Carrera,
+    carrera: Carrera[],
   ): Promise<Profile[]> {
     await this.setProfileRepositorySeed(random);
 
@@ -76,7 +86,9 @@ export default class FindAllPaginateAction {
       limit + '',
     ).replace('{{skip}}', skip + '');
 
-    query = this.addFilterToQuery(query, 'career', carrera);
+    if (carrera) {
+      query = this.addMultipleFiltersToQuery(query, 'career', carrera);
+    }
 
     const resultsRaw = await this.profileRepository.query(query);
 
@@ -137,6 +149,32 @@ export default class FindAllPaginateAction {
       } else {
         // Si no hay una cláusula WHERE, agrega la condición de filtro al final de la consulta
         query += ` WHERE ${filterCondition}`;
+      }
+    }
+
+    return query;
+  }
+
+  private addMultipleFiltersToQuery(
+    query: string,
+    columnName: string,
+    filterValues: any[],
+  ): string {
+    if (filterValues.length > 0) {
+      const filterConditions = filterValues.map(
+        (value) => `"${columnName}" = '${value}'`,
+      );
+      const filterQuery = filterConditions.join(' OR ');
+
+      const whereIndex = query.lastIndexOf('WHERE');
+      if (whereIndex !== -1) {
+        query =
+          query.slice(0, whereIndex + 5) +
+          filterQuery +
+          ' AND ' +
+          query.slice(whereIndex + 5);
+      } else {
+        query += ' WHERE ' + filterQuery;
       }
     }
 

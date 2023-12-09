@@ -4,5 +4,5 @@ export class FindAllPayload {
   page: number;
   limit: number;
   random: number;
-  carrera: Carrera;
+  carrera: Carrera[];
 }
