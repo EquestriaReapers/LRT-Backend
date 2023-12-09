@@ -81,7 +81,6 @@ export class ProfilesController {
   }
 
   @ApiTags('profile')
-  @Auth(UserRole.GRADUATE)
   @Get()
   @ApiOkResponse({
     description: 'Returns an array of ALL profiles',
