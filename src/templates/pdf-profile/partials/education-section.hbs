@@ -1,0 +1,13 @@
+
+{{#if (is-not-empty educations)}}
+    <div class="row">
+        <div class="col-12 mt-4">
+            <h1 class="color-primary">Educacion</h1>
+        </div>
+    </div>
+
+    {{#each educations}}
+        {{> educationItem temporality=this.temporality
+        title=this.title where=this.where }}
+    {{/each}}
+{{/if}}

@@ -1,0 +1,17 @@
+
+{{#if (is-not-empty lenguagues)}}
+    <div class="row">
+        <div class="col-12 mt-4">
+            <h1 class="color-primary">Lenguajes</h1>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-12">
+            <ul class="none-style-list horizontal-list normal-text">
+                {{#each lenguagues}}
+                <li><b>{{this}}</b></li>
+                {{/each}}
+            </ul>
+        </div>
+    </div>
+{{/if}}
