@@ -40,6 +40,7 @@ export enum Carrera {
   SOCIOLOGIA = 'SOCIOLOGIA',
   ECONOMIA = 'ECONOMIA',
 }
+
 @Entity()
 export class Profile {
   @ApiProperty()
@@ -105,6 +106,8 @@ export class Profile {
   @Column({
     type: 'enum',
     enum: Carrera,
+    default: null,
+    nullable: true,
   })
-  carrera: Carrera;
+  career: Carrera;
 }

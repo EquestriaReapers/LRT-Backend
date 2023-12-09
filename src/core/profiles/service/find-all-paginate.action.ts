@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Carrera, Profile } from '../entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -17,7 +17,7 @@ export default class FindAllPaginateAction {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-  ) { }
+  ) {}
 
   async execute({
     random,
@@ -26,6 +26,16 @@ export default class FindAllPaginateAction {
   }: FindAllPayload): Promise<ResponsePaginationProfile> {
     const { page, limit, skip } = this.getPaginationData(opt);
     if (!random) random = Math.random();
+
+    if (carrera) {
+      carrera = carrera.toUpperCase() as Carrera;
+
+      if (!Object.values(Carrera).includes(carrera)) {
+        throw new BadRequestException(`Invalid value for Carrera: ${carrera}`);
+      }
+    } else {
+      carrera = null;
+    }
 
     const profiles = await this.executeQueryGetRandomProfiles(
       random,
@@ -61,17 +71,14 @@ export default class FindAllPaginateAction {
   ): Promise<Profile[]> {
     await this.setProfileRepositorySeed(random);
 
-    let query = RANDOM_PROFILES_PAGINATE_QUERY.replace('{{limit}}', limit + '').replace(
-      '{{skip}}',
-      skip + '',
-    );
+    let query = RANDOM_PROFILES_PAGINATE_QUERY.replace(
+      '{{limit}}',
+      limit + '',
+    ).replace('{{skip}}', skip + '');
 
-    if (carrera) {
-      query += ` AND profile.carrera = '${carrera}'`;
-    }
+    query = this.addFilterToQuery(query, 'career', carrera);
 
     const resultsRaw = await this.profileRepository.query(query);
-
 
     const formattedResult: Profile[] = resultsRaw.map((row) => ({
       id: row.profile_id,
@@ -84,6 +91,7 @@ export default class FindAllPaginateAction {
       },
       description: row.profile_description,
       mainTitle: row.profile_mainTitle,
+      career: row.profile_career,
       countryResidence: row.profile_countryResidence,
       experience: row.experiences.map(JSON.parse),
       skills: row.skills.map(JSON.parse),
@@ -109,5 +117,29 @@ export default class FindAllPaginateAction {
       limit: opt.limit || 10,
       skip: (page - 1) * limit,
     };
+  }
+
+  private addFilterToQuery(
+    query: string,
+    columnName: string,
+    filterValue: any,
+  ): string {
+    if (filterValue) {
+      const filterCondition = `"profile"."${columnName}" = '${filterValue}'`;
+      const whereIndex = query.lastIndexOf('WHERE');
+
+      if (whereIndex !== -1) {
+        // Si ya hay una cláusula WHERE en la consulta, agrega la condición de filtro con un operador lógico AND
+        query =
+          query.slice(0, whereIndex + 5) +
+          ` ${filterCondition} AND` +
+          query.slice(whereIndex + 5);
+      } else {
+        // Si no hay una cláusula WHERE, agrega la condición de filtro al final de la consulta
+        query += ` WHERE ${filterCondition}`;
+      }
+    }
+
+    return query;
   }
 }
