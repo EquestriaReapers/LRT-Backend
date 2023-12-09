@@ -8,6 +8,8 @@ import handlebars from 'handlebars';
 import * as fs from 'fs';
 import { getDummyProfileTemplate } from './fixtures';
 import { SkillSetType } from './types';
+import ProfileTemplateAdaptator from './profile-template-adapter.class';
+import { Profile } from '../../entities/profile.entity';
 
 const FILE_CONFIG = {
   format: 'a4',
@@ -17,6 +19,10 @@ const FILE_CONFIG = {
 
 @Injectable()
 export default class ProfileExportPDFAction {
+  constructor(
+    private readonly profileTemplateAdaptator: ProfileTemplateAdaptator,
+  ) {}
+
   async execute(): Promise<Buffer> {
     try {
       const filePath = this.getTemplatePath();
@@ -41,6 +47,11 @@ export default class ProfileExportPDFAction {
         return a !== null && a !== undefined && a !== '';
       });
 
+      const profileOriginData = await this.getProfileOriginDataById(1);
+      const profileData =
+        this.profileTemplateAdaptator.execute(profileOriginData);
+
+      // Sustituir getDummyProfileTemplate con profileData cuando este listo.
       return createPdf(filePath, FILE_CONFIG, {
         ...getDummyProfileTemplate(SkillSetType.HardSoft),
       });
@@ -48,6 +59,11 @@ export default class ProfileExportPDFAction {
       console.error(error);
       throw new InternalServerErrorException(ERROR_UNKOWN_GENERATING_PDF);
     }
+  }
+
+  private async getProfileOriginDataById(userId: number): Promise<Profile> {
+    userId;
+    return {} as any;
   }
 
   private getTemplatePath() {

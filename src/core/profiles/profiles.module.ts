@@ -10,6 +10,7 @@ import ExportPDFAction from './service/export-pdf';
 import { Language } from '../language/entities/language.entity';
 import { LanguageModule } from '../language/language.module';
 import LanguageAction from './service/language.action';
+import ProfileTemplateAdaptator from './service/export-pdf/profile-template-adapter.class';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import LanguageAction from './service/language.action';
     FindAllPaginateAction,
     ExportPDFAction,
     LanguageAction,
+    ProfileTemplateAdaptator,
   ],
   exports: [ProfilesService],
 })
