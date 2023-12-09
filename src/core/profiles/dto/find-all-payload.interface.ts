@@ -1,4 +1,4 @@
-import { Carrera } from "../entities/profile.entity";
+import { Carrera } from '../entities/profile.entity';
 
 export class FindAllPayload {
   page: number;
