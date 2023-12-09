@@ -76,7 +76,7 @@ export class ExperienceService {
     id: number,
     user: UserActiveInterface,
   ): Promise<void> {
-    const experience = await this.experienceRepository.softDelete({
+    const experience = await this.experienceRepository.delete({
       profileId: user.id,
       id,
     });
