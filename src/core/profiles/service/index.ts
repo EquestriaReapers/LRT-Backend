@@ -12,7 +12,7 @@ import { SKILL_NOT_FOUND } from 'src/core/skills/messages';
 import FindAllPaginateAction from './find-all-paginate.action';
 import { ResponsePaginationProfile } from '../dto/responses.dto';
 import { FindAllPayload } from '../dto/find-all-payload.interface';
-import ProfileExportPDFAction from './export-pdf.action';
+import ExportPDFAction from './export-pdf';
 import { Buffer } from 'buffer';
 
 @Injectable()
@@ -28,7 +28,7 @@ export default class ProfilesService {
     private readonly userRepository: Repository<User>,
 
     private readonly findAllPaginateAction: FindAllPaginateAction,
-    private readonly exportPdfProfileAction: ProfileExportPDFAction,
+    private readonly exportPdfAction: ExportPDFAction,
   ) {}
 
   async findAllPaginate(
@@ -38,7 +38,7 @@ export default class ProfilesService {
   }
 
   async exportPdf(): Promise<Buffer> {
-    return await this.exportPdfProfileAction.execute();
+    return await this.exportPdfAction.execute();
   }
 
   async findOne(id: number) {

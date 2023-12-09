@@ -7,124 +7,31 @@
     <div class="header-cv bg-primary container-horizontal-paddings">
         <div class="header-content">
             <div>
-                <h2 class="title-name color-white">Grande Salcedo</h2>
-                <h3 class="sub-title-name color-white">Backend Expert</h3>
+                <h2 class="title-name color-white">{{fullName}}</h2>
+                <h3 class="sub-title-name color-white">{{mainTitle}}</h3>
             </div>
             <div>
                 <!-- Lista ordenada con la clase específica "mi-lista-ordenada" -->
                 <ul class="none-style-list vertical-list small-text color-white">
-                    {{> listItemIcon iconName="call" text="0426-6589849"}}
-                    {{> listItemIcon iconName="globe" text="www.abcdefg.com"}}
-                    {{> listItemIcon iconName="mail" text="persona@correo.com"}}
-                    {{> listItemIcon iconName="location" text="0426-6589849"}}
+                    {{#if (is-not-empty contactItems)}}
+                        {{#each contactItems}}
+                            {{> listItemIcon iconName=this.iconName text=this.text}}
+                        {{/each}}
+                    {{/if}}
                 </ul>
             </div>
         </div>
     </div>
     <div class="header-cv-bottom bg-primary">
     </div>
-    <div class="mt-4 container-horizontal-paddings">
-        <div class="row">
-            <div class="col-12">
-                <h1 class="color-primary">Habilidades</h1>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-6">
-                <div>
-                    <h2>Habilidades duras</h1>
-                        <ul class="vertical-list skills-list normal-text">
-                            <li>PHP</li>
-                            <li>NodeJS</li>
-                            <li>Python</li>
-                            <li>Java</li>
-                            <li>PHP</li>
-                            <li>NodeJS</li>
-                            <li>Python</li>
-                            <li>Java</li>
-                            <li>Java</li>
-                            <li>Java</li>
-                            <li>Java</li>
-                            <li>Java</li>
-                        </ul>
-                </div>
-            </div>
-            <div class="col-6">
-                <div>
-                    <h2>Habilidades blandas</h1>
-                        <ul class="vertical-list skills-list normal-text">
-                            <li>PHP</li>
-                            <li>NodeJS</li>
-                            <li>Python</li>
-                            <li>Java</li>
-                            <li>PHP</li>
-                            <li>NodeJS</li>
-                            <li>Python</li>
-                            <li>Java</li>
-                            <li>Java</li>
-                            <li>Java</li>
-                            <li>Java</li>
-                            <li>Java</li>
-                        </ul>
-                </div>
-            </div>
-        </div>
+    <div class="container-horizontal-paddings">
+        {{> skillsSection skillSet=skillSet }}
 
-        <div class="row">
-            <div class="col-12 mt-4">
-                <h1 class="color-primary">Experiencia</h1>
-            </div>
-        </div>
-        {{> experiencieItem company="Encora Inc, S.A.C." role="Software Engineer III" location="LIMA, PERÚ"
-        temporality="2021 - Actualidad"
-        description="Company working in the area of IT, providing services and and software engineering solutions across
-        a wide range of leading-edge technologies, including Big Data, analytics, machine learning, IoT, mobile, cloud,
-        UI/UX, and test automation" }}
-        {{> experiencieItem company="Encora Inc, S.A.C." role="Software Engineer III" location="LIMA, PERÚ"
-        temporality="2021 - Actualidad"
-        description="Company working in the area of IT, providing services and and software engineering solutions
-        across a wide range of leading-edge technologies, including Big Data, analytics, machine learning, IoT, mobile,
-        cloud,
-        UI/UX, and test automation" }}
+        {{> experiencieSection experiences=experiences }}
 
-        <div class="row">
-            <div class="col-12 mt-4">
-                <h1 class="color-primary">Educacion</h1>
-            </div>
-        </div>
+        {{> educationSection educations=educations }}
 
-        {{> educationItem temporality="2015"
-        title="Computer engineering" where="Universidad Católica Andrés Bello" }}
-        {{> educationItem temporality="2019"
-        title="Education, Especial Education mention" where="Universidad Católica Andrés Bello" }}
-
-        <div class="row">
-            <div class="col-12 mt-4">
-                <h1 class="color-primary">Lenguajes</h1>
-            </div>
-        </div>
-        <div class="row mt-2">
-            <div class="col-12">
-                <ul class="none-style-list horizontal-list normal-text">
-                    <li><b>Español</b></li>
-                    <li><b>Ingles</b></li>
-                    <li><b>French</b></li>
-                    <li><b>German</b></li>
-                    <li><b>Italian</b></li>
-                    <li><b>Español</b></li>
-                    <li><b>Ingles</b></li>
-                    <li><b>French</b></li>
-                    <li><b>German</b></li>
-                    <li><b>Italian</b></li>
-                    <li><b>Español</b></li>
-                    <li><b>Ingles</b></li>
-                    <li><b>French</b></li>
-                    <li><b>German</b></li>
-                    <li><b>Italian</b></li>
-                </ul>
-            </div>
-        </div>
-
+        {{> lenguaguesSection lenguagues=lenguagues }}
     </div>
 </body>
 

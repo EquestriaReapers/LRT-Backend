@@ -2,15 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { createPdf } from '@saemhco/nestjs-html-pdf';
 import * as path from 'path';
 import { InternalServerErrorException } from '@nestjs/common';
-import { ERROR_UNKOWN_GENERATING_PDF } from '../messages';
+import { ERROR_UNKOWN_GENERATING_PDF } from '../../messages';
 import { Buffer } from 'buffer';
 import handlebars from 'handlebars';
 import * as fs from 'fs';
+import { getDummyProfileTemplate } from './fixtures';
+import { SkillSetType } from './types';
 
 const FILE_CONFIG = {
   format: 'a4',
   printBackground: true,
-  margin: { left: '0mm', top: '0mm', right: '0mm', bottom: '0mm' },
+  margin: { left: '0mm', top: '0mm', right: '0mm', bottom: '10mm' },
 };
 
 @Injectable()
@@ -18,14 +20,32 @@ export default class ProfileExportPDFAction {
   async execute(): Promise<Buffer> {
     try {
       const filePath = this.getTemplatePath();
+      await this.registerPartial('header', 'header.hbs');
+      // Register Components
       await this.registerPartial('listItemIcon', 'list-item-icon.hbs');
       await this.registerPartial('icon', 'icon.hbs');
-      await this.registerPartial('header', 'header.hbs');
+      // Register Items
       await this.registerPartial('experiencieItem', 'experiencie-item.hbs');
       await this.registerPartial('educationItem', 'education-item.hbs');
+      // Register Sections
+      await this.registerPartial('educationSection', 'education-section.hbs');
+      await this.registerPartial(
+        'experiencieSection',
+        'experiencie-section.hbs',
+      );
+      await this.registerPartial('skillsSection', 'skills-section.hbs');
+      await this.registerPartial('lenguaguesSection', 'lenguagues-section.hbs');
 
-      return createPdf(filePath, FILE_CONFIG);
+      handlebars.registerHelper('is-not-empty', function (a) {
+        if (Array.isArray(a) && a.length > 0) return true;
+        return a !== null && a !== undefined && a !== '';
+      });
+
+      return createPdf(filePath, FILE_CONFIG, {
+        ...getDummyProfileTemplate(SkillSetType.HardSoft),
+      });
     } catch (error) {
+      console.error(error);
       throw new InternalServerErrorException(ERROR_UNKOWN_GENERATING_PDF);
     }
   }
