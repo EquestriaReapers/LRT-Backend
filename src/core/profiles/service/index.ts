@@ -14,6 +14,8 @@ import { ResponsePaginationProfile } from '../dto/responses.dto';
 import { FindAllPayload } from '../dto/find-all-payload.interface';
 import ExportPDFAction from './export-pdf';
 import { Buffer } from 'buffer';
+import { ContactMethod } from '../entities/contact-method.entity';
+import { CreateContactDto } from '../dto/createContact.dto';
 
 @Injectable()
 export default class ProfilesService {
@@ -182,5 +184,62 @@ export default class ProfilesService {
     if (!profile) throw new NotFoundException(PROFILE_NOT_FOUND);
 
     return profile;
+  }
+
+  async getContactMethods(userId: number): Promise<ContactMethod[]> {
+    const profile = await this.profileRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!profile) {
+      throw new NotFoundException(PROFILE_NOT_FOUND);
+    }
+
+    return profile.contactMethods;
+  }
+  async addContactMethod(
+    user: UserActiveInterface,
+    createContactMethodDto: CreateContactDto,
+  ): Promise<Profile> {
+    const profile = await this.profileRepository.findOne({
+      where: { id: user.id },
+    });
+
+    if (!profile) {
+      throw new NotFoundException(PROFILE_NOT_FOUND);
+    }
+
+    const contactMethod = new ContactMethod();
+    contactMethod.id = profile.contactMethods.length + 1;
+    contactMethod.type = createContactMethodDto.type;
+    contactMethod.value = createContactMethodDto.value;
+
+    profile.contactMethods.push(contactMethod);
+
+    await this.profileRepository.save(profile);
+
+    return profile;
+  }
+
+  async removeContactMethod(
+    id: number,
+    user: UserActiveInterface,
+  ): Promise<void> {
+    const profile = await this.profileRepository.findOne({
+      where: { id: user.id },
+    });
+
+    if (!profile) {
+      throw new NotFoundException(PROFILE_NOT_FOUND);
+    }
+
+    const updatedContactMethodList = profile.contactMethods.filter(
+      (contactMethod) => contactMethod.id !== id,
+    );
+
+    profile.contactMethods = updatedContactMethodList;
+
+    await this.profileRepository.save(profile);
+    return;
   }
 }
