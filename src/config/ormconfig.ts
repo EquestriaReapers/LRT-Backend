@@ -12,7 +12,7 @@ const configs: PostgresConnectionOptions = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   entities: ['dist/**/*.entity.js'],
-  migrations: ['src/config/migrations/*{.ts,.js}'],
+  migrations: ['dist/config/migrations/*{.ts,.js}'],
 };
 
 export default new DataSource(configs);
