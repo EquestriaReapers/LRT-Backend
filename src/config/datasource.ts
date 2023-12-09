@@ -19,7 +19,7 @@ export const DataSourceConfig: DataSourceOptions = {
   migrationsRun: true,
   migrationsTableName: 'migrations',
   migrations: ['dist/config/migrations/*.ts'],
-  subscribers: ['src/config/subscribers/**/*.js'],
+  subscribers: ['dist/config/subscribers/**/*.js'],
   synchronize: true,
   logging: false,
 };

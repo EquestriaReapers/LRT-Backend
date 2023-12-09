@@ -87,6 +87,7 @@ export default class FindAllPaginateAction {
       countryResidence: row.profile_countryResidence,
       experience: row.experiences.map(JSON.parse),
       skills: row.skills.map(JSON.parse),
+      languageProfile: row.languageProfile.map(JSON.parse),
       deletedAt: row.profile_deletedAt,
     }));
 

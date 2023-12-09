@@ -75,6 +75,17 @@ export class PaginationMessage {
   randomSeed: number;
 }
 
+export class LanguageProfileData {
+  @ApiProperty()
+  id: number;
+  @ApiProperty()
+  profileId: number;
+  @ApiProperty()
+  level: string;
+  @ApiProperty()
+  languageId: number;
+}
+
 export class ResponseProfile {
   @ApiProperty()
   id: number;
@@ -106,15 +117,85 @@ export class ResponseProfile {
   })
   skills: Skill[];
 
+  @ApiProperty({
+    type: [LanguageProfileData],
+  })
+  languageProfile: LanguageProfileData[];
+
+  @ApiProperty()
+  deletedAt: Date;
+}
+
+export class LanguageProfileDataExtend {
+  @ApiProperty()
+  id: number;
+  @ApiProperty()
+  profileId: number;
+  @ApiProperty()
+  level: string;
+  @ApiProperty()
+  name: string;
+  @ApiProperty()
+  languageId: number;
+}
+
+export class ResponseProfileGet {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  userId: number;
+
+  @ApiProperty({
+    type: UserProfileData,
+  })
+  user: User;
+
+  @ApiProperty()
+  description: string;
+
+  @ApiProperty()
+  mainTitle: string;
+
+  @ApiProperty()
+  countryResidence: string;
+
+  @ApiProperty({
+    type: [ExperienceData],
+  })
+  experience: Experience[];
+
+  @ApiProperty({
+    type: [SkillData],
+  })
+  skills: Skill[];
+
+  @ApiProperty({
+    type: [LanguageProfileDataExtend],
+  })
+  languageProfile: LanguageProfileDataExtend[];
+
   @ApiProperty()
   deletedAt: Date;
 }
 
 export class ResponsePaginationProfile {
   @ApiProperty({
-    type: Profile,
+    type: ResponseProfile,
   })
   profiles: ResponseProfile[];
+
+  @ApiProperty({
+    type: PaginationMessage,
+  })
+  pagination: PaginationMessage;
+}
+
+export class SwaggerResponsePagination {
+  @ApiProperty({
+    type: ResponseProfileGet,
+  })
+  profiles: ResponseProfileGet[];
 
   @ApiProperty({
     type: PaginationMessage,
