@@ -8,7 +8,7 @@ export const PROFILE_SUCCESFULLY_DELETED_LANGUAGE =
   'Idioma eliminado de tu perfil exitosamente';
 export const ERROR_PROFILE_SKILL_NOT_FOUND = 'Perfil o skill no se encontraron';
 export const PROFILE_SUCCESFULLY_DELETE_METHOD_CONTACT =
-  'Contacto eliminado con exito';
+  'Metodo de contacto eliminado con exito';
 export const ERROR_PROFILE_LANGUAGUE_NOT_FOUND =
   'Perfil o idioma no se encontraron';
 export const ERROR_EXIST_LANGUAGE_IN_PROFILE =
