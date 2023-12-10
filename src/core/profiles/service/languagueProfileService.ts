@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LanguageProfile } from '../entities/language-profile.entity';
 import { Profile } from '../entities/profile.entity';
-import { AddLanguageDto } from '../dto/add-language.dto';
+import { AddLanguageProfileDto } from '../dto/add-language-profile.dto';
 import { UserActiveInterface } from 'src/common/interface/user-active-interface';
 import {
   ERROR_EXIST_LANGUAGE_IN_PROFILE,
@@ -14,7 +14,7 @@ import {
 } from '../messages';
 
 @Injectable()
-export default class LanguageAction {
+export default class LanguagueProfileService {
   constructor(
     @InjectRepository(Language)
     private readonly languageRepository: Repository<Language>,
@@ -26,7 +26,10 @@ export default class LanguageAction {
     private readonly profileRepository: Repository<Profile>,
   ) {}
 
-  async add(addLanguageProfile: AddLanguageDto, user: UserActiveInterface) {
+  async add(
+    addLanguageProfile: AddLanguageProfileDto,
+    user: UserActiveInterface,
+  ) {
     const { languageId, level } = addLanguageProfile;
     const profile = await this.profileRepository.findOne({
       where: { userId: user.id },
@@ -47,12 +50,11 @@ export default class LanguageAction {
       throw new NotFoundException(ERROR_EXIST_LANGUAGE_IN_PROFILE);
     }
 
-    const languageProfile = new LanguageProfile();
-    languageProfile.languageId = languageId;
-    languageProfile.profileId = profile.id;
-    languageProfile.level = level;
-
-    return await this.languageProfileRepository.save(languageProfile);
+    return await this.languageProfileRepository.save({
+      languageId: languageId,
+      profileId: profile.id,
+      level: level,
+    });
   }
 
   async remove(languageId: number, user: UserActiveInterface): Promise<void> {

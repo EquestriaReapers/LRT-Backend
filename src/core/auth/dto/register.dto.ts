@@ -3,26 +3,36 @@ import { Transform } from 'class-transformer';
 import { IsEmail, IsString, MinLength } from 'class-validator';
 
 export class RegisterDto {
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Nombre',
+  })
   @IsString()
   @MinLength(1)
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Apellido',
+  })
   @IsString()
   @MinLength(1)
   lastname: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Cedula de identidad',
+  })
   @IsString()
   @MinLength(2)
   document: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Email',
+  })
   @IsEmail()
   email: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Contraseña de minimo 6 caracteres',
+  })
   @IsString()
   @MinLength(6)
   @Transform(({ value }) => value.trim())
