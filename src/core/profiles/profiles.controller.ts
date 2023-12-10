@@ -49,7 +49,7 @@ import { CreateContactDto } from './dto/createContact.dto';
 import { Carrera } from '../career/enum/career.enum';
 import { LanguageProfile } from './entities/language-profile.entity';
 import { AddLanguageProfileDto } from './dto/add-language-profile.dto';
-import LanguagueProfileService from './service/languagueProfileService';
+import LanguagueProfileService from './service/languague-profile.service';
 
 @Controller('profiles')
 export class ProfilesController {

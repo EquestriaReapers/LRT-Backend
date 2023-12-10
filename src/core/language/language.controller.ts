@@ -20,11 +20,11 @@ import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator
 import { MessageDTO } from 'src/common/dto/response.dto';
 import { UserRole } from 'src/constants';
 
-@ApiTags('admin-language')
 @Controller('language')
 export class LanguageController {
   constructor(private readonly languageService: LanguageService) {}
 
+  @ApiTags('admin-language')
   @Post()
   @Auth(UserRole.ADMIN)
   @ApiOkResponse({
@@ -36,8 +36,9 @@ export class LanguageController {
     return this.languageService.create(createLanguageDto);
   }
 
+  @ApiTags('language')
   @Get()
-  @Auth(UserRole.GRADUATE || UserRole.ADMIN)
+  @Auth(UserRole.GRADUATE)
   @ApiOkResponse({
     description: 'Returns an array of ALL languages',
     type: [Language],
@@ -47,8 +48,9 @@ export class LanguageController {
     return this.languageService.findAll();
   }
 
+  @ApiTags('language')
   @Get(':id')
-  @Auth(UserRole.GRADUATE || UserRole.ADMIN)
+  @Auth(UserRole.GRADUATE)
   @ApiOkResponse({
     description: 'Return one language',
     type: Language,
@@ -61,6 +63,7 @@ export class LanguageController {
     return this.languageService.findOne(id);
   }
 
+  @ApiTags('admin-language')
   @Patch(':id')
   @Auth(UserRole.ADMIN)
   @ApiOkResponse({
@@ -78,6 +81,7 @@ export class LanguageController {
     return this.languageService.update(id, updateLanguageDto);
   }
 
+  @ApiTags('admin-language')
   @Delete(':id')
   @Auth(UserRole.ADMIN)
   @ApiOkResponse({

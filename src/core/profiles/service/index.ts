@@ -65,15 +65,8 @@ export default class ProfilesService {
       throw new NotFoundException(PROFILE_NOT_FOUND);
     }
 
-    const mappedProfile = {
-      ...profile,
-      languageProfile: profile.languageProfile.map(({ language, ...lp }) => ({
-        ...lp,
-        name: language.name,
-      })),
-    };
-
-    return mappedProfile;
+    const result = await this.UserProfilePresenter(profile);
+    return result;
   }
 
   async updateMyProfile(
@@ -242,5 +235,19 @@ export default class ProfilesService {
 
     await this.profileRepository.save(profile);
     return;
+  }
+
+  private async UserProfilePresenter(profile: Profile) {
+    const { languageProfile, ...otherProfileProps } = profile;
+
+    const mappedProfile = {
+      ...otherProfileProps,
+      languages: profile.languageProfile.map(({ language, ...lp }) => ({
+        ...lp,
+        name: language.name,
+      })),
+    };
+
+    return mappedProfile;
   }
 }
