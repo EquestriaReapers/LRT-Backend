@@ -20,7 +20,7 @@ export class CreateUserDto {
   @ApiProperty({ example: 'V30109748' })
   @IsString()
   @IsNotEmpty()
-  document: string;
+  documentNumber: string;
 
   @ApiProperty({ example: 'Winchester' })
   @IsNotEmpty()

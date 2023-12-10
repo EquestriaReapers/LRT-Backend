@@ -20,7 +20,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty({ example: 'V30109748' })
   @IsOptional()
   @IsString()
-  document: string;
+  documentNumber: string;
 
   @ApiProperty({ example: 'Winchester' })
   @IsOptional()
