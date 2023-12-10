@@ -21,7 +21,7 @@ const FILE_CONFIG = {
 export default class ProfileExportPDFAction {
   constructor(
     private readonly profileTemplateAdaptator: ProfileTemplateAdaptator,
-  ) {}
+  ) { }
 
   async execute(): Promise<Buffer> {
     try {
@@ -48,13 +48,10 @@ export default class ProfileExportPDFAction {
       });
 
       const profileOriginData = await this.getProfileOriginDataById(1);
-      const profileData =
-        this.profileTemplateAdaptator.execute(profileOriginData);
+      const profileData = await this.profileTemplateAdaptator.execute(profileOriginData);
 
-      // Sustituir getDummyProfileTemplate con profileData cuando este listo.
-      return createPdf(filePath, FILE_CONFIG, {
-        ...getDummyProfileTemplate(SkillSetType.HardSoft),
-      });
+      return createPdf(filePath, FILE_CONFIG, { ...profileData });
+
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(ERROR_UNKOWN_GENERATING_PDF);

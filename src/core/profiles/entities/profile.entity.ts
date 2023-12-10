@@ -84,6 +84,6 @@ export class Profile {
   deletedAt: Date;
 
   @ApiProperty({ type: () => ContactMethod, isArray: true })
-  @Column({ type: 'jsonb', nullable: true, default: () => "'[]'" })
+  @Column({ type: 'json', nullable: true })
   contactMethods: ContactMethod[];
 }

@@ -41,7 +41,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
 
     private readonly jwtPayloadService: JwtPayloadService,
-  ) {}
+  ) { }
 
   async register({ email, password, name, lastname, document }: RegisterDto) {
     const user = await this.usersService.findOneByEmail(email);
@@ -56,7 +56,6 @@ export class AuthService {
       name,
       document,
       lastname,
-      document,
       role: UserRole.GRADUATE,
     });
 
