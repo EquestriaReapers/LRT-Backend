@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException, Param } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  Param,
+} from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -7,6 +13,8 @@ import { UpdateExperienceDto } from '../dto/update-experience.dto';
 import { UserActiveInterface } from '../../../common/interface/user-active-interface';
 import { ExperienceCreateResponseDTO } from '../dto/create-experience.dto';
 import { EXPERIENCE_NOT_FOUND } from '../messages';
+import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
+import { YOU_NOT_HAVE_PERMISSION_MESSAGE } from 'src/core/auth/message';
 
 @Injectable()
 export class ExperienceService {
@@ -76,16 +84,24 @@ export class ExperienceService {
     id: number,
     user: UserActiveInterface,
   ): Promise<void> {
-    const experience = await this.experienceRepository.softDelete({
-      profileId: user.id,
-      id,
-    });
+    const experience = await this.experienceRepository.findOneBy({ id });
+    if (!experience) throw new NotFoundException(EXPERIENCE_NOT_FOUND);
 
-    if (!experience) {
-      throw new NotFoundException(EXPERIENCE_NOT_FOUND);
+    if (experience.profileId !== user.id)
+      throw new ForbiddenException(YOU_NOT_HAVE_PERMISSION_MESSAGE);
+
+    try {
+      const experienceToRemove = await this.experienceRepository.softDelete({
+        profileId: user.id,
+        id: id,
+      });
+      if (experienceToRemove.affected === 0) {
+        throw new InternalServerErrorException(INTERNAL_SERVER_ERROR);
+      }
+    } catch (error) {
+      if (error instanceof InternalServerErrorException) throw error;
+      throw new InternalServerErrorException(INTERNAL_SERVER_ERROR);
     }
-
-    return;
   }
 
   async update(
