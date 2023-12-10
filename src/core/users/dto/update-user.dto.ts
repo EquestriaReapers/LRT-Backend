@@ -20,6 +20,11 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty({ example: 'V30109748' })
   @IsOptional()
   @IsString()
+  @isUniqueDb({
+    table: 'user',
+    column: 'documentNumber',
+    message: 'El número de documento ya existe',
+  })
   documentNumber: string;
 
   @ApiProperty({ example: 'Winchester' })
