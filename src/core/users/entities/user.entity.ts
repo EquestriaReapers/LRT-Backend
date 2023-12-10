@@ -16,7 +16,7 @@ export class User {
 
   @ApiProperty()
   @Column()
-  document: string;
+  documentNumber: string;
 
   @ApiProperty()
   @Column()

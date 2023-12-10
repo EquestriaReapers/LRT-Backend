@@ -37,7 +37,7 @@ import { ApiQuery } from '@nestjs/swagger';
 import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
 import { LanguageProfile } from './entities/language-profile.entity';
 import { AddLanguageProfileDto } from './dto/add-language-profile.dto';
-import LanguagueProfileService from './service/languagueProfileService';
+import LanguagueProfileService from './service/languague-profile.service';
 
 @Controller('profiles')
 export class ProfilesController {

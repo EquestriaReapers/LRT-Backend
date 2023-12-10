@@ -71,7 +71,7 @@ export class UsersService {
       where: { email },
       select: [
         'id',
-        'document',
+        'documentNumber',
         'name',
         'lastname',
         'email',

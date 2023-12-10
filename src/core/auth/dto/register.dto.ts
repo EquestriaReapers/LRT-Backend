@@ -22,7 +22,7 @@ export class RegisterDto {
   })
   @IsString()
   @MinLength(2)
-  document: string;
+  documentNumber: string;
 
   @ApiProperty({
     description: 'Email',

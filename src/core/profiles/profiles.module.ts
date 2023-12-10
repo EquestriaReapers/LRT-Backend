@@ -8,7 +8,7 @@ import FindAllPaginateAction from './service/find-all-paginate.action';
 import { LanguageProfile } from './entities/language-profile.entity';
 import { Language } from '../language/entities/language.entity';
 import { LanguageModule } from '../language/language.module';
-import LanguagueProfileService from './service/languagueProfileService';
+import LanguagueProfileService from './service/languague-profile.service';
 
 @Module({
   imports: [
