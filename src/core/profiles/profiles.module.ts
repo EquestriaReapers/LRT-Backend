@@ -28,4 +28,4 @@ import ProfileTemplateAdaptator from './service/export-pdf/profile-template-adap
   ],
   exports: [ProfilesService],
 })
-export class ProfilesModule {}
+export class ProfilesModule { }

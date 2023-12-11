@@ -140,63 +140,12 @@ export class LanguageProfileDataExtend {
   languageId: number;
 }
 
-export class ResponseProfileGet {
-  @ApiProperty()
-  id: number;
-
-  @ApiProperty()
-  userId: number;
-
-  @ApiProperty({
-    type: UserProfileData,
-  })
-  user: User;
-
-  @ApiProperty()
-  description: string;
-
-  @ApiProperty()
-  mainTitle: string;
-
-  @ApiProperty()
-  countryResidence: string;
-
-  @ApiProperty({
-    type: [ExperienceData],
-  })
-  experience: Experience[];
-
-  @ApiProperty({
-    type: [SkillData],
-  })
-  skills: Skill[];
-
-  @ApiProperty({
-    type: [LanguageProfileDataExtend],
-  })
-  languageProfile: LanguageProfileDataExtend[];
-
-  @ApiProperty()
-  deletedAt: Date;
-}
 
 export class ResponsePaginationProfile {
   @ApiProperty({
     type: ResponseProfile,
   })
   profiles: ResponseProfile[];
-
-  @ApiProperty({
-    type: PaginationMessage,
-  })
-  pagination: PaginationMessage;
-}
-
-export class SwaggerResponsePagination {
-  @ApiProperty({
-    type: ResponseProfileGet,
-  })
-  profiles: ResponseProfileGet[];
 
   @ApiProperty({
     type: PaginationMessage,
@@ -248,3 +197,62 @@ export class ResponseMethodContactDTO {
   })
   contactMethods: MethodContact[];
 }
+
+export class ResponseProfileGet {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  userId: number;
+
+  @ApiProperty({
+    type: UserProfileData,
+  })
+  user: User;
+
+  @ApiProperty()
+  description: string;
+
+  @ApiProperty()
+  mainTitle: string;
+
+  @ApiProperty()
+  countryResidence: string;
+
+  @ApiProperty({
+    type: [ExperienceData],
+  })
+  experience: Experience[];
+
+  @ApiProperty({
+    type: [SkillData],
+  })
+  skills: Skill[];
+
+  @ApiProperty({
+    type: [LanguageProfileDataExtend],
+  })
+  languageProfile: LanguageProfileDataExtend[];
+
+  @ApiProperty()
+  deletedAt: Date;
+
+  @ApiProperty({
+    type: [MethodContact],
+  })
+  contactMethods: MethodContact[];
+
+}
+
+export class SwaggerResponsePagination {
+  @ApiProperty({
+    type: ResponseProfileGet,
+  })
+  profiles: ResponseProfileGet[];
+
+  @ApiProperty({
+    type: PaginationMessage,
+  })
+  pagination: PaginationMessage;
+}
+

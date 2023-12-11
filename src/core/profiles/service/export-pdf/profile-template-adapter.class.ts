@@ -3,6 +3,7 @@ import { ContactItem, Icon, ProfileTemplate, SkillSetType } from './types';
 import { Profile } from 'src/core/profiles/entities/profile.entity';
 import { ContactMethod } from 'src/core/profiles/entities/contact-method.entity';
 import { TypeContact } from 'src/constants';
+import { ResponseProfileGet } from '../../dto/responses.dto';
 
 const ContactMethodTypeToIcon = {
   [TypeContact.PHONE]: Icon.Call,
@@ -11,7 +12,7 @@ const ContactMethodTypeToIcon = {
 
 @Injectable()
 export default class ProfileTemplateAdaptator {
-  async execute(profile: Profile): Promise<ProfileTemplate> {
+  async execute(profile: ResponseProfileGet): Promise<ProfileTemplate> {
     return {
       fullName: profile.user.name + ' ' + profile.user.lastname,
       mainTitle: profile.mainTitle,
@@ -24,7 +25,7 @@ export default class ProfileTemplateAdaptator {
         description: exp.description,
       })),
       educations: [],
-      lenguagues: profile.languageProfile.map(lang => lang.language.name),
+      lenguagues: profile.languageProfile.map(lang => lang.name),
       skillSet: {
         type: SkillSetType.Single,
         skills: profile.skills.map(skill => skill.name),
@@ -32,7 +33,7 @@ export default class ProfileTemplateAdaptator {
     };
   }
 
-  private getContactMethods(profile: Profile): ContactItem[] {
+  private getContactMethods(profile: ResponseProfileGet): ContactItem[] {
     const countryLocationMethod = [];
     if (profile.countryResidence) {
       countryLocationMethod.push({

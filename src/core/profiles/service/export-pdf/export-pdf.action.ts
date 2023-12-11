@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { createPdf } from '@saemhco/nestjs-html-pdf';
 import * as path from 'path';
 import { InternalServerErrorException } from '@nestjs/common';
@@ -10,6 +10,10 @@ import { getDummyProfileTemplate } from './fixtures';
 import { SkillSetType } from './types';
 import ProfileTemplateAdaptator from './profile-template-adapter.class';
 import { Profile } from '../../entities/profile.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ResponseProfileGet } from '../../dto/responses.dto';
+import ProfilesService from '../../service/index';
 
 const FILE_CONFIG = {
   format: 'a4',
@@ -20,6 +24,8 @@ const FILE_CONFIG = {
 @Injectable()
 export default class ProfileExportPDFAction {
   constructor(
+    @InjectRepository(Profile)
+    private readonly profileRepository: Repository<Profile>,
     private readonly profileTemplateAdaptator: ProfileTemplateAdaptator,
   ) { }
 
@@ -48,7 +54,9 @@ export default class ProfileExportPDFAction {
       });
 
       const profileOriginData = await this.getProfileOriginDataById(1);
+      console.log(profileOriginData);
       const profileData = await this.profileTemplateAdaptator.execute(profileOriginData);
+      console.log(profileData);
 
       return createPdf(filePath, FILE_CONFIG, { ...profileData });
 
@@ -58,9 +66,33 @@ export default class ProfileExportPDFAction {
     }
   }
 
-  private async getProfileOriginDataById(userId: number): Promise<Profile> {
-    userId;
-    return {} as any;
+  private async getProfileOriginDataById(userId: number): Promise<ResponseProfileGet> {
+    const profile = await this.profileRepository.findOne({
+      where: { userId: userId },
+      relations: [
+        'user',
+        'skills',
+        'experience',
+        'languageProfile',
+        'languageProfile.language',
+      ],
+      select: {
+        user: {
+          name: true,
+          lastname: true,
+          email: true,
+        },
+      },
+    });
+    const { languageProfile, ...otherProfileProps } = profile;
+    const mappedProfile = {
+      ...otherProfileProps,
+      languageProfile: profile.languageProfile.map(({ language, ...lp }) => ({
+        ...lp,
+        name: language.name,
+      })),
+    };
+    return mappedProfile;
   }
 
   private getTemplatePath() {
