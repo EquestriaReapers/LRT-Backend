@@ -7,10 +7,10 @@ import { Skill } from '../skills/entities/skill.entity';
 import FindAllPaginateAction from './service/find-all-paginate.action';
 import { LanguageProfile } from './entities/language-profile.entity';
 import ExportPDFAction from './service/export-pdf';
+import ProfileTemplateAdaptator from './service/export-pdf/profile-template-adapter.class';
 import { Language } from '../language/entities/language.entity';
 import { LanguageModule } from '../language/language.module';
-import LanguageAction from './service/language.action';
-import ProfileTemplateAdaptator from './service/export-pdf/profile-template-adapter.class';
+import LanguagueProfileService from './service/languague-profile.service';
 
 @Module({
   imports: [
@@ -23,9 +23,9 @@ import ProfileTemplateAdaptator from './service/export-pdf/profile-template-adap
     ProfilesService,
     FindAllPaginateAction,
     ExportPDFAction,
-    LanguageAction,
+    LanguagueProfileService,
     ProfileTemplateAdaptator,
   ],
   exports: [ProfilesService],
 })
-export class ProfilesModule { }
+export class ProfilesModule {}

@@ -44,17 +44,17 @@ import {
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
 import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
-import LanguageAction from './service/language.action';
 import { LanguageProfile } from './entities/language-profile.entity';
-import { AddLanguageDto } from './dto/add-language.dto';
 import { CreateContactDto } from './dto/createContact.dto';
 import { ResponseMethodContactDTO } from './dto/responses.dto';
+import { AddLanguageProfileDto } from './dto/add-language-profile.dto';
+import LanguagueProfileService from './service/languague-profile.service';
 
 @Controller('profiles')
 export class ProfilesController {
   constructor(
     private readonly profilesService: ProfilesService,
-    private readonly languageAction: LanguageAction,
+    private readonly languagueProfileService: LanguagueProfileService,
   ) {}
 
   @ApiTags('profile')
@@ -229,10 +229,10 @@ export class ProfilesController {
   })
   @ApiInternalServerError()
   addLanguageProfile(
-    @Body() addLanguageProfile: AddLanguageDto,
+    @Body() addLanguageProfile: AddLanguageProfileDto,
     @ActiveUser() user: UserActiveInterface,
   ) {
-    return this.languageAction.add(addLanguageProfile, user);
+    return this.languagueProfileService.add(addLanguageProfile, user);
   }
 
   @ApiTags('profile')
@@ -251,7 +251,7 @@ export class ProfilesController {
     @ActiveUser() user: UserActiveInterface,
     @Response() response: express.Response,
   ) {
-    await this.languageAction.remove(languageId, user);
+    await this.languagueProfileService.remove(languageId, user);
 
     return response.status(200).json({
       message: PROFILE_SUCCESFULLY_DELETED_LANGUAGE,

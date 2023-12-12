@@ -23,7 +23,7 @@ export class CreateUserDto {
   @isUniqueDb({
     table: 'user',
     column: 'documentNumber',
-    message: 'El numero de documento ya existe',
+    message: 'El número de documento ya existe',
   })
   documentNumber: string;
 

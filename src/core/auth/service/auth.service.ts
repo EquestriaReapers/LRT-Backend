@@ -41,7 +41,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
 
     private readonly jwtPayloadService: JwtPayloadService,
-  ) { }
+  ) {}
 
   async register({
     email,

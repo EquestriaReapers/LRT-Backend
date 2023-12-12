@@ -120,7 +120,7 @@ export class ExperienceController {
     description: 'Experience not found',
   })
   @ApiInternalServerError()
-  async removeMyExperiencia(
+  async removeMyExperience(
     @Param('id') id: number,
     @ActiveUser() user: UserActiveInterface,
     @Response() response: express.Response,
