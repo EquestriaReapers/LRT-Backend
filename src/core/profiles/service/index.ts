@@ -78,7 +78,6 @@ export default class ProfilesService {
       description: updateProfileDto.description,
       mainTitle: updateProfileDto.mainTitle,
       countryResidence: updateProfileDto.countryResidence,
-      career: updateProfileDto.career,
     });
 
     if (profile.affected === 0) {

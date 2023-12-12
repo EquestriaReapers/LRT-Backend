@@ -1,7 +1,7 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { CreateProfileDTO } from './create-profile.dto';
-import { Carrera } from 'src/core/career/enum/career.enum';
+import { Career } from 'src/core/career/enum/career.enum';
 
 export class UpdateProfileDto extends PartialType(CreateProfileDTO) {
   @ApiProperty({ example: 'Muy proactivo', required: true })
@@ -18,9 +18,9 @@ export class UpdateProfileDto extends PartialType(CreateProfileDTO) {
   lastName: string;
 
   @ApiProperty()
-  @IsString()
+  @IsEnum(Career, { message: 'Invalid Career' })
   @IsOptional()
-  mainTitle: string;
+  mainTitle: Career;
 
   @ApiProperty()
   @IsString()
@@ -28,7 +28,7 @@ export class UpdateProfileDto extends PartialType(CreateProfileDTO) {
   countryResidence: string;
 
   @ApiProperty()
-  @IsEnum(Carrera, { message: 'Invalid Career' })
+  @IsEnum(Career, { message: 'Invalid Career' })
   @IsOptional()
-  career: Carrera;
+  career: Career;
 }

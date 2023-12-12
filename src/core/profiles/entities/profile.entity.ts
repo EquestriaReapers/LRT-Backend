@@ -20,7 +20,7 @@ import {
   UserProfileData,
 } from '../dto/responses.dto';
 import { LanguageProfile } from './language-profile.entity';
-import { Carrera } from 'src/core/career/enum/career.enum';
+import { Career } from 'src/core/career/enum/career.enum';
 import { ContactMethod } from './contact-method.entity';
 
 @Entity()
@@ -46,11 +46,13 @@ export class Profile {
   })
   description: string;
 
-  @ApiProperty()
+  @ApiProperty({ enum: Career })
   @Column({
+    type: 'enum',
+    enum: Career,
     nullable: true,
   })
-  mainTitle: string;
+  mainTitle: Career;
 
   @ApiProperty()
   @Column({
@@ -83,15 +85,6 @@ export class Profile {
   @ApiProperty()
   @DeleteDateColumn()
   deletedAt: Date;
-
-  @ApiProperty({ enum: Carrera })
-  @Column({
-    type: 'enum',
-    enum: Carrera,
-    default: null,
-    nullable: true,
-  })
-  career: Carrera;
 
   @ApiProperty({ type: () => ContactMethod, isArray: true })
   @Column({ type: 'jsonb', nullable: true, default: () => "'[]'" })
