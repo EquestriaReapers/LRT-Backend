@@ -46,8 +46,8 @@ import { ApiInternalServerError } from 'src/common/decorator/internal-server-err
 import { LanguageProfile } from './entities/language-profile.entity';
 import { Carrera } from '../career/enum/career.enum';
 import { AddLanguageProfileDto } from './dto/add-language-profile.dto';
-import LanguagueProfileService from './service/languagueProfileService';
 import { CreateContactDto } from './dto/createContact.dto';
+import LanguagueProfileService from './service/languague-profile.service';
 
 @Controller('profiles')
 export class ProfilesController {

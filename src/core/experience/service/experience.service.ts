@@ -91,11 +91,11 @@ export class ExperienceService {
       throw new ForbiddenException(YOU_NOT_HAVE_PERMISSION_MESSAGE);
 
     try {
-      const experienceToRemove = await this.experienceRepository.softDelete({
+      const experienceRemoved = await this.experienceRepository.softDelete({
         profileId: user.id,
         id: id,
       });
-      if (experienceToRemove.affected === 0) {
+      if (experienceRemoved.affected === 0) {
         throw new InternalServerErrorException(INTERNAL_SERVER_ERROR);
       }
     } catch (error) {

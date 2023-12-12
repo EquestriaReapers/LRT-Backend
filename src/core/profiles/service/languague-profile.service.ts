@@ -59,19 +59,14 @@ export default class LanguagueProfileService {
 
   async remove(languageId: number, user: UserActiveInterface): Promise<void> {
     const profile = await this.profileRepository.findOne({
-      relations: ['languages'],
       where: { userId: user.id },
     });
-
-    if (!profile) {
-      throw new NotFoundException(PROFILE_NOT_FOUND);
-    }
 
     const language = await this.languageRepository.findOne({
       where: { id: languageId },
     });
 
-    if (!language) {
+    if (!profile || !language) {
       throw new NotFoundException(ERROR_PROFILE_LANGUAGUE_NOT_FOUND);
     }
 

@@ -66,15 +66,8 @@ export default class ProfilesService {
       throw new NotFoundException(PROFILE_NOT_FOUND);
     }
 
-    const mappedProfile = {
-      ...profile,
-      languageProfile: profile.languageProfile.map(({ language, ...lp }) => ({
-        ...lp,
-        name: language.name,
-      })),
-    };
-
-    return mappedProfile;
+    const result = await this.UserProfilePresenter(profile);
+    return result;
   }
 
   async updateMyProfile(
@@ -167,9 +160,27 @@ export default class ProfilesService {
 
     if (profile.affected === 0) throw new NotFoundException(PROFILE_NOT_FOUND);
 
-    if (updateProfileDto.name) {
+    if (updateProfileDto.name === undefined || updateProfileDto.name === null) {
+      const dataUser = await this.userRepository.findOne({
+        where: { id: userId },
+      });
+      updateProfileDto.name = dataUser.name;
+    }
+
+    if (
+      updateProfileDto.lastName === undefined ||
+      updateProfileDto.lastName === null
+    ) {
+      const dataUser = await this.userRepository.findOne({
+        where: { id: userId },
+      });
+      updateProfileDto.lastName = dataUser.lastname;
+    }
+
+    if (updateProfileDto.name || updateProfileDto.lastName) {
       const userUpdateResult = await this.userRepository.update(userId, {
         name: updateProfileDto.name,
+        lastname: updateProfileDto.lastName,
       });
 
       if (userUpdateResult.affected === 0) {
@@ -246,5 +257,18 @@ export default class ProfilesService {
 
     await this.profileRepository.save(profile);
     return;
+  }
+  async UserProfilePresenter(profile: Profile) {
+    const { languageProfile, ...otherProfileProps } = profile;
+
+    const mappedProfile = {
+      ...otherProfileProps,
+      languages: profile.languageProfile.map(({ language, ...lp }) => ({
+        ...lp,
+        name: language.name,
+      })),
+    };
+
+    return mappedProfile;
   }
 }

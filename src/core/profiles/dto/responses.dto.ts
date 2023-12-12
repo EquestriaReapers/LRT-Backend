@@ -179,7 +179,7 @@ export class ResponseProfileGet {
   @ApiProperty({
     type: [LanguageProfileDataExtend],
   })
-  languageProfile: LanguageProfileDataExtend[];
+  languages: LanguageProfileDataExtend[];
 
   @ApiProperty()
   deletedAt: Date;
