@@ -21,6 +21,7 @@ import {
 } from '../dto/responses.dto';
 import { LanguageProfile } from './language-profile.entity';
 import { Carrera } from 'src/core/career/enum/career.enum';
+import { ContactMethod } from './contact-method.entity';
 
 @Entity()
 export class Profile {
@@ -91,4 +92,8 @@ export class Profile {
     nullable: true,
   })
   career: Carrera;
+
+  @ApiProperty({ type: () => ContactMethod, isArray: true })
+  @Column({ type: 'jsonb', nullable: true, default: () => "'[]'" })
+  contactMethods: ContactMethod[];
 }

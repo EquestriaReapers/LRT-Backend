@@ -15,8 +15,10 @@ export class User {
   id: number;
 
   @ApiProperty()
-  @Column()
-  document: string;
+  @Column({
+    unique: true,
+  })
+  documentNumber: string;
 
   @ApiProperty()
   @Column()
