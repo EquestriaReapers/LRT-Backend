@@ -182,10 +182,7 @@ export class MethodContact {
   id: number;
 
   @ApiProperty()
-  type: string;
-
-  @ApiProperty()
-  value: string;
+  email: string;
 }
 
 export class ResponseProfileGet {

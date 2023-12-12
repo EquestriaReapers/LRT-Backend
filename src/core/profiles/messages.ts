@@ -17,3 +17,5 @@ export const ERROR_NOT_FOUND_LANGUAGE_IN_PROFILE =
   'Idioma no encontrado en el perfil';
 export const ERROR_UNKOWN_GENERATING_PDF =
   'Error desconocido al generar el PDF';
+export const ERROR_LIMITE_METHOD_CONTACT =
+  'Se ha alcanzado el número máximo de correos de contacto';
