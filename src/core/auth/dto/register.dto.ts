@@ -16,7 +16,7 @@ export class RegisterDto {
   @ApiProperty()
   @IsString()
   @MinLength(2)
-  document: string;
+  documentNumber: string;
 
   @ApiProperty()
   @IsEmail()

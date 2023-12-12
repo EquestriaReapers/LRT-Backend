@@ -20,7 +20,12 @@ export class CreateUserDto {
   @ApiProperty({ example: 'V30109748' })
   @IsString()
   @IsNotEmpty()
-  document: string;
+  @isUniqueDb({
+    table: 'user',
+    column: 'documentNumber',
+    message: 'El numero de documento ya existe',
+  })
+  documentNumber: string;
 
   @ApiProperty({ example: 'Winchester' })
   @IsNotEmpty()

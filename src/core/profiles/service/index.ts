@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { Profile } from '../entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,7 +10,11 @@ import { In, Repository } from 'typeorm';
 import { UserActiveInterface } from '../../../common/interface/user-active-interface';
 import { Skill } from '../../skills/entities/skill.entity';
 import { User } from '../../users/entities/user.entity';
-import { ERROR_PROFILE_SKILL_NOT_FOUND, PROFILE_NOT_FOUND } from '../messages';
+import {
+  ERROR_LIMITE_METHOD_CONTACT,
+  ERROR_PROFILE_SKILL_NOT_FOUND,
+  PROFILE_NOT_FOUND,
+} from '../messages';
 import { USER_NOT_FOUND } from 'src/core/users/messages';
 import { SKILL_NOT_FOUND } from 'src/core/skills/messages';
 import FindAllPaginateAction from './find-all-paginate.action';
@@ -209,10 +217,13 @@ export default class ProfilesService {
       throw new NotFoundException(PROFILE_NOT_FOUND);
     }
 
+    if (profile.contactMethods.length >= 3) {
+      throw new BadRequestException(ERROR_LIMITE_METHOD_CONTACT);
+    }
+
     const contactMethod = new ContactMethod();
     contactMethod.id = profile.contactMethods.length + 1;
-    contactMethod.type = createContactMethodDto.type;
-    contactMethod.value = createContactMethodDto.value;
+    contactMethod.email = createContactMethodDto.email;
 
     profile.contactMethods.push(contactMethod);
 

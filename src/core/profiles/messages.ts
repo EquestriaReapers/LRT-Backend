@@ -16,4 +16,6 @@ export const ERROR_EXIST_LANGUAGE_IN_PROFILE =
 export const ERROR_NOT_FOUND_LANGUAGE_IN_PROFILE =
   'Idioma no encontrado en el perfil';
 export const PROFILE_SUCCESFULLY_DELETE_METHOD_CONTACT =
-  'Contacto eliminado con exito';
+  'Metodo de contacto eliminado con exito';
+export const ERROR_LIMITE_METHOD_CONTACT =
+  'Se ha alcanzado el número máximo de correos de contacto';
