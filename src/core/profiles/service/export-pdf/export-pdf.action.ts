@@ -27,7 +27,7 @@ export default class ProfileExportPDFAction {
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
     private readonly profileTemplateAdaptator: ProfileTemplateAdaptator,
-  ) { }
+  ) {}
 
   async execute(): Promise<Buffer> {
     try {
@@ -46,7 +46,7 @@ export default class ProfileExportPDFAction {
         'experiencie-section.hbs',
       );
       await this.registerPartial('skillsSection', 'skills-section.hbs');
-      await this.registerPartial('lenguaguesSection', 'lenguagues-section.hbs');
+      await this.registerPartial('languagesSection', 'lenguagues-section.hbs');
 
       handlebars.registerHelper('is-not-empty', function (a) {
         if (Array.isArray(a) && a.length > 0) return true;
@@ -54,19 +54,19 @@ export default class ProfileExportPDFAction {
       });
 
       const profileOriginData = await this.getProfileOriginDataById(1);
-      console.log(profileOriginData);
-      const profileData = await this.profileTemplateAdaptator.execute(profileOriginData);
-      console.log(profileData);
+      const profileData =
+        await this.profileTemplateAdaptator.execute(profileOriginData);
 
       return createPdf(filePath, FILE_CONFIG, { ...profileData });
-
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(ERROR_UNKOWN_GENERATING_PDF);
     }
   }
 
-  private async getProfileOriginDataById(userId: number): Promise<ResponseProfileGet> {
+  private async getProfileOriginDataById(
+    userId: number,
+  ): Promise<ResponseProfileGet> {
     const profile = await this.profileRepository.findOne({
       where: { userId: userId },
       relations: [
@@ -87,7 +87,7 @@ export default class ProfileExportPDFAction {
     const { languageProfile, ...otherProfileProps } = profile;
     const mappedProfile = {
       ...otherProfileProps,
-      languageProfile: profile.languageProfile.map(({ language, ...lp }) => ({
+      languages: profile.languageProfile.map(({ language, ...lp }) => ({
         ...lp,
         name: language.name,
       })),
