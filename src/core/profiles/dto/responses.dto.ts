@@ -3,7 +3,6 @@ import { Profile } from '../entities/profile.entity';
 import { Skill } from 'src/core/skills/entities/skill.entity';
 import { Experience } from 'src/core/experience/entities/experience.entity';
 import { User } from 'src/core/users/entities/user.entity';
-import { ProfileI } from '../entities/profile.interface';
 
 export class UserProfileData {
   @ApiProperty()
@@ -151,10 +150,7 @@ export class MethodContact {
   id: number;
 
   @ApiProperty()
-  type: string;
-
-  @ApiProperty()
-  value: string;
+  email: string;
 }
 
 export class ResponseMethodContactDTO {
