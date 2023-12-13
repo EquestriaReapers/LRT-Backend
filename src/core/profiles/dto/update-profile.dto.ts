@@ -26,9 +26,4 @@ export class UpdateProfileDto extends PartialType(CreateProfileDTO) {
   @IsString()
   @IsOptional()
   countryResidence: string;
-
-  @ApiProperty()
-  @IsEnum(Career, { message: 'Invalid Career' })
-  @IsOptional()
-  career: Career;
 }
