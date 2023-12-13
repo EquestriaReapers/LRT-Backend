@@ -182,6 +182,17 @@ export class MethodContact {
   email: string;
 }
 
+export class ResponseMethodContactDTO {
+  @ApiProperty({
+    type: ProfileData,
+  })
+  profile: ProfileData;
+  @ApiProperty({
+    type: [MethodContact],
+  })
+  contactMethods: MethodContact[];
+}
+
 export class ResponseProfileGet {
   @ApiProperty()
   id: number;
@@ -198,12 +209,7 @@ export class ResponseProfileGet {
   description: string;
 
   @ApiProperty()
-  mainTitle: string;
-
-  @ApiProperty({
-    type: [MethodContact],
-  })
-  contactMethods: MethodContact[];
+  mainTitle: Career;
 
   @ApiProperty()
   countryResidence: string;
@@ -225,13 +231,7 @@ export class ResponseProfileGet {
 
   @ApiProperty()
   deletedAt: Date;
-}
 
-export class ResponseMethodContactDTO {
-  @ApiProperty({
-    type: ProfileData,
-  })
-  profile: ProfileData;
   @ApiProperty({
     type: [MethodContact],
   })
@@ -240,9 +240,9 @@ export class ResponseMethodContactDTO {
 
 export class SwaggerResponsePagination {
   @ApiProperty({
-    type: ResponseProfile,
+    type: ResponsePaginationProfile,
   })
-  profiles: ResponseProfile[];
+  profiles: ResponsePaginationProfile[];
 
   @ApiProperty({
     type: PaginationMessage,

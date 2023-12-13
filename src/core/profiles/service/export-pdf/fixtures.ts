@@ -61,7 +61,7 @@ export function getDummyProfileTemplate(
         where: 'Venezuela, Bolívar',
       },
     ],
-    lenguagues: ['Spanish', 'English'],
+    languages: ['Spanish', 'English'],
     skillSet:
       skillSetType === SkillSetType.HardSoft
         ? {

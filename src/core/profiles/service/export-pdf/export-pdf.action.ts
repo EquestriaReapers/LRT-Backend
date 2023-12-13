@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { createPdf } from '@saemhco/nestjs-html-pdf';
 import * as path from 'path';
 import { InternalServerErrorException } from '@nestjs/common';
@@ -8,6 +8,12 @@ import handlebars from 'handlebars';
 import * as fs from 'fs';
 import { getDummyProfileTemplate } from './fixtures';
 import { SkillSetType } from './types';
+import ProfileTemplateAdaptator from './profile-template-adapter.class';
+import { Profile } from '../../entities/profile.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ResponseProfileGet } from '../../dto/responses.dto';
+import ProfilesService from '../../service/index';
 
 const FILE_CONFIG = {
   format: 'a4',
@@ -17,6 +23,12 @@ const FILE_CONFIG = {
 
 @Injectable()
 export default class ProfileExportPDFAction {
+  constructor(
+    @InjectRepository(Profile)
+    private readonly profileRepository: Repository<Profile>,
+    private readonly profileTemplateAdaptator: ProfileTemplateAdaptator,
+  ) {}
+
   async execute(): Promise<Buffer> {
     try {
       const filePath = this.getTemplatePath();
@@ -34,20 +46,53 @@ export default class ProfileExportPDFAction {
         'experiencie-section.hbs',
       );
       await this.registerPartial('skillsSection', 'skills-section.hbs');
-      await this.registerPartial('lenguaguesSection', 'lenguagues-section.hbs');
+      await this.registerPartial('languagesSection', 'lenguagues-section.hbs');
 
       handlebars.registerHelper('is-not-empty', function (a) {
         if (Array.isArray(a) && a.length > 0) return true;
         return a !== null && a !== undefined && a !== '';
       });
 
-      return createPdf(filePath, FILE_CONFIG, {
-        ...getDummyProfileTemplate(SkillSetType.HardSoft),
-      });
+      const profileOriginData = await this.getProfileOriginDataById(1);
+      const profileData =
+        await this.profileTemplateAdaptator.execute(profileOriginData);
+
+      return createPdf(filePath, FILE_CONFIG, { ...profileData });
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(ERROR_UNKOWN_GENERATING_PDF);
     }
+  }
+
+  private async getProfileOriginDataById(
+    userId: number,
+  ): Promise<ResponseProfileGet> {
+    const profile = await this.profileRepository.findOne({
+      where: { userId: userId },
+      relations: [
+        'user',
+        'skills',
+        'experience',
+        'languageProfile',
+        'languageProfile.language',
+      ],
+      select: {
+        user: {
+          name: true,
+          lastname: true,
+          email: true,
+        },
+      },
+    });
+    const { languageProfile, ...otherProfileProps } = profile;
+    const mappedProfile = {
+      ...otherProfileProps,
+      languages: profile.languageProfile.map(({ language, ...lp }) => ({
+        ...lp,
+        name: language.name,
+      })),
+    };
+    return mappedProfile;
   }
 
   private getTemplatePath() {

@@ -20,10 +20,10 @@ import { SKILL_NOT_FOUND } from 'src/core/skills/messages';
 import FindAllPaginateAction from './find-all-paginate.action';
 import { ResponsePaginationProfile } from '../dto/responses.dto';
 import { FindAllPayload } from '../dto/find-all-payload.interface';
-import { ContactMethod } from '../entities/contact-method.entity';
-import { CreateContactDto } from '../dto/createContact.dto';
 import ExportPDFAction from './export-pdf';
 import { Buffer } from 'buffer';
+import { ContactMethod } from '../entities/contact-method.entity';
+import { CreateContactDto } from '../dto/createContact.dto';
 
 @Injectable()
 export default class ProfilesService {

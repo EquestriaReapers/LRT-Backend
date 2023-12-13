@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Skill } from '../skills/entities/skill.entity';
 import FindAllPaginateAction from './service/find-all-paginate.action';
 import { LanguageProfile } from './entities/language-profile.entity';
+import ProfileTemplateAdaptator from './service/export-pdf/profile-template-adapter.class';
 import { Language } from '../language/entities/language.entity';
 import { LanguageModule } from '../language/language.module';
 import ExportPDFAction from './service/export-pdf';
@@ -21,8 +22,9 @@ import LanguagueProfileService from './service/languague-profile.service';
   providers: [
     ProfilesService,
     FindAllPaginateAction,
-    LanguagueProfileService,
     ExportPDFAction,
+    LanguagueProfileService,
+    ProfileTemplateAdaptator,
   ],
   exports: [ProfilesService],
 })

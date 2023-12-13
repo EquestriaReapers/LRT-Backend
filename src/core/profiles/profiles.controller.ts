@@ -10,8 +10,8 @@ import {
   Response,
   InternalServerErrorException,
   Query,
-  ParseIntPipe,
   Res,
+  ParseIntPipe,
 } from '@nestjs/common';
 import ProfilesService from './service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -40,7 +40,7 @@ import {
   AddSkillResponse,
   ResponseMethodContactDTO,
   ResponseProfileGet,
-  SwaggerResponsePagination,
+  ResponsePaginationProfile,
 } from './dto/responses.dto';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
@@ -85,7 +85,7 @@ export class ProfilesController {
   @Get()
   @ApiOkResponse({
     description: 'Returns an array of ALL profiles',
-    type: SwaggerResponsePagination,
+    type: ResponsePaginationProfile,
   })
   @ApiInternalServerError()
   @ApiQuery({ name: 'page', required: false })
