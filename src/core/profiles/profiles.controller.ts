@@ -59,10 +59,10 @@ export class ProfilesController {
   ) {}
 
   @ApiTags('profile')
-  @Get('export-pdf')
+  @Get('export-pdf/:id')
   @ApiInternalServerError()
-  async generatePdf(@Res() res) {
-    const buffer = await this.profilesService.exportPdf();
+  async generatePdf(@Res() res, @Param('id') id: number) {
+    const buffer = await this.profilesService.exportPdf(+id);
 
     if (!buffer) {
       throw new InternalServerErrorException(ERROR_UNKOWN_GENERATING_PDF);
