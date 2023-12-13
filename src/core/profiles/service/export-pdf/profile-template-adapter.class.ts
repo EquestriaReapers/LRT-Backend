@@ -66,7 +66,9 @@ export default class ProfileTemplateAdaptator {
 
   private getMainTitle(mainTitle: string): string {
     if (mainTitle) {
-      return `${mainTitle.charAt(0).toUpperCase()}` + `${mainTitle.slice(1)}`;
+      mainTitle =
+        mainTitle.charAt(0).toUpperCase() + mainTitle.slice(1).toLowerCase();
+      return mainTitle;
     }
 
     return '';
