@@ -14,7 +14,9 @@ export default class ProfileTemplateAdaptator {
   async execute(profile: ResponseProfileGet): Promise<ProfileTemplate> {
     return {
       fullName: profile.user.name + ' ' + profile.user.lastname,
-      mainTitle: profile.mainTitle,
+      mainTitle:
+        `${profile.mainTitle.charAt(0).toUpperCase()}` +
+        `${profile.mainTitle.slice(1).toLowerCase()}`,
       contactItems: this.getContactMethods(profile),
       experiences: profile.experience.map((exp) => ({
         company: exp.businessName,

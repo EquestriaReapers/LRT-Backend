@@ -41,6 +41,7 @@ import {
   ResponseProfileGet,
   SwaggerResponsePagination,
   ResponseMethodContactDTO,
+  ResponsePaginationProfile,
 } from './dto/responses.dto';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
@@ -82,11 +83,10 @@ export class ProfilesController {
   }
 
   @ApiTags('profile')
-  @Auth(UserRole.GRADUATE)
   @Get()
   @ApiOkResponse({
     description: 'Returns an array of ALL profiles',
-    type: SwaggerResponsePagination,
+    type: ResponsePaginationProfile,
   })
   @ApiInternalServerError()
   @ApiQuery({ name: 'page', required: false })

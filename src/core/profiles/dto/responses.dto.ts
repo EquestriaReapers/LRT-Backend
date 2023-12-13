@@ -240,9 +240,9 @@ export class ResponseProfileGet {
 
 export class SwaggerResponsePagination {
   @ApiProperty({
-    type: ResponseProfileGet,
+    type: ResponsePaginationProfile,
   })
-  profiles: ResponseProfileGet[];
+  profiles: ResponsePaginationProfile[];
 
   @ApiProperty({
     type: PaginationMessage,
