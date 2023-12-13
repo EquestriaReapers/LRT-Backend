@@ -47,8 +47,8 @@ export default class ProfilesService {
     return await this.findAllPaginateAction.execute(opt);
   }
 
-  async exportPdf(): Promise<Buffer> {
-    return await this.exportPdfAction.execute();
+  async exportPdf(id: number): Promise<Buffer> {
+    return await this.exportPdfAction.execute(id);
   }
 
   async findOne(id: number) {

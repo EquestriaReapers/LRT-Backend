@@ -29,7 +29,7 @@ export default class ProfileExportPDFAction {
     private readonly profileTemplateAdaptator: ProfileTemplateAdaptator,
   ) {}
 
-  async execute(): Promise<Buffer> {
+  async execute(id: number): Promise<Buffer> {
     try {
       const filePath = this.getTemplatePath();
       await this.registerPartial('header', 'header.hbs');
@@ -53,7 +53,7 @@ export default class ProfileExportPDFAction {
         return a !== null && a !== undefined && a !== '';
       });
 
-      const profileOriginData = await this.getProfileOriginDataById(1);
+      const profileOriginData = await this.getProfileOriginDataById(id);
       const profileData =
         await this.profileTemplateAdaptator.execute(profileOriginData);
 
