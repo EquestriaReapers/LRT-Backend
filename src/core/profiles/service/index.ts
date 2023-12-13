@@ -175,19 +175,19 @@ export default class ProfilesService {
     }
 
     if (
-      updateProfileDto.lastName === undefined ||
-      updateProfileDto.lastName === null
+      updateProfileDto.lastname === undefined ||
+      updateProfileDto.lastname === null
     ) {
       const dataUser = await this.userRepository.findOne({
         where: { id: userId },
       });
-      updateProfileDto.lastName = dataUser.lastname;
+      updateProfileDto.lastname = dataUser.lastname;
     }
 
-    if (updateProfileDto.name || updateProfileDto.lastName) {
+    if (updateProfileDto.name || updateProfileDto.lastname) {
       const userUpdateResult = await this.userRepository.update(userId, {
         name: updateProfileDto.name,
-        lastname: updateProfileDto.lastName,
+        lastname: updateProfileDto.lastname,
       });
 
       if (userUpdateResult.affected === 0) {
