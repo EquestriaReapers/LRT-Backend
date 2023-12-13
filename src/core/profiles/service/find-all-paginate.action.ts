@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Profile } from '../entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,6 +11,7 @@ import {
   ResponsePaginationProfile,
 } from '../dto/responses.dto';
 import { FindAllPayload } from '../dto/find-all-payload.interface';
+import { Career } from 'src/core/career/enum/career.enum';
 
 @Injectable()
 export default class FindAllPaginateAction {
@@ -21,15 +22,37 @@ export default class FindAllPaginateAction {
 
   async execute({
     random,
+    carrera,
     ...opt
   }: FindAllPayload): Promise<ResponsePaginationProfile> {
     const { page, limit, skip } = this.getPaginationData(opt);
     if (!random) random = Math.random();
 
+    if (carrera) {
+      if (!Array.isArray(carrera)) {
+        carrera = [carrera];
+      }
+
+      carrera = carrera.map((c) => {
+        const carreraUpper = c.toUpperCase() as Career;
+
+        if (!Object.values(Career).includes(carreraUpper)) {
+          throw new BadRequestException(
+            `Invalid value for Carrera: ${carreraUpper}`,
+          );
+        }
+
+        return carreraUpper;
+      });
+    } else {
+      carrera = null;
+    }
+
     const profiles = await this.executeQueryGetRandomProfiles(
       random,
       limit,
       skip,
+      carrera,
     );
     const totalCount = await this.profileRepository.count();
 
@@ -55,15 +78,20 @@ export default class FindAllPaginateAction {
     random: number,
     limit: number,
     skip: number,
+    carrera: Career[],
   ): Promise<Profile[]> {
     await this.setProfileRepositorySeed(random);
 
-    const resultsRaw = await this.profileRepository.query(
-      RANDOM_PROFILES_PAGINATE_QUERY.replace('{{limit}}', limit + '').replace(
-        '{{skip}}',
-        skip + '',
-      ),
-    );
+    let query = RANDOM_PROFILES_PAGINATE_QUERY.replace(
+      '{{limit}}',
+      limit + '',
+    ).replace('{{skip}}', skip + '');
+
+    if (carrera) {
+      query = this.addMultipleFiltersToQuery(query, 'mainTitle', carrera);
+    }
+
+    const resultsRaw = await this.profileRepository.query(query);
 
     const formattedResult: Profile[] = resultsRaw.map((row) => ({
       id: row.profile_id,
@@ -101,5 +129,55 @@ export default class FindAllPaginateAction {
       limit: opt.limit || 10,
       skip: (page - 1) * limit,
     };
+  }
+
+  private addFilterToQuery(
+    query: string,
+    columnName: string,
+    filterValue: any,
+  ): string {
+    if (filterValue) {
+      const filterCondition = `"profile"."${columnName}" = '${filterValue}'`;
+      const whereIndex = query.lastIndexOf('WHERE');
+
+      if (whereIndex !== -1) {
+        // Si ya hay una cláusula WHERE en la consulta, agrega la condición de filtro con un operador lógico AND
+        query =
+          query.slice(0, whereIndex + 5) +
+          ` ${filterCondition} AND` +
+          query.slice(whereIndex + 5);
+      } else {
+        // Si no hay una cláusula WHERE, agrega la condición de filtro al final de la consulta
+        query += ` WHERE ${filterCondition}`;
+      }
+    }
+
+    return query;
+  }
+
+  private addMultipleFiltersToQuery(
+    query: string,
+    columnName: string,
+    filterValues: any[],
+  ): string {
+    if (filterValues.length > 0) {
+      const filterConditions = filterValues.map(
+        (value) => `"${columnName}" = '${value}'`,
+      );
+      const filterQuery = filterConditions.join(' OR ');
+
+      const whereIndex = query.lastIndexOf('WHERE');
+      if (whereIndex !== -1) {
+        query =
+          query.slice(0, whereIndex + 5) +
+          filterQuery +
+          ' AND ' +
+          query.slice(whereIndex + 5);
+      } else {
+        query += ' WHERE ' + filterQuery;
+      }
+    }
+
+    return query;
   }
 }

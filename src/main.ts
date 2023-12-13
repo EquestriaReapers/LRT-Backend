@@ -49,6 +49,7 @@ async function bootstrap() {
     .addTag('profile')
     .addTag('experience')
     .addTag('skill')
+    .addTag('career')
     .addTag('language')
     .build();
 

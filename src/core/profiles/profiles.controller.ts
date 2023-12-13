@@ -40,14 +40,15 @@ import {
   AddSkillResponse,
   ResponseProfileGet,
   SwaggerResponsePagination,
+  ResponseMethodContactDTO,
 } from './dto/responses.dto';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
 import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
 import { LanguageProfile } from './entities/language-profile.entity';
-import { CreateContactDto } from './dto/createContact.dto';
-import { ResponseMethodContactDTO } from './dto/responses.dto';
+import { Career } from '../career/enum/career.enum';
 import { AddLanguageProfileDto } from './dto/add-language-profile.dto';
+import { CreateContactDto } from './dto/createContact.dto';
 import LanguagueProfileService from './service/languague-profile.service';
 
 @Controller('profiles')
@@ -91,10 +92,12 @@ export class ProfilesController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'random', required: false })
+  @ApiQuery({ name: 'carrera', required: false })
   findAll(
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('random') random: number,
+    @Query('carrera') carrera: Career[],
   ) {
     limit = limit > 100 ? 100 : limit;
 
@@ -102,6 +105,7 @@ export class ProfilesController {
       page,
       limit,
       random,
+      carrera,
     });
   }
 
