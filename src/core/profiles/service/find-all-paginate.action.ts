@@ -11,7 +11,7 @@ import {
   ResponsePaginationProfile,
 } from '../dto/responses.dto';
 import { FindAllPayload } from '../dto/find-all-payload.interface';
-import { Carrera } from 'src/core/career/enum/career.enum';
+import { Career } from 'src/core/career/enum/career.enum';
 
 @Injectable()
 export default class FindAllPaginateAction {
@@ -34,9 +34,9 @@ export default class FindAllPaginateAction {
       }
 
       carrera = carrera.map((c) => {
-        const carreraUpper = c.toUpperCase() as Carrera;
+        const carreraUpper = c.toUpperCase() as Career;
 
-        if (!Object.values(Carrera).includes(carreraUpper)) {
+        if (!Object.values(Career).includes(carreraUpper)) {
           throw new BadRequestException(
             `Invalid value for Carrera: ${carreraUpper}`,
           );
@@ -78,7 +78,7 @@ export default class FindAllPaginateAction {
     random: number,
     limit: number,
     skip: number,
-    carrera: Carrera[],
+    carrera: Career[],
   ): Promise<Profile[]> {
     await this.setProfileRepositorySeed(random);
 
@@ -88,7 +88,7 @@ export default class FindAllPaginateAction {
     ).replace('{{skip}}', skip + '');
 
     if (carrera) {
-      query = this.addMultipleFiltersToQuery(query, 'career', carrera);
+      query = this.addMultipleFiltersToQuery(query, 'mainTitle', carrera);
     }
 
     const resultsRaw = await this.profileRepository.query(query);
@@ -104,7 +104,6 @@ export default class FindAllPaginateAction {
       },
       description: row.profile_description,
       mainTitle: row.profile_mainTitle,
-      career: row.profile_career,
       countryResidence: row.profile_countryResidence,
       experience: row.experiences.map(JSON.parse),
       skills: row.skills.map(JSON.parse),

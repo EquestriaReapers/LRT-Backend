@@ -21,7 +21,7 @@ import {
 } from '../dto/responses.dto';
 import { ContactMethod } from './contact-method.entity';
 import { LanguageProfile } from './language-profile.entity';
-import { Carrera } from 'src/core/career/enum/career.enum';
+import { Career } from 'src/core/career/enum/career.enum';
 
 @Entity()
 export class Profile {
@@ -46,11 +46,13 @@ export class Profile {
   })
   description: string;
 
-  @ApiProperty()
+  @ApiProperty({ enum: Career })
   @Column({
+    type: 'enum',
+    enum: Career,
     nullable: true,
   })
-  mainTitle: string;
+  mainTitle: Career;
 
   @ApiProperty()
   @Column({
@@ -87,13 +89,4 @@ export class Profile {
   @ApiProperty({ type: () => ContactMethod, isArray: true })
   @Column({ type: 'jsonb', nullable: true, default: () => "'[]'" })
   contactMethods: ContactMethod[];
-
-  @ApiProperty({ enum: Carrera })
-  @Column({
-    type: 'enum',
-    enum: Carrera,
-    default: null,
-    nullable: true,
-  })
-  career: Carrera;
 }

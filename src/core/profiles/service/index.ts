@@ -85,7 +85,6 @@ export default class ProfilesService {
       description: updateProfileDto.description,
       mainTitle: updateProfileDto.mainTitle,
       countryResidence: updateProfileDto.countryResidence,
-      career: updateProfileDto.career,
     });
 
     if (profile.affected === 0) {
@@ -107,6 +106,7 @@ export default class ProfilesService {
 
   async addSkillProfile(skillId: number, user: UserActiveInterface) {
     const profile = await this.profileRepository.findOne({
+      relations: ['skills'],
       where: { userId: user.id },
     });
     const skill = await this.skillRepository.findOne({
@@ -115,10 +115,6 @@ export default class ProfilesService {
 
     if (!profile || !skill) {
       throw new NotFoundException(ERROR_PROFILE_SKILL_NOT_FOUND);
-    }
-
-    if (!profile.skills) {
-      profile.skills = [];
     }
 
     profile.skills.push(skill);

@@ -45,10 +45,10 @@ import {
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
 import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
-import { CreateContactDto } from './dto/createContact.dto';
-import { Carrera } from '../career/enum/career.enum';
 import { LanguageProfile } from './entities/language-profile.entity';
+import { Career } from '../career/enum/career.enum';
 import { AddLanguageProfileDto } from './dto/add-language-profile.dto';
+import { CreateContactDto } from './dto/createContact.dto';
 import LanguagueProfileService from './service/languague-profile.service';
 
 @Controller('profiles')
@@ -96,7 +96,7 @@ export class ProfilesController {
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('random') random: number,
-    @Query('carrera') carrera: Carrera[],
+    @Query('carrera') carrera: Career[],
   ) {
     limit = limit > 100 ? 100 : limit;
 

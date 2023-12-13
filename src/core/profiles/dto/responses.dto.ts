@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Skill } from 'src/core/skills/entities/skill.entity';
 import { Experience } from 'src/core/experience/entities/experience.entity';
 import { User } from 'src/core/users/entities/user.entity';
-import { Carrera } from 'src/core/career/enum/career.enum';
+import { Career } from 'src/core/career/enum/career.enum';
 
 export class UserProfileData {
   @ApiProperty()
@@ -49,7 +49,7 @@ export class AddSkillResponse {
   @ApiProperty()
   description: string;
   @ApiProperty()
-  mainTitle: string;
+  mainTitle: Career;
   @ApiProperty()
   countryResidence: string;
   @ApiProperty()
@@ -102,10 +102,7 @@ export class ResponseProfile {
   description: string;
 
   @ApiProperty()
-  mainTitle: string;
-
-  @ApiProperty()
-  career: Carrera;
+  mainTitle: Career;
 
   @ApiProperty()
   countryResidence: string;
@@ -162,7 +159,7 @@ export class ProfileData {
   @ApiProperty()
   description: string;
   @ApiProperty()
-  mainTitle: string;
+  mainTitle: Career;
   @ApiProperty()
   countryResidence: string;
   @ApiProperty()
@@ -202,9 +199,6 @@ export class ResponseProfileGet {
 
   @ApiProperty()
   mainTitle: string;
-
-  @ApiProperty()
-  career: Carrera;
 
   @ApiProperty({
     type: [MethodContact],

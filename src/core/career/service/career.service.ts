@@ -1,16 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Carrera } from '../enum/career.enum';
+import { Career } from '../enum/career.enum';
 
 @Injectable()
 export class CareerService {
   findAll() {
     return {
-      career: [Carrera],
+      career: [Career],
     };
   }
 
   findOneByName(name: string) {
-    if (!Object.values(Carrera).includes(name as any)) {
+    if (!Object.values(Career).includes(name as any)) {
       throw new BadRequestException(`Invalid career name: ${name}`);
     }
 

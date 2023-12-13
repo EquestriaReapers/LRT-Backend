@@ -4,7 +4,7 @@ export const SET_SEED_QUERY = `SELECT 0
         ) AS randomization_seed;`;
 
 export const RANDOM_PROFILES_PAGINATE_QUERY = `
-    SELECT "profile"."id" AS "profile_id", "profile"."userId" AS "profile_userId", "profile"."description" AS "profile_description", "profile"."mainTitle" AS "profile_mainTitle", "profile"."countryResidence" AS "profile_countryResidence", "profile"."deletedAt" AS "profile_deletedAt", "user"."id" AS "user_id", "user"."name" AS "user_name", "user"."lastname" AS "user_lastname", "user"."email" AS "user_email","profile"."career" AS "profile_career",
+    SELECT "profile"."id" AS "profile_id", "profile"."userId" AS "profile_userId", "profile"."description" AS "profile_description", "profile"."mainTitle" AS "profile_mainTitle", "profile"."countryResidence" AS "profile_countryResidence", "profile"."deletedAt" AS "profile_deletedAt", "user"."id" AS "user_id", "user"."name" AS "user_name", "user"."lastname" AS "user_lastname", "user"."email" AS "user_email",
       ARRAY(
         SELECT DISTINCT ON ("experience"."id") json_build_object(
           'id', "experience"."id",
