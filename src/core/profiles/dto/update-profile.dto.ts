@@ -15,7 +15,7 @@ export class UpdateProfileDto extends PartialType(CreateProfileDTO) {
 
   @ApiProperty()
   @IsOptional()
-  lastName: string;
+  lastname: string;
 
   @ApiProperty()
   @IsString()
