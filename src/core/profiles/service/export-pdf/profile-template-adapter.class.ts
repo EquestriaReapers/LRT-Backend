@@ -14,9 +14,7 @@ export default class ProfileTemplateAdaptator {
   async execute(profile: ResponseProfileGet): Promise<ProfileTemplate> {
     return {
       fullName: profile.user.name + ' ' + profile.user.lastname,
-      mainTitle:
-        `${profile.mainTitle.charAt(0).toUpperCase()}` +
-        `${profile.mainTitle.slice(1).toLowerCase()}`,
+      mainTitle: this.getMainTitle(profile.mainTitle),
       contactItems: this.getContactMethods(profile),
       experiences: profile.experience.map((exp) => ({
         company: exp.businessName,
@@ -63,6 +61,14 @@ export default class ProfileTemplateAdaptator {
     if (startDate && !endDate) {
       return `${startDate.getFullYear()} - Actualidad`;
     }
+    return '';
+  }
+
+  private getMainTitle(mainTitle: string): string {
+    if (mainTitle) {
+      return `${mainTitle.charAt(0).toUpperCase()}` + `${mainTitle.slice(1)}`;
+    }
+
     return '';
   }
 }
