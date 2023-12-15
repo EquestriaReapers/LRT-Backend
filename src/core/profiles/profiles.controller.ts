@@ -48,8 +48,8 @@ import { ApiInternalServerError } from 'src/common/decorator/internal-server-err
 import { LanguageProfile } from './entities/language-profile.entity';
 import { Career } from '../career/enum/career.enum';
 import { AddLanguageProfileDto } from './dto/add-language-profile.dto';
-import { CreateContactDto } from './dto/createContact.dto';
 import LanguagueProfileService from './service/languague-profile.service';
+import { CreateContactDto } from './dto/createContact.dto';
 
 @Controller('profiles')
 export class ProfilesController {
@@ -284,13 +284,6 @@ export class ProfilesController {
     @Body() createContactMethodDto: CreateContactDto,
   ) {
     return this.profilesService.addContactMethod(user, createContactMethodDto);
-  }
-
-  @ApiTags('profile')
-  @Auth(UserRole.GRADUATE)
-  @Get('/my-profile/contact-methods')
-  async getContactMethods(@Param('id', ParseIntPipe) id: number) {
-    return this.profilesService.getContactMethods(id);
   }
 
   @ApiTags('profile')
