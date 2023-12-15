@@ -17,12 +17,16 @@ export class RegisterDto {
   @MinLength(1)
   lastname: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Cedula de identidad',
+  })
   @IsString()
   @MinLength(2)
   documentNumber: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Email',
+  })
   @IsEmail()
   email: string;
 
