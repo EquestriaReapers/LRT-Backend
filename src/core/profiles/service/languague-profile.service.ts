@@ -70,15 +70,15 @@ export default class LanguagueProfileService {
       throw new NotFoundException(ERROR_PROFILE_LANGUAGUE_NOT_FOUND);
     }
 
-    const existLanguagueProfile = await this.languageProfileRepository.findOne({
+    const existLanguageProfile = await this.languageProfileRepository.findOne({
       where: { languageId: languageId, profileId: profile.id },
     });
 
-    if (!existLanguagueProfile) {
+    if (!existLanguageProfile) {
       throw new NotFoundException(ERROR_NOT_FOUND_LANGUAGE_IN_PROFILE);
     }
 
-    await this.languageProfileRepository.save(profile);
+    await this.languageProfileRepository.remove(existLanguageProfile);
     return;
   }
 }
