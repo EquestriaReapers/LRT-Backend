@@ -78,7 +78,7 @@ export default class LanguagueProfileService {
       throw new NotFoundException(ERROR_NOT_FOUND_LANGUAGE_IN_PROFILE);
     }
 
-    await this.profileRepository.save(profile);
+    await this.languageProfileRepository.save(profile);
     return;
   }
 }
