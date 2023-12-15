@@ -78,7 +78,6 @@ export default class LanguagueProfileService {
       throw new NotFoundException(ERROR_NOT_FOUND_LANGUAGE_IN_PROFILE);
     }
 
-    console.log(existLanguageProfile);
     await this.languageProfileRepository.remove(existLanguageProfile);
     return;
   }
