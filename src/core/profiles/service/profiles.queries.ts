@@ -16,7 +16,7 @@ export const RANDOM_PROFILES_PAGINATE_QUERY = `
           'endDate', "experience"."endDate"
         )::text
         FROM "experience"
-        WHERE "experience"."profileId" = "profile"."id"
+        WHERE "experience"."profileId" = "profile"."id AND "experience"."deletedAt" IS NULL"
       ) AS "experiences",
       ARRAY(
         SELECT DISTINCT ON ("skills"."id") json_build_object(
