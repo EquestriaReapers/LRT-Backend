@@ -213,13 +213,6 @@ export class ProfilesController {
 
   @ApiTags('profile')
   @Auth(UserRole.GRADUATE)
-  @Get('/my-profile/contact-methods')
-  async getContactMethods(@Param('id', ParseIntPipe) id: number) {
-    return this.profilesService.getContactMethods(id);
-  }
-
-  @ApiTags('profile')
-  @Auth(UserRole.GRADUATE)
   @ApiOkResponse({
     description: 'Delete contact method from my profile',
     type: MessageDTO,

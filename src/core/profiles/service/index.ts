@@ -177,18 +177,6 @@ export default class ProfilesService {
 
     return profile;
   }
-
-  async getContactMethods(userId: number): Promise<ContactMethod[]> {
-    const profile = await this.profileRepository.findOne({
-      where: { id: userId },
-    });
-
-    if (!profile) {
-      throw new NotFoundException(PROFILE_NOT_FOUND);
-    }
-
-    return profile.contactMethods;
-  }
   async addContactMethod(
     user: UserActiveInterface,
     createContactMethodDto: CreateContactDto,
