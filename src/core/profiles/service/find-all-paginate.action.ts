@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Profile } from '../entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import {
   RANDOM_PROFILES_PAGINATE_QUERY,
   SET_SEED_QUERY,
@@ -12,17 +12,13 @@ import {
 } from '../dto/responses.dto';
 import { FindAllPayload } from '../dto/find-all-payload.interface';
 import { Career } from 'src/core/career/enum/career.enum';
-import { Skill } from 'src/core/skills/entities/skill.entity';
-import { SkillData } from '../dto/responses.dto';
-import * as request from 'supertest';
 
 @Injectable()
 export default class FindAllPaginateAction {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-
-  ) { }
+  ) {}
 
   async execute({
     random,
@@ -53,30 +49,26 @@ export default class FindAllPaginateAction {
       carrera = null;
     }
 
-
     if (skills) {
       if (!Array.isArray(skills)) {
         skills = [skills];
       }
 
-      const validationSkill = await this.profileRepository
-        .createQueryBuilder('profile')
-        .innerJoinAndSelect('profile.skills', 'skill')
-        .where('skill.name in (:...skills)', { skills })
-        .getMany()
-
-      console.log(validationSkill)
+      const validationSkill = await this.profileRepository.find({
+        relations: ['skills'],
+        where: {
+          skills: {
+            name: In(skills),
+          },
+        },
+      });
 
       if (!validationSkill) {
-        throw new BadRequestException(
-          `Valor invaldo para skill`
-        )
+        throw new BadRequestException(`Valor invaldo para skill`);
       }
     } else {
       skills = null;
     }
-
-
 
     const profiles = await this.executeQueryGetRandomProfiles(
       random,
@@ -120,12 +112,18 @@ export default class FindAllPaginateAction {
     ).replace('{{skip}}', skip + '');
 
     if (carrera) {
-      query = this.addMultipleFiltersToQuery(query, 'mainTitle', carrera);
+      query = this.addMultipleFiltersToQuery(
+        query,
+        'profile',
+        'mainTitle',
+        carrera,
+      );
     }
 
     if (skills) {
-      query = this.addMultipleFiltersToQuery(query, 'skills', skills);
+      query = this.addMultipleFiltersToQuery(query, 'skills', 'name', skills);
     }
+
     const resultsRaw = await this.profileRepository.query(query);
 
     const formattedResult: Profile[] = resultsRaw.map((row) => ({
@@ -165,7 +163,6 @@ export default class FindAllPaginateAction {
       skip: (page - 1) * limit,
     };
   }
-  /*agrega un filtro por 1 solo valor*/
   private addFilterToQuery(
     query: string,
     columnName: string,
@@ -189,27 +186,49 @@ export default class FindAllPaginateAction {
 
     return query;
   }
-  /*arreglo de cosas*/
+
   private addMultipleFiltersToQuery(
     query: string,
+    tableName: string,
     columnName: string,
     filterValues: any[],
   ): string {
     if (filterValues.length > 0) {
       const filterConditions = filterValues.map(
-        (value) => `"${columnName}" = '${value}'`,
+        (value) => `"${tableName}"."${columnName}" = '${value}'`,
       );
       const filterQuery = filterConditions.join(' OR ');
 
-      const whereIndex = query.lastIndexOf('WHERE');
-      if (whereIndex !== -1) {
-        query =
-          query.slice(0, whereIndex + 5) +
-          filterQuery +
-          ' AND ' +
-          query.slice(whereIndex + 5);
+      // Si se está filtrando por habilidades, modificar la consulta principal
+      if (tableName === 'skills') {
+        const subqueryFilter = `EXISTS (
+          SELECT 1 FROM "profile_skills_skill" "profile_skills"
+          JOIN "skill" "skills" ON "skills"."id"="profile_skills"."skillId"
+          WHERE "profile_skills"."profileId" = "profile"."id" AND (${filterQuery})
+        )`;
+
+        const whereIndex = query.lastIndexOf('WHERE');
+        if (whereIndex !== -1) {
+          query =
+            query.slice(0, whereIndex + 6) +
+            subqueryFilter +
+            ' AND ' +
+            query.slice(whereIndex + 6);
+        } else {
+          query += ' WHERE ' + subqueryFilter;
+        }
       } else {
-        query += ' WHERE ' + filterQuery;
+        // Si no se está filtrando por habilidades, agregar el filtro a la cláusula WHERE principal
+        const whereIndex = query.lastIndexOf('WHERE');
+        if (whereIndex !== -1) {
+          query =
+            query.slice(0, whereIndex + 6) +
+            filterQuery +
+            ' AND ' +
+            query.slice(whereIndex + 6);
+        } else {
+          query += ' WHERE ' + filterQuery;
+        }
       }
     }
 
