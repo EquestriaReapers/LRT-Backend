@@ -6,5 +6,5 @@ export class FindAllPayload {
   limit: number;
   random: number;
   carrera: Career[];
-  skills: Skill[];
+  skills: string[];
 }

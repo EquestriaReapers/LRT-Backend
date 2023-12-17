@@ -14,12 +14,14 @@ import { FindAllPayload } from '../dto/find-all-payload.interface';
 import { Career } from 'src/core/career/enum/career.enum';
 import { Skill } from 'src/core/skills/entities/skill.entity';
 import { SkillData } from '../dto/responses.dto';
+import * as request from 'supertest';
 
 @Injectable()
 export default class FindAllPaginateAction {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+
   ) { }
 
   async execute({
@@ -27,7 +29,7 @@ export default class FindAllPaginateAction {
     carrera,
     skills,
     ...opt
-  }: FindAllPayload & { skills?: Skill[] }): Promise<ResponsePaginationProfile> {
+  }: FindAllPayload): Promise<ResponsePaginationProfile> {
     const { page, limit, skip } = this.getPaginationData(opt);
     if (!random) random = Math.random();
 
@@ -51,18 +53,30 @@ export default class FindAllPaginateAction {
       carrera = null;
     }
 
+
     if (skills) {
       if (!Array.isArray(skills)) {
         skills = [skills];
       }
 
-      skills = skills.map((s) => {
-        const skillUpper = s.name.toUpperCase();
-        return { ...s, name: skillUpper };
-      });
+      const validationSkill = await this.profileRepository
+        .createQueryBuilder('profile')
+        .innerJoinAndSelect('profile.skills', 'skill')
+        .where('skill.name in (:...skills)', { skills })
+        .getMany()
+
+      console.log(validationSkill)
+
+      if (!validationSkill) {
+        throw new BadRequestException(
+          `Valor invaldo para skill`
+        )
+      }
     } else {
       skills = null;
     }
+
+
 
     const profiles = await this.executeQueryGetRandomProfiles(
       random,
@@ -96,7 +110,7 @@ export default class FindAllPaginateAction {
     limit: number,
     skip: number,
     carrera: Career[],
-    skills: Skill[],
+    skills: string[],
   ): Promise<Profile[]> {
     await this.setProfileRepositorySeed(random);
 
@@ -110,11 +124,8 @@ export default class FindAllPaginateAction {
     }
 
     if (skills) {
-      query = this.addMultipleFiltersToQuery(query, 'skills', skills.map(skill => skill.name));
-    } else {
       query = this.addMultipleFiltersToQuery(query, 'skills', skills);
     }
-
     const resultsRaw = await this.profileRepository.query(query);
 
     const formattedResult: Profile[] = resultsRaw.map((row) => ({
