@@ -51,13 +51,14 @@ import { Career } from '../career/enum/career.enum';
 import { AddLanguageProfileDto } from './dto/add-language-profile.dto';
 import LanguagueProfileService from './service/languague-profile.service';
 import { CreateContactDto } from './dto/createContact.dto';
+import { Skill } from '../skills/entities/skill.entity';
 
 @Controller('profiles')
 export class ProfilesController {
   constructor(
     private readonly profilesService: ProfilesService,
     private readonly languagueProfileService: LanguagueProfileService,
-  ) {}
+  ) { }
 
   @ApiTags('profile')
   @Get('export-pdf/:id')
@@ -93,11 +94,13 @@ export class ProfilesController {
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'random', required: false })
   @ApiQuery({ name: 'carrera', required: false })
+  @ApiQuery({ name: 'skills', required: false })
   findAll(
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('random') random: number,
     @Query('carrera') carrera: Career[],
+    @Query('skills') skills: Skill[],
   ) {
     limit = limit > 100 ? 100 : limit;
 
@@ -106,6 +109,7 @@ export class ProfilesController {
       limit,
       random,
       carrera,
+      skills,
     });
   }
 

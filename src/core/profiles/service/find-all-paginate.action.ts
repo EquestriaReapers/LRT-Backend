@@ -12,19 +12,22 @@ import {
 } from '../dto/responses.dto';
 import { FindAllPayload } from '../dto/find-all-payload.interface';
 import { Career } from 'src/core/career/enum/career.enum';
+import { Skill } from 'src/core/skills/entities/skill.entity';
+import { SkillData } from '../dto/responses.dto';
 
 @Injectable()
 export default class FindAllPaginateAction {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-  ) {}
+  ) { }
 
   async execute({
     random,
     carrera,
+    skills,
     ...opt
-  }: FindAllPayload): Promise<ResponsePaginationProfile> {
+  }: FindAllPayload & { skills?: Skill[] }): Promise<ResponsePaginationProfile> {
     const { page, limit, skip } = this.getPaginationData(opt);
     if (!random) random = Math.random();
 
@@ -48,11 +51,25 @@ export default class FindAllPaginateAction {
       carrera = null;
     }
 
+    if (skills) {
+      if (!Array.isArray(skills)) {
+        skills = [skills];
+      }
+
+      skills = skills.map((s) => {
+        const skillUpper = s.name.toUpperCase();
+        return { ...s, name: skillUpper };
+      });
+    } else {
+      skills = null;
+    }
+
     const profiles = await this.executeQueryGetRandomProfiles(
       random,
       limit,
       skip,
       carrera,
+      skills,
     );
     const totalCount = await this.profileRepository.count();
 
@@ -79,6 +96,7 @@ export default class FindAllPaginateAction {
     limit: number,
     skip: number,
     carrera: Career[],
+    skills: Skill[],
   ): Promise<Profile[]> {
     await this.setProfileRepositorySeed(random);
 
@@ -89,6 +107,12 @@ export default class FindAllPaginateAction {
 
     if (carrera) {
       query = this.addMultipleFiltersToQuery(query, 'mainTitle', carrera);
+    }
+
+    if (skills) {
+      query = this.addMultipleFiltersToQuery(query, 'skills', skills.map(skill => skill.name));
+    } else {
+      query = this.addMultipleFiltersToQuery(query, 'skills', skills);
     }
 
     const resultsRaw = await this.profileRepository.query(query);
@@ -130,7 +154,7 @@ export default class FindAllPaginateAction {
       skip: (page - 1) * limit,
     };
   }
-
+  /*agrega un filtro por 1 solo valor*/
   private addFilterToQuery(
     query: string,
     columnName: string,
@@ -154,7 +178,7 @@ export default class FindAllPaginateAction {
 
     return query;
   }
-
+  /*arreglo de cosas*/
   private addMultipleFiltersToQuery(
     query: string,
     columnName: string,
