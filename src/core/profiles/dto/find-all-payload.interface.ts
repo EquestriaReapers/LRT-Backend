@@ -7,4 +7,5 @@ export class FindAllPayload {
   random: number;
   carrera: Career[];
   skills: string[];
+  countryResidence: string;
 }

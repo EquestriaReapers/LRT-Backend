@@ -18,12 +18,13 @@ export default class FindAllPaginateAction {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-  ) {}
+  ) { }
 
   async execute({
     random,
     carrera,
     skills,
+    countryResidence,
     ...opt
   }: FindAllPayload): Promise<ResponsePaginationProfile> {
     const { page, limit, skip } = this.getPaginationData(opt);
@@ -70,12 +71,18 @@ export default class FindAllPaginateAction {
       skills = null;
     }
 
+    if (countryResidence) {
+      countryResidence = countryResidence.toUpperCase();
+    } else {
+      countryResidence = null;
+    }
     const profiles = await this.executeQueryGetRandomProfiles(
       random,
       limit,
       skip,
       carrera,
       skills,
+      countryResidence
     );
     const totalCount = await this.profileRepository.count();
 
@@ -103,6 +110,7 @@ export default class FindAllPaginateAction {
     skip: number,
     carrera: Career[],
     skills: string[],
+    countryResidence: string,
   ): Promise<Profile[]> {
     await this.setProfileRepositorySeed(random);
 
@@ -123,6 +131,11 @@ export default class FindAllPaginateAction {
     if (skills) {
       query = this.addMultipleFiltersToQuery(query, 'skills', 'name', skills);
     }
+
+    if (countryResidence) {
+      query = this.addFilterToQuery(query, 'countryResidence', countryResidence);
+    }
+
 
     const resultsRaw = await this.profileRepository.query(query);
 

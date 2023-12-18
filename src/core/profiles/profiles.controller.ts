@@ -95,12 +95,14 @@ export class ProfilesController {
   @ApiQuery({ name: 'random', required: false })
   @ApiQuery({ name: 'carrera', required: false })
   @ApiQuery({ name: 'skills', required: false })
+  @ApiQuery({ name: 'countryResidence', required: false })
   findAll(
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('random') random: number,
     @Query('carrera') carrera: Career[],
     @Query('skills') skills: string[],
+    @Query('countryResidence') countryResidence: string,
   ) {
     limit = limit > 100 ? 100 : limit;
 
@@ -110,6 +112,7 @@ export class ProfilesController {
       random,
       carrera,
       skills,
+      countryResidence,
     });
   }
 
