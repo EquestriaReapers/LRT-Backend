@@ -72,10 +72,23 @@ export default class FindAllPaginateAction {
     }
 
     if (countryResidence) {
-      countryResidence = countryResidence.toUpperCase();
+      if (!Array.isArray(countryResidence)) {
+
+        countryResidence = [countryResidence];
+      }
+      const validationLocation = await this.profileRepository.find({
+        where: {
+          countryResidence: In(countryResidence),
+        },
+
+      });
+      if (!validationLocation) {
+        throw new BadRequestException(`Valor invaldo para countryResidence`);
+      }
     } else {
       countryResidence = null;
     }
+
     const profiles = await this.executeQueryGetRandomProfiles(
       random,
       limit,
@@ -110,7 +123,7 @@ export default class FindAllPaginateAction {
     skip: number,
     carrera: Career[],
     skills: string[],
-    countryResidence: string,
+    countryResidence: string[],
   ): Promise<Profile[]> {
     await this.setProfileRepositorySeed(random);
 
@@ -133,7 +146,12 @@ export default class FindAllPaginateAction {
     }
 
     if (countryResidence) {
-      query = this.addFilterToQuery(query, 'countryResidence', countryResidence);
+      query = this.addMultipleFiltersToQuery(
+        query,
+        'profile',
+        'countryResidence',
+        countryResidence,
+      )
     }
 
 
