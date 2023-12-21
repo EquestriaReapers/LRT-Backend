@@ -9,6 +9,13 @@ import {
 import { Profile } from './profile.entity';
 import { Language } from 'src/core/language/entities/language.entity';
 
+export enum LanguageLevel {
+  ALTO = 'ALTO',
+  BAJO = 'BAJO',
+  NATIVO = 'NATIVO',
+  INTERMEDIO = 'INTERMEDIO',
+}
+
 @Entity()
 export class LanguageProfile {
   @ApiProperty()
@@ -23,9 +30,13 @@ export class LanguageProfile {
   @Column()
   languageId: number;
 
-  @ApiProperty()
-  @Column()
-  level: string;
+  @ApiProperty({ enum: LanguageLevel })
+  @Column({
+    type: 'enum',
+    enum: LanguageLevel,
+    default: LanguageLevel.BAJO
+  })
+  level: LanguageLevel;
 
   @ManyToOne(() => Profile, (profile) => profile.languageProfile)
   profile: Profile;
