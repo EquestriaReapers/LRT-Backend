@@ -30,11 +30,11 @@ export default class FindAllPaginateAction {
     const { page, limit, skip } = this.getPaginationData(opt);
     if (!random) random = Math.random();
 
-    this.validateCarrera(carrera);
+    carrera = await this.validateCarrera(carrera);
 
-    this.validateQueryArrayRelation(skills, 'skills');
+    skills = await this.validateQueryArrayRelation(skills, 'skills');
 
-    this.validateQueryArrayCountry(countryResidence);
+    countryResidence = await this.validateQueryArrayCountry(countryResidence);
 
     const profiles = await this.executeQueryGetRandomProfiles(
       random,
@@ -213,7 +213,7 @@ export default class FindAllPaginateAction {
   }
 
   private async validateQueryArrayRelation(
-    relations: string | string[] | null,
+    relations: string[] | null,
     relationName: string,
   ) {
     if (relations) {
@@ -238,7 +238,7 @@ export default class FindAllPaginateAction {
     return relations;
   }
 
-  private async validateQueryArrayCountry(column: string | string[] | null) {
+  private async validateQueryArrayCountry(column: string[] | null) {
     if (column) {
       column = Array.isArray(column) ? column : [column];
 
@@ -261,6 +261,8 @@ export default class FindAllPaginateAction {
   private async validateCarrera(carrera: any) {
     if (carrera) {
       carrera = Array.isArray(carrera) ? carrera : [carrera];
+
+      console.log(carrera);
 
       carrera = carrera.map((c) => {
         const carreraUpper = c.toUpperCase() as Career;
