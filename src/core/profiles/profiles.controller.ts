@@ -46,7 +46,7 @@ import {
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
 import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
-import { LanguageProfile } from './entities/language-profile.entity';
+import { LanguageLevel, LanguageProfile } from './entities/language-profile.entity';
 import { Career } from '../career/enum/career.enum';
 import { AddLanguageProfileDto } from './dto/add-language-profile.dto';
 import LanguagueProfileService from './service/languague-profile.service';
@@ -234,6 +234,13 @@ export class ProfilesController {
   @ApiOkResponse({
     description: 'Return my profile with languages',
     type: LanguageProfile,
+    schema: {
+      properties: {
+        level: {
+          enum: Object.values(LanguageLevel),
+        },
+      },
+    },
   })
   @ApiException(() => NotFoundException, {
     description: 'Profile not found or language not found',
