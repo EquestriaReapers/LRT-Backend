@@ -18,7 +18,7 @@ export default class FindAllPaginateAction {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-  ) { }
+  ) {}
 
   async execute({
     random,
@@ -30,64 +30,11 @@ export default class FindAllPaginateAction {
     const { page, limit, skip } = this.getPaginationData(opt);
     if (!random) random = Math.random();
 
-    if (carrera) {
-      if (!Array.isArray(carrera)) {
-        carrera = [carrera];
-      }
+    this.validateCarrera(carrera);
 
-      carrera = carrera.map((c) => {
-        const carreraUpper = c.toUpperCase() as Career;
+    this.validateQueryArrayRelation(skills, 'skills');
 
-        if (!Object.values(Career).includes(carreraUpper)) {
-          throw new BadRequestException(
-            `Invalid value for Carrera: ${carreraUpper}`,
-          );
-        }
-
-        return carreraUpper;
-      });
-    } else {
-      carrera = null;
-    }
-
-    if (skills) {
-      if (!Array.isArray(skills)) {
-        skills = [skills];
-      }
-
-      const validationSkill = await this.profileRepository.find({
-        relations: ['skills'],
-        where: {
-          skills: {
-            name: In(skills),
-          },
-        },
-      });
-
-      if (!validationSkill) {
-        throw new BadRequestException(`Valor invaldo para skill`);
-      }
-    } else {
-      skills = null;
-    }
-
-    if (countryResidence) {
-      if (!Array.isArray(countryResidence)) {
-
-        countryResidence = [countryResidence];
-      }
-      const validationLocation = await this.profileRepository.find({
-        where: {
-          countryResidence: In(countryResidence),
-        },
-
-      });
-      if (!validationLocation) {
-        throw new BadRequestException(`Valor invaldo para countryResidence`);
-      }
-    } else {
-      countryResidence = null;
-    }
+    this.validateQueryArrayCountry(countryResidence);
 
     const profiles = await this.executeQueryGetRandomProfiles(
       random,
@@ -95,7 +42,7 @@ export default class FindAllPaginateAction {
       skip,
       carrera,
       skills,
-      countryResidence
+      countryResidence,
     );
     const totalCount = await this.profileRepository.count();
 
@@ -151,9 +98,8 @@ export default class FindAllPaginateAction {
         'profile',
         'countryResidence',
         countryResidence,
-      )
+      );
     }
-
 
     const resultsRaw = await this.profileRepository.query(query);
 
@@ -264,5 +210,73 @@ export default class FindAllPaginateAction {
     }
 
     return query;
+  }
+
+  private async validateQueryArrayRelation(
+    relations: string | string[] | null,
+    relationName: string,
+  ) {
+    if (relations) {
+      relations = Array.isArray(relations) ? relations : [relations];
+
+      const validationQuery = await this.profileRepository.find({
+        relations: [relationName],
+        where: {
+          skills: {
+            name: In(relations),
+          },
+        },
+      });
+
+      if (!validationQuery) {
+        throw new BadRequestException(`Valor invaldo para ${relationName}`);
+      }
+    } else {
+      relations = null;
+    }
+
+    return relations;
+  }
+
+  private async validateQueryArrayCountry(column: string | string[] | null) {
+    if (column) {
+      column = Array.isArray(column) ? column : [column];
+
+      const validationQuery = await this.profileRepository.find({
+        where: {
+          countryResidence: In(column),
+        },
+      });
+
+      if (!validationQuery) {
+        throw new BadRequestException(`Valor invaldo para ${column}`);
+      }
+    } else {
+      column = null;
+    }
+
+    return column;
+  }
+
+  private async validateCarrera(carrera: any) {
+    if (carrera) {
+      carrera = Array.isArray(carrera) ? carrera : [carrera];
+
+      carrera = carrera.map((c) => {
+        const carreraUpper = c.toUpperCase() as Career;
+
+        if (!Object.values(Career).includes(carreraUpper)) {
+          throw new BadRequestException(
+            `Invalido valor para carrera : ${carreraUpper}`,
+          );
+        }
+
+        return carreraUpper;
+      });
+    } else {
+      carrera = null;
+    }
+
+    return carrera;
   }
 }
