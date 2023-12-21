@@ -45,18 +45,19 @@ import {
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
 import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
-import { LanguageProfile } from './entities/language-profile.entity';
+import { LanguageLevel, LanguageProfile } from './entities/language-profile.entity';
 import { Career } from '../career/enum/career.enum';
 import { AddLanguageProfileDto } from './dto/add-language-profile.dto';
 import LanguagueProfileService from './service/languague-profile.service';
 import { CreateContactDto } from './dto/createContact.dto';
+import { Skill } from '../skills/entities/skill.entity';
 
 @Controller('profiles')
 export class ProfilesController {
   constructor(
     private readonly profilesService: ProfilesService,
     private readonly languagueProfileService: LanguagueProfileService,
-  ) {}
+  ) { }
 
   @ApiTags('profile')
   @Get('export-pdf/:id')
@@ -92,11 +93,15 @@ export class ProfilesController {
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'random', required: false })
   @ApiQuery({ name: 'carrera', required: false })
+  @ApiQuery({ name: 'skills', required: false })
+  @ApiQuery({ name: 'countryResidence', required: false })
   findAll(
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('random') random: number,
     @Query('carrera') carrera: Career[],
+    @Query('skills') skills: string[],
+    @Query('countryResidence') countryResidence: string[],
   ) {
     limit = limit > 100 ? 100 : limit;
 
@@ -105,6 +110,8 @@ export class ProfilesController {
       limit,
       random,
       carrera,
+      skills,
+      countryResidence,
     });
   }
 
@@ -226,6 +233,13 @@ export class ProfilesController {
   @ApiOkResponse({
     description: 'Return my profile with languages',
     type: LanguageProfile,
+    schema: {
+      properties: {
+        level: {
+          enum: Object.values(LanguageLevel),
+        },
+      },
+    },
   })
   @ApiException(() => NotFoundException, {
     description: 'Profile not found or language not found',
