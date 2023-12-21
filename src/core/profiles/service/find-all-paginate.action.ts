@@ -262,18 +262,16 @@ export default class FindAllPaginateAction {
     if (carrera) {
       carrera = Array.isArray(carrera) ? carrera : [carrera];
 
-      console.log(carrera);
+      carrera = carrera.map((c: string) => {
+        const carreraLower = c.toLowerCase() as Career;
 
-      carrera = carrera.map((c) => {
-        const carreraUpper = c.toUpperCase() as Career;
-
-        if (!Object.values(Career).includes(carreraUpper)) {
+        if (!Object.values(Career).includes(carreraLower)) {
           throw new BadRequestException(
-            `Invalido valor para carrera : ${carreraUpper}`,
+            `Valor inválido para carrera: ${carreraLower}`,
           );
         }
 
-        return carreraUpper;
+        return carreraLower;
       });
     } else {
       carrera = null;

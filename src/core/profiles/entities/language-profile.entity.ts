@@ -10,10 +10,10 @@ import { Profile } from './profile.entity';
 import { Language } from 'src/core/language/entities/language.entity';
 
 export enum LanguageLevel {
-  ALTO = 'ALTO',
-  BAJO = 'BAJO',
-  NATIVO = 'NATIVO',
-  INTERMEDIO = 'INTERMEDIO',
+  ALTO = 'alto',
+  BAJO = 'bajo',
+  NATIVO = 'nativo',
+  INTERMEDIO = 'intermedio',
 }
 
 @Entity()
@@ -34,7 +34,7 @@ export class LanguageProfile {
   @Column({
     type: 'enum',
     enum: LanguageLevel,
-    default: LanguageLevel.BAJO
+    nullable: true,
   })
   level: LanguageLevel;
 
