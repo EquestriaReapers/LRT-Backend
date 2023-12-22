@@ -28,6 +28,8 @@ export const envData = {
   JWTSECRET: configService.get('JWT_SECRET'),
   BACKEND_BASE_URL: configService.get('BACKEND_BASE_URL'),
   DB_PORT: configService.get('DB_PORT'),
+  MEILISEARCH: configService.get('MEILISEARCH_URL'),
+  MEILISEARCH_KEY: configService.get('MEILISEARCH_KEY'),
 };
 
 export const AppOS = new DataSource(DataSourceConfig);
