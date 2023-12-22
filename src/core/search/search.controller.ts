@@ -22,50 +22,32 @@ export class SearchController {
   @ApiTags('search')
   @Get('/')
   public async getSearch() {
-    const profiles = await this.searchService.getProfiles();
-
-    const resp = await this.searchService.addDocuments(profiles);
+    const resp = await this.searchService.indexProfiles();
     console.log(resp);
   }
 
   @ApiTags('search')
   @Post('/')
-  @ApiQuery({
-    name: 'offset',
-    required: false,
-    type: Number,
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-  })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-  })
-  public async searchProfile(
-    @Body() search: SearchProfileDto,
-    @Query('offset') offset: number,
-    @Query('limit') limit: number,
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'limit', required: false })
+  @ApiQuery({ name: 'random', required: false })
+  public async search(
+    @Body() body: SearchProfileDto,
     @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query('random') random: number,
   ) {
-    offset = Number(offset) || 0;
     limit = Number(limit) || 10;
     page = Number(page) || 1;
 
-    return await this.searchService.search(search.text, {
-      offset: offset,
-      limit: limit,
-      page: page,
-    });
+    const resp = await this.searchService.search(body, page, limit, random);
+    return resp;
   }
 
-  @Auth(UserRole.ADMIN)
-  @ApiTags('admin-search')
+  @ApiTags('search')
   @Delete('/')
-  public async deleteAllDocuments() {
-    return await this.searchService.deleteAllDocuments();
+  public async deleteIndex() {
+    const resp = await this.searchService.deleteIndex();
+    console.log(resp);
   }
 }

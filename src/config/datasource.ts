@@ -30,6 +30,9 @@ export const envData = {
   DB_PORT: configService.get('DB_PORT'),
   MEILISEARCH: configService.get('MEILISEARCH_URL'),
   MEILISEARCH_KEY: configService.get('MEILISEARCH_KEY'),
+  ELASTIC_URL: configService.get('ELASTIC_URL'),
+  ELASTIC_USER: configService.get('ELASTIC_USER'),
+  ELASTIC_PASSWORD: configService.get('ELASTIC_PASSWORD'),
 };
 
 export const AppOS = new DataSource(DataSourceConfig);

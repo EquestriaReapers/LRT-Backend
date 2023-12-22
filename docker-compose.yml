@@ -24,17 +24,17 @@ services:
     volumes:
       - pgadmin-data:/var/lib/pgadmin
 
-  meilisearch:
-    image: getmeili/meilisearch
-    environment:
-      MEILI_NO_ANALYTICS: 'true'
-    restart: always
-    ports:
-      - '7700:7700'
-    volumes:
-      - ./_volumes/meilisearch/data.ms:/data.ms:cached
-    depends_on:
-      - db
+  #meilisearch:
+  #  image: getmeili/meilisearch
+  #  environment:
+  #    MEILI_NO_ANALYTICS: 'true'
+  #  restart: always
+  #  ports:
+  #    - '7700:7700'
+  #  volumes:
+  #    - ./_volumes/meilisearch/data.ms:/data.ms:cached
+  #  depends_on:
+  #    - db
 
 volumes:
   local_pgdata:
