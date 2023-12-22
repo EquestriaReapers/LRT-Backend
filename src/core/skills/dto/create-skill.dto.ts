@@ -7,8 +7,4 @@ export class CreateSkillDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ example: '10', required: true })
-  @IsNumber()
-  @IsOptional()
-  level: number;
 }
