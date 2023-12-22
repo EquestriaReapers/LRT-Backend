@@ -4,9 +4,6 @@ import { MeiliSearch, Index, SearchParams } from 'meilisearch';
 import { Profile } from '../profiles/entities/profile.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { last } from 'rxjs';
-import { FindOptionsSelect } from 'typeorm';
-import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class SearchService {
