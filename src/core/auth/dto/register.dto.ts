@@ -6,34 +6,36 @@ export class RegisterDto {
   @ApiProperty({
     description: 'Nombre',
   })
-  @IsString()
+  @IsString({ message: 'El nombre debe ser un string' })
   @MinLength(1)
   name: string;
 
   @ApiProperty({
     description: 'Apellido',
   })
-  @IsString()
+  @IsString({ message: 'El apellido debe ser un string' })
   @MinLength(1)
   lastname: string;
 
   @ApiProperty({
     description: 'Cedula de identidad',
   })
-  @IsString()
+  @IsString({ message: 'La cedula debe ser un string' })
   @MinLength(2)
   documentNumber: string;
 
   @ApiProperty({
     description: 'Email',
   })
-  @IsEmail()
+  @IsEmail({}, { message: 'El correo debe ser un email válido' })
   email: string;
 
   @ApiProperty({
     description: 'Contraseña de minimo 6 caracteres',
   })
-  @IsString()
+  @IsString({
+    message: 'La contraseña debe ser un string',
+  })
   @MinLength(6)
   @Transform(({ value }) => value.trim())
   password: string;
