@@ -5,25 +5,27 @@ import { Career } from 'src/core/career/enum/career.enum';
 
 export class UpdateProfileDto extends PartialType(CreateProfileDTO) {
   @ApiProperty({ example: 'Muy proactivo', required: true })
-  @IsString()
+  @IsString({ message: 'La descripción debe ser una cadena de texto' })
   @IsOptional()
   description: string;
 
   @ApiProperty()
+  @IsString({ message: 'El nombre debe ser una cadena de texto' })
   @IsOptional()
   name: string;
 
   @ApiProperty()
+  @IsString({ message: 'El apellido debe ser una cadena de texto' })
   @IsOptional()
   lastname: string;
 
   @ApiProperty()
-  @IsEnum(Career, { message: 'Invalid Career' })
+  @IsEnum(Career, { message: 'Carrera inválida' })
   @IsOptional()
   mainTitle: Career;
 
   @ApiProperty()
-  @IsString()
+  @IsString({ message: 'El país de residencia debe ser una cadena de texto' })
   @IsOptional()
   countryResidence: string;
 }
