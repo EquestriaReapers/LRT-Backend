@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Profile } from '../profiles/entities/profile.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InjectOpensearchClient, OpensearchClient } from 'nestjs-opensearch';
-import { SearchProfile } from '@opensearch-project/opensearch/api/types';
 import { SearchProfileDto } from './dto/search.profiles.dto';
+import { Career } from '../career/enum/career.enum';
 
 @Injectable()
 export class SearchService {
@@ -111,80 +111,137 @@ export class SearchService {
     page: number,
     limit: number,
     random: number,
+    career: string[],
+    skills: string[],
+    countryResidence: string[],
   ) {
     try {
       const from = (page - 1) * limit;
 
+      let filters = [];
+
       if (!random) random = Math.floor(Math.random() * 1000);
 
-      let query: any = {
-        bool: {
-          should: [
-            {
-              multi_match: {
-                query: searchParam.text,
-                fields: [
-                  'name',
-                  'lastname',
-                  'email',
-                  'description',
-                  'mainTitle',
-                  'countryResidence',
-                ],
-                type: 'bool_prefix',
-                operator: 'or',
-              },
+      career = await this.validateCarrera(career);
+
+      skills = await this.validateQueryArrayRelation(skills, 'skills');
+
+      countryResidence = await this.validateQueryArrayCountry(countryResidence);
+
+      if (career && Array.isArray(career)) {
+        career.forEach((c) => {
+          filters.push({
+            match: {
+              mainTitle: c,
             },
-            {
-              nested: {
-                path: 'skills',
-                query: {
-                  match: { 'skills.name': searchParam.text },
+          });
+        });
+      }
+
+      if (skills && Array.isArray(skills)) {
+        skills.forEach((skill) => {
+          filters.push({
+            nested: {
+              path: 'skills',
+              query: {
+                match: {
+                  'skills.name': skill,
                 },
               },
             },
-            {
-              nested: {
-                path: 'experience',
-                query: {
-                  multi_match: {
-                    query: searchParam.text,
-                    fields: [
-                      'experience.businessName',
-                      'experience.role',
-                      'experience.location',
-                      'experience.description',
-                    ],
-                    type: 'bool_prefix',
-                    operator: 'or',
+          });
+        });
+      }
+
+      if (countryResidence && Array.isArray(countryResidence)) {
+        countryResidence.forEach((country) => {
+          filters.push({
+            match: {
+              countryResidence: country,
+            },
+          });
+        });
+      }
+
+      let should: any[] = [];
+
+      if (searchParam.text) {
+        should.push(
+          {
+            multi_match: {
+              query: searchParam.text,
+              fields: [
+                'name',
+                'lastname',
+                'email',
+                'description',
+                'mainTitle',
+                'countryResidence',
+              ],
+              type: 'bool_prefix',
+              operator: 'or',
+            },
+          },
+          {
+            nested: {
+              path: 'skills',
+              query: {
+                bool: {
+                  must: {
+                    match: { 'skills.name': searchParam.text },
+                  },
+                  must_not: {
+                    exists: {
+                      field: 'skills.deletedAt',
+                    },
                   },
                 },
               },
             },
-          ],
-          filter: [
-            {
-              term: {
-                'experience.deletedAt': null,
+          },
+          {
+            nested: {
+              path: 'experience',
+              query: {
+                bool: {
+                  must: {
+                    multi_match: {
+                      query: searchParam.text,
+                      fields: [
+                        'experience.businessName',
+                        'experience.role',
+                        'experience.location',
+                        'experience.description',
+                      ],
+                      type: 'bool_prefix',
+                      operator: 'or',
+                    },
+                  },
+                  must_not: {
+                    exists: {
+                      field: 'experience.deletedAt',
+                    },
+                  },
+                },
               },
             },
-            {
-              term: {
-                'skills.deletedAt': null,
-              },
+          },
+        );
+      } else {
+        should = [{ match_all: {} }];
+      }
+
+      let query: any = {
+        bool: {
+          should: should,
+          filter: filters,
+          must_not: {
+            exists: {
+              field: 'deletedAt',
             },
-            {
-              term: {
-                deletedAt: null,
-              },
-            },
-          ],
+          },
         },
       };
-
-      if (!searchParam.text) {
-        query = { match_all: {} };
-      }
 
       query = {
         function_score: {
@@ -208,7 +265,9 @@ export class SearchService {
 
       const totalCount = body.hits.total.value;
       const hits = body.hits.hits;
-      const data = hits.map((item: any) => item._source);
+      let data = hits.map((item: any) => item._source);
+      data = await this.formatedData(data);
+
       return {
         pagination: {
           itemCount: body.length,
@@ -218,7 +277,7 @@ export class SearchService {
           currentPage: page,
           randomSeed: random,
         },
-        data,
+        profiles: data,
       };
     } catch (err) {
       throw err;
@@ -253,5 +312,87 @@ export class SearchService {
     });
 
     return resp;
+  }
+
+  private async validateQueryArrayRelation(
+    relations: string[] | null,
+    relationName: string,
+  ) {
+    if (relations) {
+      relations = Array.isArray(relations) ? relations : [relations];
+
+      const validationQuery = await this.profileRepository.find({
+        relations: [relationName],
+        where: {
+          skills: {
+            name: In(relations),
+          },
+        },
+      });
+
+      if (!validationQuery) {
+        throw new BadRequestException(`Valor invaldo para ${relationName}`);
+      }
+    } else {
+      relations = null;
+    }
+
+    return relations;
+  }
+
+  private async validateQueryArrayCountry(column: string[] | null) {
+    if (column) {
+      column = Array.isArray(column) ? column : [column];
+
+      const validationQuery = await this.profileRepository.find({
+        where: {
+          countryResidence: In(column),
+        },
+      });
+
+      if (!validationQuery) {
+        throw new BadRequestException(`Valor invaldo para ${column}`);
+      }
+    } else {
+      column = null;
+    }
+
+    return column;
+  }
+
+  private async validateCarrera(carrera: any) {
+    if (carrera) {
+      carrera = Array.isArray(carrera) ? carrera : [carrera];
+
+      carrera = carrera.map((c: string) => {
+        const carreraLower = c.toLowerCase() as Career;
+
+        if (!Object.values(Career).includes(carreraLower)) {
+          throw new BadRequestException(
+            `Valor inválido para carrera: ${carreraLower}`,
+          );
+        }
+
+        return carreraLower;
+      });
+    } else {
+      carrera = null;
+    }
+
+    return carrera;
+  }
+
+  private async formatedData(data: any) {
+    const respuestaNormal = data.map((item) => ({
+      ...item,
+      user: {
+        id: item.id,
+        name: item.name,
+        lastname: item.lastname,
+        email: item.email,
+      },
+    }));
+
+    return respuestaNormal;
   }
 }
