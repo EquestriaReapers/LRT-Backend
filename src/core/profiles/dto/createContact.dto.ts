@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsEmail } from 'class-validator';
+import { IsNotEmpty, IsEmail } from 'class-validator';
 import { TypeContact } from 'src/constants';
 
 export class CreateContactDto {
   @ApiProperty()
-  @IsEmail()
-  @IsNotEmpty()
+  @IsEmail({}, { message: 'El correo electrónico no es válido' })
+  @IsNotEmpty({ message: 'El correo electrónico no puede estar vacío' })
   email: string;
 }

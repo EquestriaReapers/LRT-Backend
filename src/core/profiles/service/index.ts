@@ -68,7 +68,14 @@ export default class ProfilesService {
           email: true,
         },
       },
+      order: {
+        id: 'DESC',
+        experience: {
+          id: 'DESC',
+        },
+      },
     });
+
     if (!profile) {
       throw new NotFoundException(PROFILE_NOT_FOUND);
     }

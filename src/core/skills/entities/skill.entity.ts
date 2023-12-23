@@ -12,12 +12,6 @@ export class Skill {
   @Column()
   name: string;
 
-  @ApiProperty()
-  @Column({
-    nullable: true,
-  })
-  level: number;
-
   @ManyToMany(() => Profile, (profile) => profile.skills)
   profiles: Profile[];
 }
