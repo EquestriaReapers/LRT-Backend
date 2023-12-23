@@ -7,8 +7,4 @@ export class UpdateSkillDto extends PartialType(CreateSkillDto) {
   @IsOptional()
   name: string;
 
-  @ApiProperty({ example: '10' })
-  @IsNumber()
-  @IsOptional()
-  level: number;
 }

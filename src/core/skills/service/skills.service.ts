@@ -21,12 +21,10 @@ export class SkillsService {
 
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-  ) {}
+  ) { }
 
   async create(createSkillDto: CreateSkillDto) {
-    // Create a new skill instance
     const newSkill = await this.skillsRepository.create(createSkillDto);
-    // Save this skill instance to the database
     return this.skillsRepository.save(newSkill);
   }
 
