@@ -1,7 +1,7 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { ExperienceCreateResponseDTO } from './create-experience.dto';
 import {
-  IsDate,
+  IsDateString,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -36,13 +36,17 @@ export class UpdateExperienceDto extends PartialType(
   @IsOptional()
   description: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: '2021-01-01',
+  })
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   startDate: Date;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: '2021-01-02',
+  })
   @IsOptional()
-  @IsDate()
+  @IsDateString()
   endDate: Date;
 }
