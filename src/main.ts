@@ -46,6 +46,8 @@ async function bootstrap() {
     .addTag('admin-experience')
     .addTag('admin-skill')
     .addTag('admin-language')
+    .addTag('admin-search')
+    .addTag('search')
     .addTag('profile')
     .addTag('experience')
     .addTag('skill')

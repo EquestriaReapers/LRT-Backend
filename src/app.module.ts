@@ -12,6 +12,7 @@ import { ExperienceModule } from './core/experience/experience.module';
 import { SkillsModule } from './core/skills/skills.module';
 import { LanguageModule } from './core/language/language.module';
 import { CareerModule } from './core/career/career.module';
+import { SearchModule } from './core/search/search.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { CareerModule } from './core/career/career.module';
     ExperienceModule,
     LanguageModule,
     CareerModule,
+    SearchModule,
   ],
   controllers: [AppController, UsersController],
   providers: [],
