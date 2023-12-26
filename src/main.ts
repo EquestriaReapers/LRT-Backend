@@ -53,6 +53,7 @@ async function bootstrap() {
     .addTag('skill')
     .addTag('career')
     .addTag('language')
+    .addTag('education')
     .build();
 
   const document = SwaggerModule.createDocument(app, config); // Documentación
