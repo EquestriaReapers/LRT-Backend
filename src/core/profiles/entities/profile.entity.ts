@@ -14,6 +14,7 @@ import {
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  EducationData,
   ExperienceData,
   LanguageProfileData,
   SkillData,
@@ -22,7 +23,7 @@ import {
 import { ContactMethod } from './contact-method.entity';
 import { LanguageProfile } from './language-profile.entity';
 import { Career } from 'src/core/career/enum/career.enum';
-
+import { Education } from 'src/core/education/entities/education.entity';
 @Entity()
 export class Profile {
   @ApiProperty()
@@ -89,4 +90,10 @@ export class Profile {
   @ApiProperty({ type: () => ContactMethod, isArray: true })
   @Column({ type: 'jsonb', nullable: true, default: () => "'[]'" })
   contactMethods: ContactMethod[];
+
+  @ApiProperty({
+    type: [EducationData],
+  })
+  @OneToMany(() => Education, (education) => education.profile)
+  education: Education[];
 }
