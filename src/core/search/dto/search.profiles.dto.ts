@@ -8,6 +8,5 @@ export class SearchProfileDto {
   })
   @IsOptional()
   @IsString()
-  @MinLength(2)
   text: string;
 }
