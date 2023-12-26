@@ -165,7 +165,7 @@ export class SearchService {
 
       let should: any[] = [];
 
-      if (searchParam.text) {
+      if (searchParam.text.trim().length > 0) {
         should.push(
           {
             multi_match: {
