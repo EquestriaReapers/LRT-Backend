@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Profile } from '../entities/profile.entity';
-import { Skill } from 'src/core/skills/entities/skill.entity';
+import { Skill, SkillType } from 'src/core/skills/entities/skill.entity';
 import { Experience } from 'src/core/experience/entities/experience.entity';
 import { User } from 'src/core/users/entities/user.entity';
 
@@ -37,8 +37,8 @@ export class SkillData {
   id: number;
   @ApiProperty()
   name: string;
-  @ApiProperty()
-  level: string;
+  @ApiProperty({ enum: SkillType, example: SkillType.HARD })
+  type: SkillType;
 }
 
 export class AddSkillResponse {

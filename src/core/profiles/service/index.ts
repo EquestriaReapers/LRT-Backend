@@ -26,7 +26,7 @@ export default class ProfilesService {
     private readonly userRepository: Repository<User>,
 
     private readonly findAllPaginateAction: FindAllPaginateAction,
-  ) {}
+  ) { }
 
   async findAllPaginate(
     opt: FindAllPayload,

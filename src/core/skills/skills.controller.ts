@@ -17,7 +17,7 @@ import { Auth } from '../auth/decorators/auth.decorator';
 import { UserRole } from '../../constants';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator';
-import { Skill } from './entities/skill.entity';
+import { Skill, SkillType } from './entities/skill.entity';
 import { MessageDTO } from 'src/common/dto/response.dto';
 import * as express from 'express';
 import {
@@ -28,7 +28,7 @@ import { ApiInternalServerError } from 'src/common/decorator/internal-server-err
 
 @Controller('skills')
 export class SkillsController {
-  constructor(private readonly skillsService: SkillsService) {}
+  constructor(private readonly skillsService: SkillsService) { }
 
   @ApiTags('skill')
   @Auth(UserRole.GRADUATE)
@@ -49,8 +49,8 @@ export class SkillsController {
     type: [Skill],
   })
   @ApiInternalServerError()
-  findAll(@Query('name') name: string) {
-    return this.skillsService.findAll(name);
+  findAll(@Query('name') name: string, @Query('type') type: SkillType) {
+    return this.skillsService.findAll(name, type);
   }
   @ApiTags('skill')
   @Auth(UserRole.GRADUATE || UserRole.ADMIN)
