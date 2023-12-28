@@ -22,7 +22,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator';
-import { Skill } from './entities/skill.entity';
+import { Skill, SkillType } from './entities/skill.entity';
 import { MessageDTO } from 'src/common/dto/response.dto';
 import * as express from 'express';
 import {
@@ -88,9 +88,14 @@ export class SkillsController {
     required: false,
     description: 'A parameter. Optional',
   })
-  async findAll(@Query('name') name?: string) {
+  @ApiQuery({
+    name: 'type',
+    required: false,
+    description: 'A parameter. Optional',
+  })
+  async findAll(@Query('name') name?: string, @Query('type') type?: SkillType) {
     try {
-      const skills = await this.skillsService.findAll(name);
+      const skills = await this.skillsService.findAll(name, type);
 
       return skills;
     } catch (error) {
