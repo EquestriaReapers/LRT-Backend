@@ -40,6 +40,8 @@ export class EducationData {
   @ApiProperty()
   principal: boolean;
   @ApiProperty()
+  isUCAB: boolean;
+  @ApiProperty()
   title: string;
   @ApiProperty()
   entity: string;
