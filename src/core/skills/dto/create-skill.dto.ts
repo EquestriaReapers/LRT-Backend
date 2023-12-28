@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { SkillType } from '../entities/skill.entity';
 
 export class CreateSkillDto {
   @ApiProperty({ example: 'React', required: true })
@@ -7,4 +8,8 @@ export class CreateSkillDto {
   @IsNotEmpty()
   name: string;
 
+  @ApiProperty({ enum: SkillType, example: SkillType.HARD, required: true })
+  @IsEnum(SkillType, { message: 'El tipo de habilidad debe ser HARD o SOFT' })
+  @IsNotEmpty()
+  type: SkillType;
 }

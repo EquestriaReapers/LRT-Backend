@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { UserActiveInterface } from 'src/common/interface/user-active-interface';
 import {
   EDUCATION_NOT_FOUND,
+  ERROR_EDUCATION_IS_UCAB,
   ERROR_EDUCATION_PRINCIPAL_ALREADY_EXISTS,
 } from '../message';
 
@@ -25,17 +26,6 @@ export class EducationService {
     createEducationDto: CreateEducationDto,
     user: UserActiveInterface,
   ) {
-    const verifyPrincipal = await this.educationRepository.findOne({
-      where: {
-        principal: true,
-        profileId: user.id,
-      },
-    });
-
-    if (createEducationDto.principal && verifyPrincipal) {
-      throw new BadRequestException(ERROR_EDUCATION_PRINCIPAL_ALREADY_EXISTS);
-    }
-
     const newEducation = await this.educationRepository.save({
       ...createEducationDto,
       profileId: user.id,
@@ -78,15 +68,42 @@ export class EducationService {
     updateEducationDto: UpdateEducationDto,
     user: UserActiveInterface,
   ): Promise<void> {
-    const education = await this.educationRepository.update(
-      {
-        id,
+    let education;
+
+    const validateEducationIsUCAB = await this.educationRepository.findOne({
+      where: {
         profileId: user.id,
+        id: id,
       },
-      {
-        ...updateEducationDto,
-      },
-    );
+    });
+
+    if (
+      validateEducationIsUCAB.isUCAB === true &&
+      (updateEducationDto.principal === true ||
+        updateEducationDto.principal === false)
+    ) {
+      education = await this.educationRepository.update(
+        {
+          id,
+          profileId: user.id,
+        },
+        {
+          principal: updateEducationDto.principal,
+        },
+      );
+    }
+
+    if (validateEducationIsUCAB.isUCAB === false) {
+      education = await this.educationRepository.update(
+        {
+          id,
+          profileId: user.id,
+        },
+        {
+          ...updateEducationDto,
+        },
+      );
+    }
 
     if (education.affected === 0) {
       throw new NotFoundException(EDUCATION_NOT_FOUND);
@@ -96,6 +113,17 @@ export class EducationService {
   }
 
   async remove(id: number, user: UserActiveInterface): Promise<void> {
+    const verifyEducationUCAB = await this.educationRepository.findOne({
+      where: {
+        profileId: user.id,
+        id: id,
+      },
+    });
+
+    if (verifyEducationUCAB.isUCAB === true) {
+      throw new BadRequestException(ERROR_EDUCATION_IS_UCAB);
+    }
+
     const education = await this.educationRepository.softDelete({
       id,
       profileId: user.id,

@@ -9,13 +9,6 @@ import {
 
 export class CreateEducationDto {
   @ApiProperty()
-  @IsBoolean({
-    message: 'El campo principal debe ser booleano',
-  })
-  @IsOptional()
-  principal: boolean;
-
-  @ApiProperty()
   @IsString({
     message: 'El campo título debe ser string',
   })
