@@ -12,18 +12,13 @@ import { SearchService } from './search.service';
 import { SearchProfileDto } from './dto/search.profiles.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Career } from '../career/enum/career.enum';
+import { Auth } from '../auth/decorators/auth.decorator';
+import { UserRole } from 'src/constants';
 
 @ApiTags('search')
 @Controller('search')
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
-
-  @ApiTags('search')
-  @Get('/')
-  public async getSearch() {
-    const resp = await this.searchService.indexProfiles();
-    console.log(resp);
-  }
 
   @ApiTags('search')
   @Post('/')
@@ -58,6 +53,15 @@ export class SearchController {
   }
 
   @ApiTags('search')
+  @Auth(UserRole.ADMIN)
+  @Get('/')
+  public async getSearch() {
+    const resp = await this.searchService.indexProfiles();
+    console.log(resp);
+  }
+
+  @ApiTags('search')
+  @Auth(UserRole.ADMIN)
   @Delete('/')
   public async deleteIndex() {
     const resp = await this.searchService.deleteIndex();
