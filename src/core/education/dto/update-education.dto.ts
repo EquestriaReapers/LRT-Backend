@@ -1,13 +1,11 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateEducationDto } from './create-education.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsDateString, IsOptional, IsString } from 'class-validator';
 
 export class UpdateEducationDto extends PartialType(CreateEducationDto) {
   @ApiProperty()
-  @IsString({
-    message: 'El campo título debe ser string',
-  })
+  @IsBoolean({ message: 'El campo principal debe ser booleano' })
   @IsOptional()
   principal: boolean;
 
