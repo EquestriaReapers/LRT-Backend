@@ -3,6 +3,7 @@ import { ContactItem, Icon, ProfileTemplate, SkillSetType } from './types';
 import { ContactMethod } from 'src/core/profiles/entities/contact-method.entity';
 import { TypeContact } from 'src/constants';
 import { ResponseProfileGet } from '../../dto/responses.dto';
+import { SkillType } from 'src/core/skills/entities/skill.entity';
 
 const ContactMethodTypeToIcon = {
   [TypeContact.PHONE]: Icon.Call,
@@ -30,8 +31,13 @@ export default class ProfileTemplateAdaptator {
       })),
       languages: profile.languages.map((lang) => lang.name),
       skillSet: {
-        type: SkillSetType.Single,
-        skills: profile.skills.map((skill) => skill.name),
+        type: SkillSetType.HardSoft,
+        hardSkills: profile.skills
+          .filter((skill) => skill.type === SkillType.HARD)
+          .map((skill) => skill.name),
+        softSkills: profile.skills
+          .filter((skill) => skill.type === SkillType.SOFT)
+          .map((skill) => skill.name),
       },
     };
   }

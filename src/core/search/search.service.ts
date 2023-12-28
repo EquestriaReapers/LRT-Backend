@@ -75,6 +75,7 @@ export class SearchService {
                 type: 'nested',
                 properties: {
                   name: { type: 'text' },
+                  type: { type: 'text' },
                 },
               },
               experience: {

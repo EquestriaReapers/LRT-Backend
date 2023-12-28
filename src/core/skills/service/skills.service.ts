@@ -21,11 +21,11 @@ export class SkillsService {
 
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-  ) { }
+  ) {}
 
   async create(createSkillDto: CreateSkillDto) {
-    const newSkill = await this.skillsRepository.create(createSkillDto);
-    return this.skillsRepository.save(newSkill);
+    const newSkill = await this.skillsRepository.save(createSkillDto);
+    return newSkill;
   }
 
   async createSkillAndUserAsing(
@@ -60,12 +60,19 @@ export class SkillsService {
     };
   }
 
-  async findAll(name?: string) {
+  async findAll(name?: string, type?: string) {
     const queryOptions: any = {};
 
     if (name) {
       queryOptions.where = {
         name: ILike(`%${name}%`),
+      };
+    }
+
+    if (type) {
+      queryOptions.where = {
+        ...queryOptions.where,
+        type,
       };
     }
 
