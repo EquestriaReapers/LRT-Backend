@@ -4,14 +4,17 @@ import { Career } from '../enum/career.enum';
 @Injectable()
 export class CareerService {
   findAll() {
-    return {
-      career: [Career],
-    };
+    const careers = {};
+    Object.keys(Career).forEach((key) => {
+      const newKey = key.replace(/_/g, ' ');
+      careers[Career[key]] = newKey;
+    });
+    return careers;
   }
 
   findOneByName(name: string) {
     if (!Object.values(Career).includes(name as any)) {
-      throw new BadRequestException(`Invalid career name: ${name}`);
+      throw new BadRequestException(`Nombre de carrera invalida: ${name}`);
     }
 
     return {
