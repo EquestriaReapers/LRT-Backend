@@ -95,16 +95,32 @@ export default class ProfilesService {
       countryResidence: updateProfileDto.countryResidence,
     });
 
-    if (profile.affected === 0) {
-      throw new NotFoundException(PROFILE_NOT_FOUND);
+    if (profile.affected === 0) throw new NotFoundException(PROFILE_NOT_FOUND);
+
+    if (updateProfileDto.name === undefined || updateProfileDto.name === null) {
+      const dataUser = await this.userRepository.findOne({
+        where: { id: user.id },
+      });
+      updateProfileDto.name = dataUser.name;
     }
 
-    if (updateProfileDto.name) {
-      const userUpdated = await this.userRepository.update(user.id, {
+    if (
+      updateProfileDto.lastname === undefined ||
+      updateProfileDto.lastname === null
+    ) {
+      const dataUser = await this.userRepository.findOne({
+        where: { id: user.id },
+      });
+      updateProfileDto.lastname = dataUser.lastname;
+    }
+
+    if (updateProfileDto.name || updateProfileDto.lastname) {
+      const userUpdateResult = await this.userRepository.update(user.id, {
         name: updateProfileDto.name,
+        lastname: updateProfileDto.lastname,
       });
 
-      if (userUpdated.affected === 0) {
+      if (userUpdateResult.affected === 0) {
         throw new NotFoundException(USER_NOT_FOUND);
       }
     }
