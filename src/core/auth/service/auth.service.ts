@@ -43,7 +43,13 @@ export class AuthService {
     private readonly jwtPayloadService: JwtPayloadService,
   ) {}
 
-  async register({ email, password, name, lastname }: RegisterDto) {
+  async register({
+    email,
+    password,
+    name,
+    lastname,
+    documentNumber,
+  }: RegisterDto) {
     const user = await this.usersService.findOneByEmail(email);
 
     if (user) {
@@ -54,6 +60,7 @@ export class AuthService {
       email,
       password: await bcryptjs.hash(password, 10),
       name,
+      documentNumber,
       lastname,
       role: UserRole.GRADUATE,
     });

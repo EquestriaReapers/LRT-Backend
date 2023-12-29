@@ -121,3 +121,45 @@ export class ResponsePaginationProfile {
   })
   pagination: PaginationMessage;
 }
+
+export class ProfileData {
+  @ApiProperty()
+  id: number;
+  @ApiProperty()
+  userId: number;
+  @ApiProperty()
+  description: string;
+  @ApiProperty()
+  mainTitle: string;
+  @ApiProperty()
+  countryResidence: string;
+  @ApiProperty()
+  deletedAt: Date;
+  @ApiProperty({
+    type: [ExperienceData],
+  })
+  experience: Experience[];
+  @ApiProperty({
+    type: [SkillData],
+  })
+  skills: Skill[];
+}
+
+export class MethodContact {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  email: string;
+}
+
+export class ResponseMethodContactDTO {
+  @ApiProperty({
+    type: ProfileData,
+  })
+  profile: ProfileData;
+  @ApiProperty({
+    type: [MethodContact],
+  })
+  contactMethods: MethodContact[];
+}

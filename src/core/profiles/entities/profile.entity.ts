@@ -15,10 +15,10 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import {
   ExperienceData,
-  PaginationMessage,
   SkillData,
   UserProfileData,
 } from '../dto/responses.dto';
+import { ContactMethod } from './contact-method.entity';
 
 @Entity()
 export class Profile {
@@ -71,4 +71,8 @@ export class Profile {
   @ApiProperty()
   @DeleteDateColumn()
   deletedAt: Date;
+
+  @ApiProperty({ type: () => ContactMethod, isArray: true })
+  @Column({ type: 'jsonb', nullable: true, default: () => "'[]'" })
+  contactMethods: ContactMethod[];
 }

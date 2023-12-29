@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { Profile } from '../entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,12 +10,18 @@ import { Repository } from 'typeorm';
 import { UserActiveInterface } from '../../../common/interface/user-active-interface';
 import { Skill } from '../../skills/entities/skill.entity';
 import { User } from '../../users/entities/user.entity';
-import { ERROR_PROFILE_SKILL_NOT_FOUND, PROFILE_NOT_FOUND } from '../messages';
+import {
+  ERROR_LIMITE_METHOD_CONTACT,
+  ERROR_PROFILE_SKILL_NOT_FOUND,
+  PROFILE_NOT_FOUND,
+} from '../messages';
 import { USER_NOT_FOUND } from 'src/core/users/messages';
 import { SKILL_NOT_FOUND } from 'src/core/skills/messages';
 import FindAllPaginateAction from './find-all-paginate.action';
 import { ResponsePaginationProfile } from '../dto/responses.dto';
 import { FindAllPayload } from '../dto/find-all-payload.interface';
+import { ContactMethod } from '../entities/contact-method.entity';
+import { CreateContactDto } from '../dto/createContact.dto';
 
 @Injectable()
 export default class ProfilesService {
@@ -166,5 +176,53 @@ export default class ProfilesService {
     if (!profile) throw new NotFoundException(PROFILE_NOT_FOUND);
 
     return profile;
+  }
+  async addContactMethod(
+    user: UserActiveInterface,
+    createContactMethodDto: CreateContactDto,
+  ): Promise<Profile> {
+    const profile = await this.profileRepository.findOne({
+      where: { id: user.id },
+    });
+
+    if (!profile) {
+      throw new NotFoundException(PROFILE_NOT_FOUND);
+    }
+
+    if (profile.contactMethods.length >= 3) {
+      throw new BadRequestException(ERROR_LIMITE_METHOD_CONTACT);
+    }
+
+    const contactMethod = new ContactMethod();
+    contactMethod.id = profile.contactMethods.length + 1;
+    contactMethod.email = createContactMethodDto.email;
+
+    profile.contactMethods.push(contactMethod);
+
+    await this.profileRepository.save(profile);
+
+    return profile;
+  }
+
+  async removeContactMethod(
+    id: number,
+    user: UserActiveInterface,
+  ): Promise<void> {
+    const profile = await this.profileRepository.findOne({
+      where: { id: user.id },
+    });
+
+    if (!profile) {
+      throw new NotFoundException(PROFILE_NOT_FOUND);
+    }
+
+    const updatedContactMethodList = profile.contactMethods.filter(
+      (contactMethod) => contactMethod.id !== id,
+    );
+
+    profile.contactMethods = updatedContactMethodList;
+
+    await this.profileRepository.save(profile);
+    return;
   }
 }

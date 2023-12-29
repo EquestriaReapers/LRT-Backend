@@ -14,7 +14,18 @@ import { Transform } from 'class-transformer';
 export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty({ example: 'John' })
   @IsOptional()
+  @IsString()
   name: string;
+
+  @ApiProperty({ example: 'V30109748' })
+  @IsOptional()
+  @IsString()
+  @isUniqueDb({
+    table: 'user',
+    column: 'documentNumber',
+    message: 'El numero de documento ya existe',
+  })
+  documentNumber: string;
 
   @ApiProperty({ example: 'Winchester' })
   @IsOptional()
