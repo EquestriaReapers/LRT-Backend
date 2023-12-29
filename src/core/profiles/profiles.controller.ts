@@ -34,18 +34,21 @@ import {
   PROFILE_SUCCESFULLY_DELETED_SKILL,
   PROFILE_SUCCESFULLY_DELETE_METHOD_CONTACT,
   PROFILE_SUCCESFULLY_UPDATED,
+  SUCCESSFULLY_CREATED_CONTACT,
 } from './messages';
 import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator';
 import {
   AddSkillResponse,
-  ResponseMethodContactDTO,
-  ResponseProfileGet,
   ResponsePaginationProfile,
+  ResponseProfileGet,
 } from './dto/responses.dto';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
 import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
-import { LanguageLevel, LanguageProfile } from './entities/language-profile.entity';
+import {
+  LanguageLevel,
+  LanguageProfile,
+} from './entities/language-profile.entity';
 import { Career } from '../career/enum/career.enum';
 import { AddLanguageProfileDto } from './dto/add-language-profile.dto';
 import LanguagueProfileService from './service/languague-profile.service';
@@ -57,7 +60,7 @@ export class ProfilesController {
   constructor(
     private readonly profilesService: ProfilesService,
     private readonly languagueProfileService: LanguagueProfileService,
-  ) { }
+  ) {}
 
   @ApiTags('profile')
   @Get('export-pdf/:id')
@@ -290,14 +293,18 @@ export class ProfilesController {
   @Auth(UserRole.GRADUATE)
   @ApiCreatedResponse({
     description: 'Add contact method to my profile',
-    type: ResponseMethodContactDTO,
+    type: MessageDTO,
   })
   @Post('/my-profile/contact-methods')
   async addContactMethod(
     @ActiveUser() user: UserActiveInterface,
     @Body() createContactMethodDto: CreateContactDto,
   ) {
-    return this.profilesService.addContactMethod(user, createContactMethodDto);
+    await this.profilesService.addContactMethod(user, createContactMethodDto);
+
+    return {
+      message: SUCCESSFULLY_CREATED_CONTACT,
+    };
   }
 
   @ApiTags('profile')
