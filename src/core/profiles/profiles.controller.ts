@@ -34,14 +34,13 @@ import {
   PROFILE_SUCCESFULLY_DELETED_SKILL,
   PROFILE_SUCCESFULLY_DELETE_METHOD_CONTACT,
   PROFILE_SUCCESFULLY_UPDATED,
+  SUCCESSFULLY_CREATED_CONTACT,
 } from './messages';
 import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator';
 import {
   AddSkillResponse,
-  ResponseProfileGet,
-  SwaggerResponsePagination,
-  ResponseMethodContactDTO,
   ResponsePaginationProfile,
+  ResponseProfileGet,
 } from './dto/responses.dto';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
@@ -277,14 +276,18 @@ export class ProfilesController {
   @Auth(UserRole.GRADUATE)
   @ApiCreatedResponse({
     description: 'Add contact method to my profile',
-    type: ResponseMethodContactDTO,
+    type: MessageDTO,
   })
   @Post('/my-profile/contact-methods')
   async addContactMethod(
     @ActiveUser() user: UserActiveInterface,
     @Body() createContactMethodDto: CreateContactDto,
   ) {
-    return this.profilesService.addContactMethod(user, createContactMethodDto);
+    await this.profilesService.addContactMethod(user, createContactMethodDto);
+
+    return {
+      message: SUCCESSFULLY_CREATED_CONTACT,
+    };
   }
 
   @ApiTags('profile')
