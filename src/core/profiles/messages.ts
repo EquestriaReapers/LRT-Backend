@@ -9,3 +9,5 @@ export const PROFILE_SUCCESFULLY_DELETE_METHOD_CONTACT =
   'Metodo de contacto eliminado con exito';
 export const ERROR_LIMITE_METHOD_CONTACT =
   'Se ha alcanzado el número máximo de correos de contacto';
+export const SUCCESSFULLY_CREATED_CONTACT =
+  'Correo de contacto creado exitosamente';
