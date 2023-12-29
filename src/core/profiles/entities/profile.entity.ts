@@ -22,6 +22,7 @@ import {
 import { LanguageProfile } from './language-profile.entity';
 import { Career } from 'src/core/career/enum/career.enum';
 import { ContactMethod } from './contact-method.entity';
+import { Portafolio } from 'src/portafolio/entities/portafolio.entity';
 
 @Entity()
 export class Profile {
@@ -89,4 +90,10 @@ export class Profile {
   @ApiProperty({ type: () => ContactMethod, isArray: true })
   @Column({ type: 'jsonb', nullable: true, default: () => "'[]'" })
   contactMethods: ContactMethod[];
+
+
+  @ApiProperty({
+    type: [Portafolio],
+  }) @OneToMany(() => Portafolio, (portafolio) => portafolio.profile)
+  portafolios: Portafolio[];
 }
