@@ -24,10 +24,8 @@ export class SkillsService {
   ) {}
 
   async create(createSkillDto: CreateSkillDto) {
-    // Create a new skill instance
-    const newSkill = await this.skillsRepository.create(createSkillDto);
-    // Save this skill instance to the database
-    return this.skillsRepository.save(newSkill);
+    const newSkill = await this.skillsRepository.save(createSkillDto);
+    return newSkill;
   }
 
   async createSkillAndUserAsing(
@@ -62,12 +60,19 @@ export class SkillsService {
     };
   }
 
-  async findAll(name?: string) {
+  async findAll(name?: string, type?: string) {
     const queryOptions: any = {};
 
     if (name) {
       queryOptions.where = {
         name: ILike(`%${name}%`),
+      };
+    }
+
+    if (type) {
+      queryOptions.where = {
+        ...queryOptions.where,
+        type,
       };
     }
 

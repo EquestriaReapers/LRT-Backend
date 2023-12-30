@@ -1,7 +1,7 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { ExperienceCreateResponseDTO } from './create-experience.dto';
 import {
-  IsDate,
+  IsDateString,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -12,37 +12,50 @@ export class UpdateExperienceDto extends PartialType(
   ExperienceCreateResponseDTO,
 ) {
   @ApiProperty({ example: 'Narrador de futbol en ESPN', required: true })
-  @IsString()
+  @IsString({ message: 'El rol debe ser un string' })
   @IsOptional()
   role: string;
 
   @ApiProperty()
-  @IsString()
+  @IsString({ message: 'El nombre de la empresa debe ser un string' })
   @IsOptional()
   businessName: string;
 
   @ApiProperty()
-  @IsNumber()
+  @IsNumber({}, { message: 'El id del perfil debe ser un número' })
   @IsOptional()
   profileId: number;
 
   @ApiProperty()
-  @IsString()
+  @IsString({ message: 'La ubicación debe ser un string' })
   @IsOptional()
   location: string;
 
   @ApiProperty()
-  @IsString()
+  @IsString({ message: 'La descripción debe ser un string' })
   @IsOptional()
   description: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsDate()
+  @ApiProperty({
+    example: '2021-01-01',
+  })
+  @IsDateString(
+    {},
+    {
+      message:
+        'La fecha de inicio debe ser una fecha válida ejemplo 2021-01-01',
+    },
+  )
+  @IsOptional()
   startDate: Date;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: '2021-01-02',
+  })
+  @IsDateString(
+    {},
+    { message: 'La fecha de fin debe ser una fecha válida ejemplo 2021-01-01' },
+  )
   @IsOptional()
-  @IsDate()
   endDate: Date;
 }

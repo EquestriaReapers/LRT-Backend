@@ -2,6 +2,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Profile } from '../../profiles/entities/profile.entity';
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
+export enum SkillType {
+  HARD = 'HARD',
+  SOFT = 'SOFT',
+}
 @Entity()
 export class Skill {
   @ApiProperty()
@@ -12,11 +16,14 @@ export class Skill {
   @Column()
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ enum: SkillType })
   @Column({
-    nullable: true,
+    type: 'enum',
+    enum: SkillType,
+    nullable: false,
+    default: SkillType.HARD,
   })
-  level: number;
+  type: SkillType;
 
   @ManyToMany(() => Profile, (profile) => profile.skills)
   profiles: Profile[];

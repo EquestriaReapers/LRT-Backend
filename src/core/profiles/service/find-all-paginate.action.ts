@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Profile } from '../entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import {
   RANDOM_PROFILES_PAGINATE_QUERY,
   SET_SEED_QUERY,
@@ -23,36 +23,26 @@ export default class FindAllPaginateAction {
   async execute({
     random,
     carrera,
+    skills,
+    countryResidence,
     ...opt
   }: FindAllPayload): Promise<ResponsePaginationProfile> {
     const { page, limit, skip } = this.getPaginationData(opt);
     if (!random) random = Math.random();
 
-    if (carrera) {
-      if (!Array.isArray(carrera)) {
-        carrera = [carrera];
-      }
+    carrera = await this.validateCarrera(carrera);
 
-      carrera = carrera.map((c) => {
-        const carreraUpper = c.toUpperCase() as Career;
+    skills = await this.validateQueryArrayRelation(skills, 'skills');
 
-        if (!Object.values(Career).includes(carreraUpper)) {
-          throw new BadRequestException(
-            `Invalid value for Carrera: ${carreraUpper}`,
-          );
-        }
-
-        return carreraUpper;
-      });
-    } else {
-      carrera = null;
-    }
+    countryResidence = await this.validateQueryArrayCountry(countryResidence);
 
     const profiles = await this.executeQueryGetRandomProfiles(
       random,
       limit,
       skip,
       carrera,
+      skills,
+      countryResidence,
     );
     const totalCount = await this.profileRepository.count();
 
@@ -79,6 +69,8 @@ export default class FindAllPaginateAction {
     limit: number,
     skip: number,
     carrera: Career[],
+    skills: string[],
+    countryResidence: string[],
   ): Promise<Profile[]> {
     await this.setProfileRepositorySeed(random);
 
@@ -88,7 +80,25 @@ export default class FindAllPaginateAction {
     ).replace('{{skip}}', skip + '');
 
     if (carrera) {
-      query = this.addMultipleFiltersToQuery(query, 'mainTitle', carrera);
+      query = this.addMultipleFiltersToQuery(
+        query,
+        'profile',
+        'mainTitle',
+        carrera,
+      );
+    }
+
+    if (skills) {
+      query = this.addMultipleFiltersToQuery(query, 'skills', 'name', skills);
+    }
+
+    if (countryResidence) {
+      query = this.addMultipleFiltersToQuery(
+        query,
+        'profile',
+        'countryResidence',
+        countryResidence,
+      );
     }
 
     const resultsRaw = await this.profileRepository.query(query);
@@ -130,7 +140,6 @@ export default class FindAllPaginateAction {
       skip: (page - 1) * limit,
     };
   }
-
   private addFilterToQuery(
     query: string,
     columnName: string,
@@ -157,27 +166,117 @@ export default class FindAllPaginateAction {
 
   private addMultipleFiltersToQuery(
     query: string,
+    tableName: string,
     columnName: string,
     filterValues: any[],
   ): string {
     if (filterValues.length > 0) {
       const filterConditions = filterValues.map(
-        (value) => `"${columnName}" = '${value}'`,
+        (value) => `"${tableName}"."${columnName}" = '${value}'`,
       );
       const filterQuery = filterConditions.join(' OR ');
 
-      const whereIndex = query.lastIndexOf('WHERE');
-      if (whereIndex !== -1) {
-        query =
-          query.slice(0, whereIndex + 5) +
-          filterQuery +
-          ' AND ' +
-          query.slice(whereIndex + 5);
+      // Si se está filtrando por habilidades, modificar la consulta principal
+      if (tableName === 'skills') {
+        const subqueryFilter = `EXISTS (
+          SELECT 1 FROM "profile_skills_skill" "profile_skills"
+          JOIN "skill" "skills" ON "skills"."id"="profile_skills"."skillId"
+          WHERE "profile_skills"."profileId" = "profile"."id" AND (${filterQuery})
+        )`;
+
+        const whereIndex = query.lastIndexOf('WHERE');
+        if (whereIndex !== -1) {
+          query =
+            query.slice(0, whereIndex + 6) +
+            subqueryFilter +
+            ' AND ' +
+            query.slice(whereIndex + 6);
+        } else {
+          query += ' WHERE ' + subqueryFilter;
+        }
       } else {
-        query += ' WHERE ' + filterQuery;
+        // Si no se está filtrando por habilidades, agregar el filtro a la cláusula WHERE principal
+        const whereIndex = query.lastIndexOf('WHERE');
+        if (whereIndex !== -1) {
+          query =
+            query.slice(0, whereIndex + 6) +
+            filterQuery +
+            ' AND ' +
+            query.slice(whereIndex + 6);
+        } else {
+          query += ' WHERE ' + filterQuery;
+        }
       }
     }
 
     return query;
+  }
+
+  private async validateQueryArrayRelation(
+    relations: string[] | null,
+    relationName: string,
+  ) {
+    if (relations) {
+      relations = Array.isArray(relations) ? relations : [relations];
+
+      const validationQuery = await this.profileRepository.find({
+        relations: [relationName],
+        where: {
+          skills: {
+            name: In(relations),
+          },
+        },
+      });
+
+      if (!validationQuery) {
+        throw new BadRequestException(`Valor invaldo para ${relationName}`);
+      }
+    } else {
+      relations = null;
+    }
+
+    return relations;
+  }
+
+  private async validateQueryArrayCountry(column: string[] | null) {
+    if (column) {
+      column = Array.isArray(column) ? column : [column];
+
+      const validationQuery = await this.profileRepository.find({
+        where: {
+          countryResidence: In(column),
+        },
+      });
+
+      if (!validationQuery) {
+        throw new BadRequestException(`Valor invaldo para ${column}`);
+      }
+    } else {
+      column = null;
+    }
+
+    return column;
+  }
+
+  private async validateCarrera(carrera: any) {
+    if (carrera) {
+      carrera = Array.isArray(carrera) ? carrera : [carrera];
+
+      carrera = carrera.map((c: string) => {
+        const carreraLower = c.toLowerCase() as Career;
+
+        if (!Object.values(Career).includes(carreraLower)) {
+          throw new BadRequestException(
+            `Valor inválido para carrera: ${carreraLower}`,
+          );
+        }
+
+        return carreraLower;
+      });
+    } else {
+      carrera = null;
+    }
+
+    return carrera;
   }
 }

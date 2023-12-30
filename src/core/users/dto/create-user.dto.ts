@@ -13,13 +13,13 @@ import { Transform } from 'class-transformer';
 
 export class CreateUserDto {
   @ApiProperty({ example: 'John', required: true })
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: 'El nombre es requerido' })
+  @IsString({ message: 'El nombre debe ser un string' })
   name: string;
 
   @ApiProperty({ example: 'V30109748' })
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'El número de documento debe ser un string' })
+  @IsNotEmpty({ message: 'El número de documento es requerido' })
   @isUniqueDb({
     table: 'user',
     column: 'documentNumber',
@@ -29,7 +29,7 @@ export class CreateUserDto {
 
   @ApiProperty({ example: 'Winchester' })
   @IsNotEmpty()
-  @IsString()
+  @IsString({ message: 'El apellido debe ser un string' })
   lastname: string;
 
   @ApiProperty({ example: 'ronaldo@gmail.com', required: true })
@@ -51,6 +51,6 @@ export class CreateUserDto {
 
   @ApiProperty({ example: 'admin|graduate', required: true })
   @IsNotEmpty()
-  @IsEnum(UserRole, { message: 'Invalid role' })
+  @IsEnum(UserRole, { message: 'Rol invalido' })
   role: UserRole;
 }
