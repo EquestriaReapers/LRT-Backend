@@ -10,6 +10,7 @@ import {
   Response,
   InternalServerErrorException,
   Query,
+  Res,
   ParseIntPipe,
 } from '@nestjs/common';
 import ProfilesService from './service';
@@ -25,10 +26,11 @@ import { UserRole } from '../../constants';
 import { ActiveUser } from '../../common/decorator/active-user-decorator';
 import { UserActiveInterface } from '../../common/interface/user-active-interface';
 import { AddSkillDto } from './dto/add-skill.dto';
-import { Profile } from './entities/profile.entity';
 import { MessageDTO } from 'src/common/dto/response.dto';
 import * as express from 'express';
 import {
+  ERROR_UNKOWN_GENERATING_PDF,
+  PROFILE_SUCCESFULLY_DELETED_LANGUAGE,
   PROFILE_SUCCESFULLY_DELETED_SKILL,
   PROFILE_SUCCESFULLY_DELETE_METHOD_CONTACT,
   PROFILE_SUCCESFULLY_UPDATED,
@@ -38,18 +40,49 @@ import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator
 import {
   AddSkillResponse,
   ResponsePaginationProfile,
+  ResponseProfileGet,
 } from './dto/responses.dto';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
 import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
+import { LanguageLevel, LanguageProfile } from './entities/language-profile.entity';
+import { Career } from '../career/enum/career.enum';
+import { AddLanguageProfileDto } from './dto/add-language-profile.dto';
+import LanguagueProfileService from './service/languague-profile.service';
 import { CreateContactDto } from './dto/createContact.dto';
+import { Skill } from '../skills/entities/skill.entity';
 
 @Controller('profiles')
 export class ProfilesController {
-  constructor(private readonly profilesService: ProfilesService) {}
+  constructor(
+    private readonly profilesService: ProfilesService,
+    private readonly languagueProfileService: LanguagueProfileService,
+  ) { }
 
   @ApiTags('profile')
-  @Auth(UserRole.GRADUATE)
+  @Get('export-pdf/:id')
+  @ApiInternalServerError()
+  async generatePdf(@Res() res, @Param('id') id: number) {
+    const buffer = await this.profilesService.exportPdf(+id);
+
+    if (!buffer) {
+      throw new InternalServerErrorException(ERROR_UNKOWN_GENERATING_PDF);
+    }
+
+    res.set({
+      // pdf
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename=profile.pdf`,
+      'Content-Length': buffer.length,
+      // prevent cache
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Pragma: 'no-cache',
+      Expires: 0,
+    });
+    res.end(buffer);
+  }
+
+  @ApiTags('profile')
   @Get()
   @ApiOkResponse({
     description: 'Returns an array of ALL profiles',
@@ -59,10 +92,16 @@ export class ProfilesController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'random', required: false })
+  @ApiQuery({ name: 'carrera', required: false })
+  @ApiQuery({ name: 'skills', required: false })
+  @ApiQuery({ name: 'countryResidence', required: false })
   findAll(
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('random') random: number,
+    @Query('carrera') carrera: Career[],
+    @Query('skills') skills: string[],
+    @Query('countryResidence') countryResidence: string[],
   ) {
     limit = limit > 100 ? 100 : limit;
 
@@ -70,17 +109,19 @@ export class ProfilesController {
       page,
       limit,
       random,
+      carrera,
+      skills,
+      countryResidence,
     });
   }
 
   @ApiTags('profile')
-  @Auth(UserRole.GRADUATE)
   @Get(':id')
   @ApiInternalServerError()
   @ApiResponse({
     status: 200,
     description: 'Return the profile',
-    type: Profile,
+    type: ResponseProfileGet,
   })
   @ApiException(() => NotFoundException, {
     description: 'Profile not found',
@@ -183,6 +224,54 @@ export class ProfilesController {
 
     return response.status(200).json({
       message: PROFILE_SUCCESFULLY_DELETED_SKILL,
+    });
+  }
+
+  @ApiTags('profile')
+  @Auth(UserRole.GRADUATE)
+  @Post('/my-profile/language')
+  @ApiOkResponse({
+    description: 'Return my profile with languages',
+    type: LanguageProfile,
+    schema: {
+      properties: {
+        level: {
+          enum: Object.values(LanguageLevel),
+        },
+      },
+    },
+  })
+  @ApiException(() => NotFoundException, {
+    description: 'Profile not found or language not found',
+  })
+  @ApiInternalServerError()
+  addLanguageProfile(
+    @Body() addLanguageProfile: AddLanguageProfileDto,
+    @ActiveUser() user: UserActiveInterface,
+  ) {
+    return this.languagueProfileService.add(addLanguageProfile, user);
+  }
+
+  @ApiTags('profile')
+  @Auth(UserRole.GRADUATE)
+  @Delete('/my-profile/language/:languageId')
+  @ApiOkResponse({
+    description: 'Delete language from my profile',
+    type: MessageDTO,
+  })
+  @ApiException(() => NotFoundException, {
+    description: 'Profile not found or language not found',
+  })
+  @ApiInternalServerError()
+  async removeLanguageProfile(
+    @Param('languageId') languageId: number,
+    @ActiveUser() user: UserActiveInterface,
+    @Response() response: express.Response,
+  ) {
+    await this.languagueProfileService.remove(languageId, user);
+
+    return response.status(200).json({
+      message: PROFILE_SUCCESFULLY_DELETED_LANGUAGE,
     });
   }
 

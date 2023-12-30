@@ -16,7 +16,7 @@ export const RANDOM_PROFILES_PAGINATE_QUERY = `
           'endDate', "experience"."endDate"
         )::text
         FROM "experience"
-        WHERE "experience"."profileId" = "profile"."id"
+        WHERE "experience"."profileId" = "profile"."id" AND "experience"."deletedAt" IS NULL
       ) AS "experiences",
       ARRAY(
         SELECT DISTINCT ON ("skills"."id") json_build_object(
@@ -26,7 +26,19 @@ export const RANDOM_PROFILES_PAGINATE_QUERY = `
         FROM "profile_skills_skill" "profile_skills"
         JOIN "skill" "skills" ON "skills"."id"="profile_skills"."skillId"
         WHERE "profile_skills"."profileId" = "profile"."id"
-      ) AS "skills"
+      ) AS "skills",
+      ARRAY(
+        SELECT DISTINCT ON ("language_profile"."id") json_build_object(
+          'id', "language_profile"."id",
+          'profileId', "language_profile"."profileId",
+          'level', "language_profile"."level",
+          'name', "languages"."name",
+          'languageId', "language_profile"."languageId"
+        )::text
+        FROM "language_profile"
+        JOIN "language" "languages" ON "languages"."id"="language_profile"."languageId"
+        WHERE "language_profile"."profileId" = "profile"."id"
+      ) AS "languageProfile"
     FROM "profile" "profile"
     LEFT JOIN "user" "user" ON "user"."id"="profile"."userId" AND ("user"."deletedAt" IS NULL)
     WHERE "profile"."deletedAt" IS NULL

@@ -15,9 +15,14 @@ import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { UserRole } from '../../constants';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator';
-import { Skill } from './entities/skill.entity';
+import { Skill, SkillType } from './entities/skill.entity';
 import { MessageDTO } from 'src/common/dto/response.dto';
 import * as express from 'express';
 import {
@@ -25,13 +30,16 @@ import {
   SKILL_SUCCESFULLY_UPDATED,
 } from './messages';
 import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
+import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
+import { ActiveUser } from 'src/common/decorator/active-user-decorator';
+import { UserActiveInterface } from 'src/common/interface/user-active-interface';
 
 @Controller('skills')
 export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
 
-  @ApiTags('skill')
-  @Auth(UserRole.GRADUATE)
+  @ApiTags('admin-skill')
+  @Auth(UserRole.ADMIN)
   @Post()
   @ApiCreatedResponse({
     description: 'Returns the created skill',
@@ -41,16 +49,58 @@ export class SkillsController {
   create(@Body() createSkillDto: CreateSkillDto) {
     return this.skillsService.create(createSkillDto);
   }
+
   @ApiTags('skill')
-  @Auth(UserRole.GRADUATE || UserRole.ADMIN)
+  @Auth(UserRole.GRADUATE)
+  @Post('skill-user')
+  @ApiCreatedResponse({
+    description: 'Returns the created skill',
+    type: Skill,
+  })
+  @ApiInternalServerError()
+  async createSkillAndUserAsing(
+    @Body() createSkillDto: CreateSkillDto,
+    @ActiveUser() user: UserActiveInterface,
+  ) {
+    try {
+      const response = await this.skillsService.createSkillAndUserAsing(
+        createSkillDto,
+        user,
+      );
+
+      return response;
+    } catch (error) {
+      console.log(error);
+      throw new NotFoundException(INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @ApiTags('skill')
+  @Auth(UserRole.GRADUATE)
   @Get()
   @ApiOkResponse({
     description: 'Returns an array of ALL skills',
     type: [Skill],
   })
   @ApiInternalServerError()
-  findAll(@Query('name') name: string) {
-    return this.skillsService.findAll(name);
+  @ApiQuery({
+    name: 'name',
+    required: false,
+    description: 'A parameter. Optional',
+  })
+  @ApiQuery({
+    name: 'type',
+    required: false,
+    description: 'A parameter. Optional',
+  })
+  async findAll(@Query('name') name?: string, @Query('type') type?: SkillType) {
+    try {
+      const skills = await this.skillsService.findAll(name, type);
+
+      return skills;
+    } catch (error) {
+      throw new NotFoundException(INTERNAL_SERVER_ERROR);
+    }
   }
   @ApiTags('skill')
   @Auth(UserRole.GRADUATE || UserRole.ADMIN)

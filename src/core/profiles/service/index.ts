@@ -6,7 +6,7 @@ import {
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { Profile } from '../entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { UserActiveInterface } from '../../../common/interface/user-active-interface';
 import { Skill } from '../../skills/entities/skill.entity';
 import { User } from '../../users/entities/user.entity';
@@ -20,6 +20,8 @@ import { SKILL_NOT_FOUND } from 'src/core/skills/messages';
 import FindAllPaginateAction from './find-all-paginate.action';
 import { ResponsePaginationProfile } from '../dto/responses.dto';
 import { FindAllPayload } from '../dto/find-all-payload.interface';
+import ExportPDFAction from './export-pdf';
+import { Buffer } from 'buffer';
 import { ContactMethod } from '../entities/contact-method.entity';
 import { CreateContactDto } from '../dto/createContact.dto';
 
@@ -36,6 +38,7 @@ export default class ProfilesService {
     private readonly userRepository: Repository<User>,
 
     private readonly findAllPaginateAction: FindAllPaginateAction,
+    private readonly exportPdfAction: ExportPDFAction,
   ) {}
 
   async findAllPaginate(
@@ -44,19 +47,31 @@ export default class ProfilesService {
     return await this.findAllPaginateAction.execute(opt);
   }
 
+  async exportPdf(id: number): Promise<Buffer> {
+    return await this.exportPdfAction.execute(id);
+  }
+
   async findOne(id: number) {
     const profile = await this.profileRepository.findOne({
       where: { userId: id },
-      relations: {
-        user: true,
-        skills: true,
-        experience: true,
-      },
+      relations: [
+        'user',
+        'skills',
+        'experience',
+        'languageProfile',
+        'languageProfile.language',
+      ],
       select: {
         user: {
           name: true,
           lastname: true,
           email: true,
+        },
+      },
+      order: {
+        id: 'DESC',
+        experience: {
+          id: 'DESC',
         },
       },
     });
@@ -65,7 +80,8 @@ export default class ProfilesService {
       throw new NotFoundException(PROFILE_NOT_FOUND);
     }
 
-    return profile;
+    const result = await this.UserProfilePresenter(profile);
+    return result;
   }
 
   async updateMyProfile(
@@ -78,16 +94,32 @@ export default class ProfilesService {
       countryResidence: updateProfileDto.countryResidence,
     });
 
-    if (profile.affected === 0) {
-      throw new NotFoundException(PROFILE_NOT_FOUND);
+    if (profile.affected === 0) throw new NotFoundException(PROFILE_NOT_FOUND);
+
+    if (updateProfileDto.name === undefined || updateProfileDto.name === null) {
+      const dataUser = await this.userRepository.findOne({
+        where: { id: user.id },
+      });
+      updateProfileDto.name = dataUser.name;
     }
 
-    if (updateProfileDto.name) {
-      const userUpdated = await this.userRepository.update(user.id, {
+    if (
+      updateProfileDto.lastname === undefined ||
+      updateProfileDto.lastname === null
+    ) {
+      const dataUser = await this.userRepository.findOne({
+        where: { id: user.id },
+      });
+      updateProfileDto.lastname = dataUser.lastname;
+    }
+
+    if (updateProfileDto.name || updateProfileDto.lastname) {
+      const userUpdateResult = await this.userRepository.update(user.id, {
         name: updateProfileDto.name,
+        lastname: updateProfileDto.lastname,
       });
 
-      if (userUpdated.affected === 0) {
+      if (userUpdateResult.affected === 0) {
         throw new NotFoundException(USER_NOT_FOUND);
       }
     }
@@ -97,6 +129,7 @@ export default class ProfilesService {
 
   async addSkillProfile(skillId: number, user: UserActiveInterface) {
     const profile = await this.profileRepository.findOne({
+      relations: ['skills'],
       where: { userId: user.id },
     });
     const skill = await this.skillRepository.findOne({
@@ -105,10 +138,6 @@ export default class ProfilesService {
 
     if (!profile || !skill) {
       throw new NotFoundException(ERROR_PROFILE_SKILL_NOT_FOUND);
-    }
-
-    if (!profile.skills) {
-      profile.skills = [];
     }
 
     profile.skills.push(skill);
@@ -157,9 +186,27 @@ export default class ProfilesService {
 
     if (profile.affected === 0) throw new NotFoundException(PROFILE_NOT_FOUND);
 
-    if (updateProfileDto.name) {
+    if (updateProfileDto.name === undefined || updateProfileDto.name === null) {
+      const dataUser = await this.userRepository.findOne({
+        where: { id: userId },
+      });
+      updateProfileDto.name = dataUser.name;
+    }
+
+    if (
+      updateProfileDto.lastname === undefined ||
+      updateProfileDto.lastname === null
+    ) {
+      const dataUser = await this.userRepository.findOne({
+        where: { id: userId },
+      });
+      updateProfileDto.lastname = dataUser.lastname;
+    }
+
+    if (updateProfileDto.name || updateProfileDto.lastname) {
       const userUpdateResult = await this.userRepository.update(userId, {
         name: updateProfileDto.name,
+        lastname: updateProfileDto.lastname,
       });
 
       if (userUpdateResult.affected === 0) {
@@ -177,6 +224,7 @@ export default class ProfilesService {
 
     return profile;
   }
+
   async addContactMethod(
     user: UserActiveInterface,
     createContactMethodDto: CreateContactDto,
@@ -224,5 +272,18 @@ export default class ProfilesService {
 
     await this.profileRepository.save(profile);
     return;
+  }
+  async UserProfilePresenter(profile: Profile) {
+    const { languageProfile, ...otherProfileProps } = profile;
+
+    const mappedProfile = {
+      ...otherProfileProps,
+      languages: profile.languageProfile.map(({ language, ...lp }) => ({
+        ...lp,
+        name: language.name,
+      })),
+    };
+
+    return mappedProfile;
   }
 }

@@ -15,9 +15,12 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import {
   ExperienceData,
+  LanguageProfileData,
   SkillData,
   UserProfileData,
 } from '../dto/responses.dto';
+import { LanguageProfile } from './language-profile.entity';
+import { Career } from 'src/core/career/enum/career.enum';
 import { ContactMethod } from './contact-method.entity';
 
 @Entity()
@@ -43,11 +46,13 @@ export class Profile {
   })
   description: string;
 
-  @ApiProperty()
+  @ApiProperty({ enum: Career })
   @Column({
+    type: 'enum',
+    enum: Career,
     nullable: true,
   })
-  mainTitle: string;
+  mainTitle: Career;
 
   @ApiProperty()
   @Column({
@@ -67,6 +72,15 @@ export class Profile {
   @ManyToMany(() => Skill, (skill) => skill.profiles)
   @JoinTable()
   skills: Skill[];
+
+  @ApiProperty({
+    type: [LanguageProfileData],
+  })
+  @OneToMany(
+    () => LanguageProfile,
+    (languageProfile) => languageProfile.profile,
+  )
+  languageProfile: LanguageProfile[];
 
   @ApiProperty()
   @DeleteDateColumn()

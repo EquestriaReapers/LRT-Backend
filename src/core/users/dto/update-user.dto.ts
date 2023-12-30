@@ -14,29 +14,29 @@ import { Transform } from 'class-transformer';
 export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty({ example: 'John' })
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'El nombre debe ser un string' })
   name: string;
 
   @ApiProperty({ example: 'V30109748' })
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'El número de documento debe ser un string' })
   @isUniqueDb({
     table: 'user',
     column: 'documentNumber',
-    message: 'El numero de documento ya existe',
+    message: 'El número de documento ya existe',
   })
   documentNumber: string;
 
   @ApiProperty({ example: 'Winchester' })
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'El apellido debe ser un string' })
   lastname: string;
 
   @ApiProperty({ example: 'ronaldo@gmail.com' })
   @isUniqueDb({
     table: 'user',
     column: 'email',
-    message: 'Email already exists',
+    message: 'Correo ya existe',
   })
   @IsEmail()
   @IsOptional()

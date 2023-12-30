@@ -1,5 +1,7 @@
+import { SkillType } from './skill.entity';
+
 export interface SkillI {
   id?: number;
   name?: string;
-  level?: number;
+  type?: SkillType;
 }
