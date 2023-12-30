@@ -9,7 +9,7 @@ import { OpensearchModule } from 'nestjs-opensearch';
   imports: [
     UsersModule,
     OpensearchModule.forRoot({
-      node: 'https://localhost:9200',
+      node: envData.ELASTIC_URL,
       auth: {
         username: envData.ELASTIC_USER,
         password: envData.ELASTIC_PASSWORD,
