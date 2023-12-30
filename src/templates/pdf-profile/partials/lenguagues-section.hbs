@@ -8,7 +8,11 @@
     <div class='col-12'>
       <ul class='none-style-list horizontal-list normal-text'>
         {{#each languages}}
-          <li><b>{{this}}</b></li>
+          {{#if (is-not-empty this.level)}}
+            <li><b>{{this.name}}:</b>&bnsp;<span>{{this.level}}</span></li>
+          {{else}}
+            <li><b>{{this.name}}</b></li>
+          {{/if}}
         {{/each}}
       </ul>
     </div>
