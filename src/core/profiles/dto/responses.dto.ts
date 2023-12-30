@@ -39,6 +39,10 @@ export class SkillData {
   name: string;
   @ApiProperty({ enum: SkillType })
   type: SkillType;
+  @ApiProperty()
+  skillProfileId: number;
+  @ApiProperty()
+  isVisible: boolean;
 }
 
 export class AddSkillResponse {
@@ -262,7 +266,7 @@ export class ResponseProfileGet {
   @ApiProperty({
     type: [SkillData],
   })
-  skills: Skill[];
+  skills: SkillData[];
 
   @ApiProperty({
     type: [LanguageProfileDataExtend],

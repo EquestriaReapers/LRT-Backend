@@ -48,7 +48,7 @@ export default class ProfilesService {
 
     private readonly findAllPaginateAction: FindAllPaginateAction,
     private readonly exportPdfAction: ExportPDFAction,
-  ) { }
+  ) {}
 
   async findAllPaginate(
     opt: FindAllPayload,
@@ -91,7 +91,7 @@ export default class ProfilesService {
       throw new NotFoundException(PROFILE_NOT_FOUND);
     }
 
-    const result = await this.UserProfilePresenter(profile);
+    const result = this.UserProfilePresenter(profile);
     return result;
   }
 
@@ -161,7 +161,10 @@ export default class ProfilesService {
     return await this.skillsProfileRepository.save(skillProfile);
   }
 
-  async removeSkillProfile(skillId: number, user: UserActiveInterface): Promise<void> {
+  async removeSkillProfile(
+    skillId: number,
+    user: UserActiveInterface,
+  ): Promise<void> {
     const profile = await this.profileRepository.findOne({
       relations: ['skillsProfile'],
       where: { userId: user.id },
@@ -171,7 +174,9 @@ export default class ProfilesService {
       throw new NotFoundException(PROFILE_NOT_FOUND);
     }
 
-    const skillProfile = profile.skillsProfile.find(skillProfile => skillProfile.skillId === skillId);
+    const skillProfile = profile.skillsProfile.find(
+      (skillProfile) => skillProfile.skillId === skillId,
+    );
 
     if (!skillProfile) {
       throw new NotFoundException(SKILL_NOT_FOUND);
@@ -280,11 +285,18 @@ export default class ProfilesService {
     await this.profileRepository.save(profile);
     return;
   }
-  async UserProfilePresenter(profile: Profile) {
-    const { languageProfile, ...otherProfileProps } = profile;
+  private UserProfilePresenter(profile: Profile) {
+    const { skillsProfile, languageProfile, ...otherProfileProps } = profile;
 
     const mappedProfile = {
       ...otherProfileProps,
+      skills: skillsProfile.map(({ skill, ...sp }) => ({
+        id: skill.id,
+        name: skill.name,
+        type: skill.type,
+        skillProfileId: sp.id,
+        isVisible: sp.isVisible,
+      })),
       languages: profile.languageProfile.map(({ language, ...lp }) => ({
         ...lp,
         name: language.name,
@@ -326,8 +338,7 @@ export default class ProfilesService {
     user: UserActiveInterface,
   ): Promise<void> {
     const profile = await this.profileRepository.findOne({
-      relations: ['languageProfile',
-        'languageProfile.language'],
+      relations: ['languageProfile', 'languageProfile.language'],
       where: { userId: user.id },
     });
 

@@ -21,7 +21,13 @@ export class SearchService {
 
   public async getProfiles() {
     const profiles = await this.profileRepository.find({
-      relations: ['user', 'experience', 'skills', 'portfolio'],
+      relations: [
+        'user',
+        'experience',
+        'skillsProfile',
+        'skillsProfile.skill',
+        'portfolio',
+      ],
       select: {
         user: {
           name: true,
@@ -34,7 +40,7 @@ export class SearchService {
       },
     });
 
-    return profiles;
+    return this.UserProfilePresenter(profiles);
   }
 
   async indexProfiles() {
@@ -359,5 +365,32 @@ export class SearchService {
         email: item.email,
       },
     }));
+  }
+
+  private UserProfilePresenter(profiles: Profile[]) {
+    return profiles.map((profile) => {
+      const { skillsProfile, languageProfile, ...otherProfileProps } = profile;
+
+      const mappedProfile = {
+        ...otherProfileProps,
+        languages: languageProfile
+          ? languageProfile.map(({ language, ...lp }) => ({
+              ...lp,
+              name: language.name,
+            }))
+          : [],
+        skills: skillsProfile
+          ? skillsProfile.map(({ skill, ...sp }) => ({
+              id: skill.id,
+              name: skill.name,
+              type: skill.type,
+              skillProfileId: sp.id,
+              isVisible: sp.isVisible,
+            }))
+          : [],
+      };
+
+      return mappedProfile;
+    });
   }
 }

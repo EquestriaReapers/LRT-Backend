@@ -89,10 +89,7 @@ export class Profile {
   @ApiProperty({
     type: [SkillProfileData],
   })
-  @OneToMany(
-    () => SkillsProfile,
-    (skillsProfile) => skillsProfile.profile,
-  )
+  @OneToMany(() => SkillsProfile, (skillsProfile) => skillsProfile.profile)
   skillsProfile: SkillsProfile[];
 
   @ApiProperty()
@@ -106,6 +103,4 @@ export class Profile {
   @ApiProperty({ type: [PortfolioData] })
   @OneToMany(() => Portfolio, (portfolio) => portfolio.profile)
   portfolio: Portfolio[];
-
-
 }
