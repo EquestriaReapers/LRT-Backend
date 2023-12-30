@@ -21,7 +21,7 @@ export class ExperienceService {
   constructor(
     @InjectRepository(Experience)
     private readonly experienceRepository: Repository<Experience>,
-  ) {}
+  ) { }
 
   async findAll() {
     return await this.experienceRepository.find({

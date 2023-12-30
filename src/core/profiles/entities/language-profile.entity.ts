@@ -43,4 +43,7 @@ export class LanguageProfile {
 
   @ManyToOne(() => Language, (language) => language.languageProfile)
   language: Language;
+
+  @Column({ default: false })
+  isVisible: boolean;
 }

@@ -86,6 +86,20 @@ export class LanguageProfileData {
   languageId: number;
 }
 
+export class SkillProfileData {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  profileId: number;
+
+  @ApiProperty()
+  skillId: number;
+
+  @ApiProperty()
+  isVisible: boolean;
+}
+
 export class ResponseProfile {
   @ApiProperty()
   id: number;

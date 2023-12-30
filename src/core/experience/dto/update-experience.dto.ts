@@ -1,6 +1,7 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { ExperienceCreateResponseDTO } from './create-experience.dto';
 import {
+  IsBoolean,
   IsDateString,
   IsNotEmpty,
   IsNumber,
@@ -58,4 +59,9 @@ export class UpdateExperienceDto extends PartialType(
   )
   @IsOptional()
   endDate: Date;
+
+  @ApiProperty()
+  @IsBoolean({ message: 'isVisible debe ser un valor booleano' })
+  @IsOptional()
+  isVisible: boolean;
 }

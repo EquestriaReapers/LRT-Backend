@@ -12,6 +12,7 @@ import { SKILL_NOT_FOUND } from '../messages';
 import { UserActiveInterface } from 'src/common/interface/user-active-interface';
 import { Profile } from 'src/core/profiles/entities/profile.entity';
 import { PROFILE_NOT_FOUND } from 'src/core/profiles/messages';
+import { SkillsProfile } from 'src/core/profiles/entities/skills-profile.entity';
 
 @Injectable()
 export class SkillsService {
@@ -21,7 +22,10 @@ export class SkillsService {
 
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-  ) {}
+
+    @InjectRepository(SkillsProfile)
+    private readonly skillsProfileRepository: Repository<SkillsProfile>,
+  ) { }
 
   async create(createSkillDto: CreateSkillDto) {
     const newSkill = await this.skillsRepository.save(createSkillDto);
@@ -43,7 +47,7 @@ export class SkillsService {
     const newSkill = await this.skillsRepository.save(skill);
 
     const profile = await this.profileRepository.findOne({
-      relations: ['skills'],
+      relations: ['skillsProfile'],
       where: { userId: user.id },
     });
 
@@ -51,12 +55,16 @@ export class SkillsService {
       throw new NotFoundException(PROFILE_NOT_FOUND);
     }
 
-    profile.skills.push(newSkill);
+    const skillProfile = new SkillsProfile();
+    skillProfile.skillId = newSkill.id;
+    skillProfile.profileId = user.id;
+    skillProfile.isVisible = false;
 
-    await this.profileRepository.save(profile);
+    await this.skillsProfileRepository.save(skillProfile);
 
     return {
       skill: newSkill,
+      isVisible: skillProfile.isVisible,
     };
   }
 
