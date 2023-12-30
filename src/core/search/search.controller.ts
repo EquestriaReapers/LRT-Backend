@@ -39,6 +39,7 @@ export class SearchController {
   ) {
     limit = Number(limit) || 10;
     page = Number(page) || 1;
+    if (page === 0) page = 1;
 
     const resp = await this.searchService.search(
       body,
