@@ -1,10 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Profile } from '../profiles/entities/profile.entity';
+import { Profile } from '../../profiles/entities/profile.entity';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InjectOpensearchClient, OpensearchClient } from 'nestjs-opensearch';
-import { SearchProfileDto } from './dto/search.profiles.dto';
-import { Career } from '../career/enum/career.enum';
+import { SearchProfileDto } from '../dto/search.profiles.dto';
+import { Career } from '../../career/enum/career.enum';
+import { IndexService } from './create-index.service';
 
 @Injectable()
 export class SearchService {
@@ -14,6 +15,8 @@ export class SearchService {
 
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+
+    private readonly indexService: IndexService,
   ) {}
 
   public async getProfiles() {
@@ -34,76 +37,8 @@ export class SearchService {
     return profiles;
   }
 
-  async createIndex() {
-    const checkIndex = await this.searchClient.indices.exists({
-      index: 'profiles',
-    });
-
-    if (checkIndex.statusCode === 404) {
-      const index = await this.searchClient.indices.create({
-        index: 'profiles',
-        body: {
-          settings: {
-            analysis: {
-              filter: {
-                autocomplete_filter: {
-                  type: 'edge_ngram',
-                  min_gram: 1,
-                  max_gram: 20,
-                },
-              },
-              analyzer: {
-                autocomplete: {
-                  type: 'custom',
-                  tokenizer: 'standard',
-                  filter: ['lowercase', 'autocomplete_filter'],
-                },
-              },
-            },
-          },
-          mappings: {
-            properties: {
-              id: { type: 'integer' },
-              userId: { type: 'integer' },
-              name: { type: 'text' },
-              lastname: { type: 'text' },
-              email: { type: 'text' },
-              description: { type: 'text' },
-              mainTitle: { type: 'text' },
-              countryResidence: { type: 'text' },
-              skills: {
-                type: 'nested',
-                properties: {
-                  name: { type: 'text' },
-                  type: { type: 'text' },
-                },
-              },
-              experience: {
-                type: 'nested',
-                properties: {
-                  businessName: { type: 'text' },
-                  role: { type: 'text' },
-                  location: { type: 'text' },
-                  description: { type: 'text' },
-                },
-              },
-              education: {
-                type: 'nested',
-                properties: {
-                  title: { type: 'text' },
-                  entity: { type: 'text' },
-                  endDate: { type: 'date' },
-                },
-              },
-            },
-          },
-        },
-      });
-    }
-  }
-
   async indexProfiles() {
-    await this.createIndex();
+    await this.indexService.createIndex();
 
     const body = await this.parseAndPrepareData();
 
@@ -127,21 +62,21 @@ export class SearchService {
     try {
       const from = (page - 1) * limit;
 
-      let filters = [];
+      let filter = [];
 
       if (!random) random = Math.floor(Math.random() * 1000);
 
-      career = await this.validateCarrera(career);
+      career = this.getValidatedCarreras(career);
 
       skills = await this.validateQueryArrayRelation(skills, 'skills');
 
       countryResidence = await this.validateQueryArrayCountry(countryResidence);
 
-      if (career && Array.isArray(career)) {
-        career.forEach((c) => {
-          filters.push({
+      if (career) {
+        career.forEach((mainTitle) => {
+          filter.push({
             match: {
-              mainTitle: c,
+              mainTitle,
             },
           });
         });
@@ -149,7 +84,7 @@ export class SearchService {
 
       if (skills && Array.isArray(skills)) {
         skills.forEach((skill) => {
-          filters.push({
+          filter.push({
             nested: {
               path: 'skills',
               query: {
@@ -163,10 +98,10 @@ export class SearchService {
       }
 
       if (countryResidence && Array.isArray(countryResidence)) {
-        countryResidence.forEach((country) => {
-          filters.push({
+        countryResidence.forEach((countryResidence) => {
+          filter.push({
             match: {
-              countryResidence: country,
+              countryResidence,
             },
           });
         });
@@ -268,8 +203,8 @@ export class SearchService {
 
       let query: any = {
         bool: {
-          should: should,
-          filter: filters,
+          should,
+          filter,
           must_not: {
             exists: {
               field: 'deletedAt',
@@ -301,7 +236,7 @@ export class SearchService {
       const totalCount = body.hits.total.value;
       const hits = body.hits.hits;
       let data = hits.map((item: any) => item._source);
-      data = await this.formatedData(data);
+      data = this.formatedData(data);
 
       return {
         pagination: {
@@ -319,7 +254,11 @@ export class SearchService {
     }
   }
 
-  async parseAndPrepareData() {
+  async deleteIndex() {
+    return await this.indexService.deleteIndex();
+  }
+
+  private async parseAndPrepareData() {
     const profiles = await this.getProfiles();
 
     const body = profiles.flatMap((doc) => [
@@ -340,14 +279,6 @@ export class SearchService {
     ]);
 
     return body;
-  }
-
-  async deleteIndex() {
-    const resp = await this.searchClient.indices.delete({
-      index: 'profiles',
-    });
-
-    return resp;
   }
 
   private async validateQueryArrayRelation(
@@ -396,30 +327,26 @@ export class SearchService {
     return column;
   }
 
-  private async validateCarrera(carrera: any) {
-    if (carrera) {
-      carrera = Array.isArray(carrera) ? carrera : [carrera];
-
-      carrera = carrera.map((c: string) => {
-        const carreraLower = c.toLowerCase() as Career;
-
+  private getValidatedCarreras(_carrerasRaw: any) {
+    if (_carrerasRaw) {
+      const carrerasRaw = Array.isArray(_carrerasRaw)
+        ? _carrerasRaw
+        : [_carrerasRaw];
+      return carrerasRaw.map((carreraRaw: string) => {
+        const carreraLower = carreraRaw.toLowerCase() as Career;
         if (!Object.values(Career).includes(carreraLower)) {
           throw new BadRequestException(
             `Valor inválido para carrera: ${carreraLower}`,
           );
         }
-
         return carreraLower;
       });
-    } else {
-      carrera = null;
     }
-
-    return carrera;
+    return null;
   }
 
-  private async formatedData(data: any) {
-    const respuestaNormal = data.map((item) => ({
+  private formatedData(data: any) {
+    return data.map((item) => ({
       ...item,
       user: {
         id: item.id,
@@ -428,7 +355,5 @@ export class SearchService {
         email: item.email,
       },
     }));
-
-    return respuestaNormal;
   }
 }
