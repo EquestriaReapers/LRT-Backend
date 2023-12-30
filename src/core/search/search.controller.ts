@@ -8,7 +8,7 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
-import { SearchService } from './search.service';
+import { SearchService } from './service/search.service';
 import { SearchProfileDto } from './dto/search.profiles.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Career } from '../career/enum/career.enum';
@@ -39,6 +39,7 @@ export class SearchController {
   ) {
     limit = Number(limit) || 10;
     page = Number(page) || 1;
+    if (page === 0) page = 1;
 
     const resp = await this.searchService.search(
       body,
