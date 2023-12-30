@@ -16,13 +16,14 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   ExperienceData,
   LanguageProfileData,
+  PortfolioData,
   SkillData,
   UserProfileData,
 } from '../dto/responses.dto';
 import { LanguageProfile } from './language-profile.entity';
 import { Career } from 'src/core/career/enum/career.enum';
 import { ContactMethod } from './contact-method.entity';
-import { Portafolio } from 'src/portafolio/entities/portafolio.entity';
+import { Portfolio } from 'src/core/portfolio/entities/portfolio.entity';
 
 @Entity()
 export class Profile {
@@ -91,9 +92,7 @@ export class Profile {
   @Column({ type: 'jsonb', nullable: true, default: () => "'[]'" })
   contactMethods: ContactMethod[];
 
-
-  @ApiProperty({
-    type: [Portafolio],
-  }) @OneToMany(() => Portafolio, (portafolio) => portafolio.profile)
-  portafolios: Portafolio[];
+  @ApiProperty({ type: [PortfolioData] })
+  @OneToMany(() => Portfolio, (portfolio) => portfolio.profile)
+  portfolio: Portfolio[];
 }

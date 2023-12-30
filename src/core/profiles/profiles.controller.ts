@@ -45,19 +45,21 @@ import {
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
 import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
-import { LanguageLevel, LanguageProfile } from './entities/language-profile.entity';
+import {
+  LanguageLevel,
+  LanguageProfile,
+} from './entities/language-profile.entity';
 import { Career } from '../career/enum/career.enum';
 import { AddLanguageProfileDto } from './dto/add-language-profile.dto';
 import LanguagueProfileService from './service/languague-profile.service';
 import { CreateContactDto } from './dto/createContact.dto';
-import { Skill } from '../skills/entities/skill.entity';
 
 @Controller('profiles')
 export class ProfilesController {
   constructor(
     private readonly profilesService: ProfilesService,
     private readonly languagueProfileService: LanguagueProfileService,
-  ) { }
+  ) {}
 
   @ApiTags('profile')
   @Get('export-pdf/:id')
