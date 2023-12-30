@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+
+{{> header}}
+
+<body>
+    <div class="header-cv bg-primary container-horizontal-paddings">
+        <div class="header-content">
+            <div>
+                <h2 class="title-name color-white">{{fullName}}</h2>
+                <h3 class="sub-title-name color-white">{{mainTitle}}</h3>
+            </div>
+            <div>
+                <!-- Lista ordenada con la clase específica "mi-lista-ordenada" -->
+                <ul class="none-style-list vertical-list small-text color-white">
+                    {{#if (is-not-empty contactItems)}}
+                        {{#each contactItems}}
+                            {{> listItemIcon iconName=this.iconName text=this.text}}
+                        {{/each}}
+                    {{/if}}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="header-cv-bottom bg-primary">
+    </div>
+    <div class="container-horizontal-paddings">
+        {{> experiencieSection experiences=experiences }}
+
+        {{> educationSection educations=educations }}
+
+        {{> skillsSection skillSet=skillSet }}
+
+        {{> languagesSection languages=languages }}
+    </div>
+</body>
+
+</html>

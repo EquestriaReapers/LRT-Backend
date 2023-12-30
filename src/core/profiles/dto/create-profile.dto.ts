@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { Career } from 'src/core/career/enum/career.enum';
 
 export class CreateProfileDTO {
   @ApiProperty()
@@ -8,9 +9,9 @@ export class CreateProfileDTO {
   description: string;
 
   @ApiProperty()
+  @IsEnum(Career, { message: 'Invalid Career' })
   @IsNotEmpty()
-  @IsString()
-  mainTitle: string;
+  mainTitle: Career;
 
   @ApiProperty()
   @IsNotEmpty()

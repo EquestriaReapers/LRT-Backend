@@ -20,6 +20,8 @@ import { SKILL_NOT_FOUND } from 'src/core/skills/messages';
 import FindAllPaginateAction from './find-all-paginate.action';
 import { ResponsePaginationProfile } from '../dto/responses.dto';
 import { FindAllPayload } from '../dto/find-all-payload.interface';
+import ExportPDFAction from './export-pdf';
+import { Buffer } from 'buffer';
 import { ContactMethod } from '../entities/contact-method.entity';
 import { CreateContactDto } from '../dto/createContact.dto';
 
@@ -36,12 +38,17 @@ export default class ProfilesService {
     private readonly userRepository: Repository<User>,
 
     private readonly findAllPaginateAction: FindAllPaginateAction,
+    private readonly exportPdfAction: ExportPDFAction,
   ) {}
 
   async findAllPaginate(
     opt: FindAllPayload,
   ): Promise<ResponsePaginationProfile> {
     return await this.findAllPaginateAction.execute(opt);
+  }
+
+  async exportPdf(id: number): Promise<Buffer> {
+    return await this.exportPdfAction.execute(id);
   }
 
   async findOne(id: number) {
@@ -99,6 +106,7 @@ export default class ProfilesService {
 
   async addSkillProfile(skillId: number, user: UserActiveInterface) {
     const profile = await this.profileRepository.findOne({
+      relations: ['skills'],
       where: { userId: user.id },
     });
     const skill = await this.skillRepository.findOne({
@@ -107,10 +115,6 @@ export default class ProfilesService {
 
     if (!profile || !skill) {
       throw new NotFoundException(ERROR_PROFILE_SKILL_NOT_FOUND);
-    }
-
-    if (!profile.skills) {
-      profile.skills = [];
     }
 
     profile.skills.push(skill);
@@ -198,19 +202,6 @@ export default class ProfilesService {
     return profile;
   }
 
-  async UserProfilePresenter(profile: Profile) {
-    const { languageProfile, ...otherProfileProps } = profile;
-
-    const mappedProfile = {
-      ...otherProfileProps,
-      languages: profile.languageProfile.map(({ language, ...lp }) => ({
-        ...lp,
-        name: language.name,
-      })),
-    };
-
-    return mappedProfile;
-  }
   async addContactMethod(
     user: UserActiveInterface,
     createContactMethodDto: CreateContactDto,
@@ -258,5 +249,18 @@ export default class ProfilesService {
 
     await this.profileRepository.save(profile);
     return;
+  }
+  async UserProfilePresenter(profile: Profile) {
+    const { languageProfile, ...otherProfileProps } = profile;
+
+    const mappedProfile = {
+      ...otherProfileProps,
+      languages: profile.languageProfile.map(({ language, ...lp }) => ({
+        ...lp,
+        name: language.name,
+      })),
+    };
+
+    return mappedProfile;
   }
 }

@@ -62,7 +62,6 @@ export class AuthService {
       name,
       documentNumber,
       lastname,
-      documentNumber,
       role: UserRole.GRADUATE,
     });
 

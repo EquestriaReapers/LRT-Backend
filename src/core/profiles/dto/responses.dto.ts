@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Profile } from '../entities/profile.entity';
 import { Skill } from 'src/core/skills/entities/skill.entity';
 import { Experience } from 'src/core/experience/entities/experience.entity';
 import { User } from 'src/core/users/entities/user.entity';
+import { Career } from 'src/core/career/enum/career.enum';
 
 export class UserProfileData {
   @ApiProperty()
@@ -49,7 +49,7 @@ export class AddSkillResponse {
   @ApiProperty()
   description: string;
   @ApiProperty()
-  mainTitle: string;
+  mainTitle: Career;
   @ApiProperty()
   countryResidence: string;
   @ApiProperty()
@@ -102,7 +102,7 @@ export class ResponseProfile {
   description: string;
 
   @ApiProperty()
-  mainTitle: string;
+  mainTitle: Career;
 
   @ApiProperty()
   countryResidence: string;
@@ -137,6 +137,60 @@ export class LanguageProfileDataExtend {
   name: string;
   @ApiProperty()
   languageId: number;
+}
+
+export class ResponsePaginationProfile {
+  @ApiProperty({
+    type: ResponseProfile,
+  })
+  profiles: ResponseProfile[];
+
+  @ApiProperty({
+    type: PaginationMessage,
+  })
+  pagination: PaginationMessage;
+}
+
+export class ProfileData {
+  @ApiProperty()
+  id: number;
+  @ApiProperty()
+  userId: number;
+  @ApiProperty()
+  description: string;
+  @ApiProperty()
+  mainTitle: Career;
+  @ApiProperty()
+  countryResidence: string;
+  @ApiProperty()
+  deletedAt: Date;
+  @ApiProperty({
+    type: [ExperienceData],
+  })
+  experience: Experience[];
+  @ApiProperty({
+    type: [SkillData],
+  })
+  skills: Skill[];
+}
+
+export class MethodContact {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  email: string;
+}
+
+export class ResponseMethodContactDTO {
+  @ApiProperty({
+    type: ProfileData,
+  })
+  profile: ProfileData;
+  @ApiProperty({
+    type: [MethodContact],
+  })
+  contactMethods: MethodContact[];
 }
 
 export class ResponseProfileGet {
@@ -177,69 +231,21 @@ export class ResponseProfileGet {
 
   @ApiProperty()
   deletedAt: Date;
-}
 
-export class ResponsePaginationProfile {
-  @ApiProperty({
-    type: ResponseProfile,
-  })
-  profiles: ResponseProfile[];
-
-  @ApiProperty({
-    type: PaginationMessage,
-  })
-  pagination: PaginationMessage;
-}
-
-export class SwaggerResponsePagination {
-  @ApiProperty({
-    type: ResponseProfileGet,
-  })
-  profiles: ResponseProfileGet[];
-
-  @ApiProperty({
-    type: PaginationMessage,
-  })
-  pagination: PaginationMessage;
-}
-export class ProfileData {
-  @ApiProperty()
-  id: number;
-  @ApiProperty()
-  userId: number;
-  @ApiProperty()
-  description: string;
-  @ApiProperty()
-  mainTitle: string;
-  @ApiProperty()
-  countryResidence: string;
-  @ApiProperty()
-  deletedAt: Date;
-  @ApiProperty({
-    type: [ExperienceData],
-  })
-  experience: Experience[];
-  @ApiProperty({
-    type: [SkillData],
-  })
-  skills: Skill[];
-}
-
-export class MethodContact {
-  @ApiProperty()
-  id: number;
-
-  @ApiProperty()
-  email: string;
-}
-
-export class ResponseMethodContactDTO {
-  @ApiProperty({
-    type: ProfileData,
-  })
-  profile: ProfileData;
   @ApiProperty({
     type: [MethodContact],
   })
   contactMethods: MethodContact[];
+}
+
+export class SwaggerResponsePagination {
+  @ApiProperty({
+    type: ResponsePaginationProfile,
+  })
+  profiles: ResponsePaginationProfile[];
+
+  @ApiProperty({
+    type: PaginationMessage,
+  })
+  pagination: PaginationMessage;
 }

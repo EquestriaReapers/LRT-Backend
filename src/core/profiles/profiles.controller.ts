@@ -10,6 +10,7 @@ import {
   Response,
   InternalServerErrorException,
   Query,
+  Res,
   ParseIntPipe,
 } from '@nestjs/common';
 import ProfilesService from './service';
@@ -28,23 +29,24 @@ import { AddSkillDto } from './dto/add-skill.dto';
 import { MessageDTO } from 'src/common/dto/response.dto';
 import * as express from 'express';
 import {
+  ERROR_UNKOWN_GENERATING_PDF,
   PROFILE_SUCCESFULLY_DELETED_LANGUAGE,
   PROFILE_SUCCESFULLY_DELETED_SKILL,
   PROFILE_SUCCESFULLY_DELETE_METHOD_CONTACT,
   PROFILE_SUCCESFULLY_UPDATED,
+  SUCCESSFULLY_CREATED_CONTACT,
 } from './messages';
 import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator';
 import {
   AddSkillResponse,
-  ResponseProfileGet,
-  SwaggerResponsePagination,
-  ResponseMethodContactDTO,
   ResponsePaginationProfile,
+  ResponseProfileGet,
 } from './dto/responses.dto';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
 import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
 import { LanguageProfile } from './entities/language-profile.entity';
+import { Career } from '../career/enum/career.enum';
 import { AddLanguageProfileDto } from './dto/add-language-profile.dto';
 import LanguagueProfileService from './service/languague-profile.service';
 import { CreateContactDto } from './dto/createContact.dto';
@@ -57,19 +59,44 @@ export class ProfilesController {
   ) {}
 
   @ApiTags('profile')
+  @Get('export-pdf/:id')
+  @ApiInternalServerError()
+  async generatePdf(@Res() res, @Param('id') id: number) {
+    const buffer = await this.profilesService.exportPdf(+id);
+
+    if (!buffer) {
+      throw new InternalServerErrorException(ERROR_UNKOWN_GENERATING_PDF);
+    }
+
+    res.set({
+      // pdf
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename=profile.pdf`,
+      'Content-Length': buffer.length,
+      // prevent cache
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Pragma: 'no-cache',
+      Expires: 0,
+    });
+    res.end(buffer);
+  }
+
+  @ApiTags('profile')
   @Get()
   @ApiOkResponse({
     description: 'Returns an array of ALL profiles',
-    type: SwaggerResponsePagination,
+    type: ResponsePaginationProfile,
   })
   @ApiInternalServerError()
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'random', required: false })
+  @ApiQuery({ name: 'carrera', required: false })
   findAll(
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('random') random: number,
+    @Query('carrera') carrera: Career[],
   ) {
     limit = limit > 100 ? 100 : limit;
 
@@ -77,6 +104,7 @@ export class ProfilesController {
       page,
       limit,
       random,
+      carrera,
     });
   }
 
@@ -248,14 +276,18 @@ export class ProfilesController {
   @Auth(UserRole.GRADUATE)
   @ApiCreatedResponse({
     description: 'Add contact method to my profile',
-    type: ResponseMethodContactDTO,
+    type: MessageDTO,
   })
   @Post('/my-profile/contact-methods')
   async addContactMethod(
     @ActiveUser() user: UserActiveInterface,
     @Body() createContactMethodDto: CreateContactDto,
   ) {
-    return this.profilesService.addContactMethod(user, createContactMethodDto);
+    await this.profilesService.addContactMethod(user, createContactMethodDto);
+
+    return {
+      message: SUCCESSFULLY_CREATED_CONTACT,
+    };
   }
 
   @ApiTags('profile')

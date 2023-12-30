@@ -1,0 +1,16 @@
+
+{{#if (is-not-empty experiences)}}
+    <div class="row">
+        <div class="col-12 mt-4">
+            <h1 class="color-primary">Experiencia</h1>
+        </div>
+    </div>
+
+    {{#each experiences}}
+        {{> experiencieItem 
+            company=this.company role=this.role location=this.location
+            temporality=this.temporality
+            description=this.description
+        }}
+    {{/each}}
+{{/if}}

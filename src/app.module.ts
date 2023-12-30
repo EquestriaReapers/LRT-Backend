@@ -11,6 +11,7 @@ import { AuthModule } from './core/auth/auth.module';
 import { ExperienceModule } from './core/experience/experience.module';
 import { SkillsModule } from './core/skills/skills.module';
 import { LanguageModule } from './core/language/language.module';
+import { CareerModule } from './core/career/career.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { LanguageModule } from './core/language/language.module';
     ExperienceModule,
     SkillsModule,
     LanguageModule,
+    CareerModule,
   ],
   controllers: [AppController, UsersController],
   providers: [],

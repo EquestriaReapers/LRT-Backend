@@ -6,6 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Skill } from '../skills/entities/skill.entity';
 import FindAllPaginateAction from './service/find-all-paginate.action';
 import { LanguageProfile } from './entities/language-profile.entity';
+import ExportPDFAction from './service/export-pdf';
+import ProfileTemplateAdaptator from './service/export-pdf/profile-template-adapter.class';
 import { Language } from '../language/entities/language.entity';
 import { LanguageModule } from '../language/language.module';
 import LanguagueProfileService from './service/languague-profile.service';
@@ -17,7 +19,13 @@ import LanguagueProfileService from './service/languague-profile.service';
     TypeOrmModule.forFeature([Skill, LanguageProfile, Language]),
   ],
   controllers: [ProfilesController],
-  providers: [ProfilesService, FindAllPaginateAction, LanguagueProfileService],
+  providers: [
+    ProfilesService,
+    FindAllPaginateAction,
+    ExportPDFAction,
+    LanguagueProfileService,
+    ProfileTemplateAdaptator,
+  ],
   exports: [ProfilesService],
 })
 export class ProfilesModule {}
