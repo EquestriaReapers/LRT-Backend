@@ -199,6 +199,32 @@ export class MethodContact {
   email: string;
 }
 
+export class PortfolioData {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  profileId: number;
+
+  @ApiProperty()
+  title: string;
+
+  @ApiProperty()
+  description: string;
+
+  @ApiProperty()
+  location: string;
+
+  @ApiProperty()
+  dateEnd: Date;
+
+  @ApiProperty()
+  imagePrincipal: string;
+
+  @ApiProperty()
+  image: string[];
+}
+
 export class ResponseMethodContactDTO {
   @ApiProperty({
     type: ProfileData,
@@ -258,6 +284,11 @@ export class ResponseProfileGet {
     type: [EducationData],
   })
   education: EducationData[];
+
+  @ApiProperty({
+    type: [PortfolioData],
+  })
+  portfolio: PortfolioData[];
 }
 
 export class SwaggerResponsePagination {

@@ -53,7 +53,6 @@ import { Career } from '../career/enum/career.enum';
 import { AddLanguageProfileDto } from './dto/add-language-profile.dto';
 import LanguagueProfileService from './service/languague-profile.service';
 import { CreateContactDto } from './dto/createContact.dto';
-import { Skill } from '../skills/entities/skill.entity';
 
 @Controller('profiles')
 export class ProfilesController {

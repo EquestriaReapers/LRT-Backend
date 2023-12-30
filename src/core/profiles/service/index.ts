@@ -59,6 +59,7 @@ export default class ProfilesService {
         'skills',
         'experience',
         'education',
+        'portfolio',
         'languageProfile',
         'languageProfile.language',
       ],

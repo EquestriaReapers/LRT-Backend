@@ -15,6 +15,7 @@ import { CareerModule } from './core/career/career.module';
 import { SearchModule } from './core/search/search.module';
 import { EducationModule } from './core/education/education.module';
 import { LocationModule } from './core/location/location.module';
+import { PortfolioModule } from './core/portfolio/portfolio.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { LocationModule } from './core/location/location.module';
     SearchModule,
     EducationModule,
     LocationModule,
+    PortfolioModule,
   ],
   controllers: [AppController, UsersController],
   providers: [],

@@ -17,6 +17,7 @@ import {
   EducationData,
   ExperienceData,
   LanguageProfileData,
+  PortfolioData,
   SkillData,
   UserProfileData,
 } from '../dto/responses.dto';
@@ -24,6 +25,8 @@ import { ContactMethod } from './contact-method.entity';
 import { LanguageProfile } from './language-profile.entity';
 import { Career } from 'src/core/career/enum/career.enum';
 import { Education } from 'src/core/education/entities/education.entity';
+import { Portfolio } from 'src/core/portfolio/entities/portfolio.entity';
+
 @Entity()
 export class Profile {
   @ApiProperty()
@@ -96,4 +99,8 @@ export class Profile {
   })
   @OneToMany(() => Education, (education) => education.profile)
   education: Education[];
+
+  @ApiProperty({ type: [PortfolioData] })
+  @OneToMany(() => Portfolio, (portfolio) => portfolio.profile)
+  portfolio: Portfolio[];
 }

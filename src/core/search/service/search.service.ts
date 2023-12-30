@@ -21,7 +21,7 @@ export class SearchService {
 
   public async getProfiles() {
     const profiles = await this.profileRepository.find({
-      relations: ['user', 'experience', 'skills', 'education'],
+      relations: ['user', 'experience', 'skills', 'education', 'portfolio'],
       select: {
         user: {
           name: true,
@@ -196,6 +196,32 @@ export class SearchService {
               },
             },
           },
+          {
+            nested: {
+              path: 'portfolio',
+              query: {
+                bool: {
+                  must: {
+                    multi_match: {
+                      query: searchParam.text,
+                      fields: [
+                        'portfolio.title',
+                        'portfolio.description',
+                        'portfolio.location',
+                      ],
+                      type: 'bool_prefix',
+                      operator: 'or',
+                    },
+                  },
+                  must_not: {
+                    exists: {
+                      field: 'portfolio.deletedAt',
+                    },
+                  },
+                },
+              },
+            },
+          },
         );
       } else {
         should = [{ match_all: {} }];
@@ -275,6 +301,7 @@ export class SearchService {
         skills: doc.skills,
         experience: doc.experience,
         education: doc.education,
+        portfolio: doc.portfolio,
       },
     ]);
 

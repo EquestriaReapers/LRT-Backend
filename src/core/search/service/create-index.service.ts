@@ -61,6 +61,14 @@ export class IndexService {
                   description: { type: 'text' },
                 },
               },
+              portfolio: {
+                type: 'nested',
+                properties: {
+                  title: { type: 'text' },
+                  description: { type: 'text' },
+                  location: { type: 'text' },
+                },
+              },
             },
           },
         },
