@@ -1,15 +1,16 @@
 import { Module } from '@nestjs/common';
-import { SearchService } from './search.service';
+import { SearchService } from './service/search.service';
 import { SearchController } from './search.controller';
 import { UsersModule } from '../users/users.module';
 import { envData } from 'src/config/datasource';
 import { OpensearchModule } from 'nestjs-opensearch';
+import { IndexService } from './service/create-index.service';
 
 @Module({
   imports: [
     UsersModule,
     OpensearchModule.forRoot({
-      node: 'https://localhost:9200',
+      node: envData.ELASTIC_URL,
       auth: {
         username: envData.ELASTIC_USER,
         password: envData.ELASTIC_PASSWORD,
@@ -20,6 +21,6 @@ import { OpensearchModule } from 'nestjs-opensearch';
     }),
   ],
   controllers: [SearchController],
-  providers: [SearchService],
+  providers: [SearchService, IndexService],
 })
 export class SearchModule {}
