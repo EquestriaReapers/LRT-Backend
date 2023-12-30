@@ -8,7 +8,7 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
-import { SearchService } from './search.service';
+import { SearchService } from './service/search.service';
 import { SearchProfileDto } from './dto/search.profiles.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Career } from '../career/enum/career.enum';
