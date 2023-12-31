@@ -68,7 +68,8 @@ export default class ProfileExportPDFAction {
       where: { userId: userId },
       relations: [
         'user',
-        'skills',
+        'skillsProfile',
+        'skillsProfile.skill',
         'experience',
         'education',
         'languageProfile',
@@ -82,15 +83,23 @@ export default class ProfileExportPDFAction {
         },
       },
     });
-    const { languageProfile, ...otherProfileProps } = profile;
-
-    return {
+    const { skillsProfile, languageProfile, ...otherProfileProps } = profile;
+    const mappedProfile = {
       ...otherProfileProps,
+      skills: skillsProfile.map(({ skill, ...sp }) => ({
+        id: skill.id,
+        name: skill.name,
+        type: skill.type,
+        skillProfileId: sp.id,
+        isVisible: sp.isVisible,
+      })),
       languages: profile.languageProfile.map(({ language, ...lp }) => ({
         ...lp,
         name: language.name,
       })),
     };
+
+    return mappedProfile;
   }
 
   private getTemplatePath() {

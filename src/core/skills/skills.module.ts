@@ -5,11 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProfilesModule } from '../profiles/profiles.module';
 import { Skill } from './entities/skill.entity';
 import { Profile } from '../profiles/entities/profile.entity';
+import { SkillsProfile } from '../profiles/entities/skills-profile.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Skill, Profile])],
+  imports: [TypeOrmModule.forFeature([Skill, Profile, SkillsProfile]), ProfilesModule],
   controllers: [SkillsController],
   providers: [SkillsService],
   exports: [SkillsService],
 })
-export class SkillsModule {}
+export class SkillsModule { }

@@ -59,7 +59,7 @@ export class ProfilesController {
   constructor(
     private readonly profilesService: ProfilesService,
     private readonly languagueProfileService: LanguagueProfileService,
-  ) {}
+  ) { }
 
   @ApiTags('profile')
   @Get('export-pdf/:id')
@@ -322,6 +322,44 @@ export class ProfilesController {
 
     return response.status(200).json({
       message: PROFILE_SUCCESFULLY_DELETE_METHOD_CONTACT,
+    });
+  }
+
+  @ApiTags('profile')
+  @Auth(UserRole.GRADUATE)
+  @ApiOkResponse({
+    description: 'Update visibility of a skill in my profile',
+    type: MessageDTO,
+  })
+  @Patch('/my-profile/skills/:id/visibility')
+  async updateSkillVisibility(
+    @Param('id', ParseIntPipe) id: number,
+    @ActiveUser() user: UserActiveInterface,
+    @Response() response: express.Response,
+  ) {
+    await this.profilesService.updateVisibilitySkill(id, user);
+
+    return response.status(200).json({
+      message: 'Skill visibility successfully updated',
+    });
+  }
+
+  @ApiTags('profile')
+  @Auth(UserRole.GRADUATE)
+  @ApiOkResponse({
+    description: 'Update visibility of a language in my profile',
+    type: MessageDTO,
+  })
+  @Patch('/my-profile/languages/:id/visibility')
+  async updateLanguageVisibility(
+    @Param('id', ParseIntPipe) id: number,
+    @ActiveUser() user: UserActiveInterface,
+    @Response() response: express.Response,
+  ) {
+    await this.profilesService.updateVisibilityLanguage(id, user);
+
+    return response.status(200).json({
+      message: 'El lenguaje seleccionado ahora es visible en CV',
     });
   }
 }

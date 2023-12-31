@@ -24,6 +24,9 @@ import ExportPDFAction from './export-pdf';
 import { Buffer } from 'buffer';
 import { ContactMethod } from '../entities/contact-method.entity';
 import { CreateContactDto } from '../dto/createContact.dto';
+import { SkillsProfile } from '../entities/skills-profile.entity';
+import { LanguageProfile } from '../entities/language-profile.entity';
+import { ERROR_LANGUAGE_NOT_FOUND } from 'src/core/language/messages';
 
 @Injectable()
 export default class ProfilesService {
@@ -36,6 +39,12 @@ export default class ProfilesService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+
+    @InjectRepository(SkillsProfile)
+    private skillsProfileRepository: Repository<SkillsProfile>,
+
+    @InjectRepository(LanguageProfile)
+    private languageProfileRepository: Repository<LanguageProfile>,
 
     private readonly findAllPaginateAction: FindAllPaginateAction,
     private readonly exportPdfAction: ExportPDFAction,
@@ -56,7 +65,8 @@ export default class ProfilesService {
       where: { userId: id },
       relations: [
         'user',
-        'skills',
+        'skillsProfile',
+        'skillsProfile.skill',
         'experience',
         'education',
         'portfolio',
@@ -82,7 +92,7 @@ export default class ProfilesService {
       throw new NotFoundException(PROFILE_NOT_FOUND);
     }
 
-    const result = await this.UserProfilePresenter(profile);
+    const result = this.UserProfilePresenter(profile);
     return result;
   }
 
@@ -131,7 +141,7 @@ export default class ProfilesService {
 
   async addSkillProfile(skillId: number, user: UserActiveInterface) {
     const profile = await this.profileRepository.findOne({
-      relations: ['skills'],
+      relations: ['skillsProfile'],
       where: { userId: user.id },
     });
     const skill = await this.skillRepository.findOne({
@@ -142,9 +152,14 @@ export default class ProfilesService {
       throw new NotFoundException(ERROR_PROFILE_SKILL_NOT_FOUND);
     }
 
-    profile.skills.push(skill);
+    const skillProfile = new SkillsProfile();
+    skillProfile.skillId = skillId;
+    skillProfile.profileId = user.id;
+    skillProfile.isVisible = false;
 
-    return await this.profileRepository.save(profile);
+    profile.skillsProfile.push(skillProfile);
+
+    return await this.skillsProfileRepository.save(skillProfile);
   }
 
   async removeSkillProfile(
@@ -152,7 +167,7 @@ export default class ProfilesService {
     user: UserActiveInterface,
   ): Promise<void> {
     const profile = await this.profileRepository.findOne({
-      relations: ['skills'],
+      relations: ['skillsProfile'],
       where: { userId: user.id },
     });
 
@@ -160,19 +175,15 @@ export default class ProfilesService {
       throw new NotFoundException(PROFILE_NOT_FOUND);
     }
 
-    const skill = await this.skillRepository.findOneBy({ id: skillId });
+    const skillProfile = profile.skillsProfile.find(
+      (skillProfile) => skillProfile.skillId === skillId,
+    );
 
-    if (!skill) {
+    if (!skillProfile) {
       throw new NotFoundException(SKILL_NOT_FOUND);
     }
 
-    const updatedSkillList = profile.skills.filter(
-      (skillItem) => skillItem.id !== skillId,
-    );
-
-    profile.skills = updatedSkillList;
-
-    await this.profileRepository.save(profile);
+    await this.skillsProfileRepository.remove(skillProfile);
     return;
   }
 
@@ -275,12 +286,18 @@ export default class ProfilesService {
     await this.profileRepository.save(profile);
     return;
   }
-
-  private async UserProfilePresenter(profile: Profile) {
-    const { languageProfile, ...otherProfileProps } = profile;
+  private UserProfilePresenter(profile: Profile) {
+    const { skillsProfile, languageProfile, ...otherProfileProps } = profile;
 
     const mappedProfile = {
       ...otherProfileProps,
+      skills: skillsProfile.map(({ skill, ...sp }) => ({
+        id: skill.id,
+        name: skill.name,
+        type: skill.type,
+        skillProfileId: sp.id,
+        isVisible: sp.isVisible,
+      })),
       languages: profile.languageProfile.map(({ language, ...lp }) => ({
         ...lp,
         name: language.name,
@@ -288,5 +305,59 @@ export default class ProfilesService {
     };
 
     return mappedProfile;
+  }
+
+  async updateVisibilitySkill(
+    skillId: number,
+    user: UserActiveInterface,
+  ): Promise<void> {
+    const profile = await this.profileRepository.findOne({
+      relations: ['skillsProfile'],
+      where: { userId: user.id },
+    });
+
+    if (!profile) {
+      throw new NotFoundException(PROFILE_NOT_FOUND);
+    }
+
+    const skillProfile = profile.skillsProfile.find(
+      (skillProfile) => skillProfile.skillId === skillId,
+    );
+
+    if (!skillProfile) {
+      throw new NotFoundException(SKILL_NOT_FOUND);
+    }
+
+    skillProfile.isVisible = true;
+
+    await this.skillsProfileRepository.save(skillProfile);
+    return;
+  }
+
+  async updateVisibilityLanguage(
+    languageProfileId: number,
+    user: UserActiveInterface,
+  ): Promise<void> {
+    const profile = await this.profileRepository.findOne({
+      relations: ['languageProfile', 'languageProfile.language'],
+      where: { userId: user.id },
+    });
+
+    if (!profile) {
+      throw new NotFoundException(PROFILE_NOT_FOUND);
+    }
+
+    const languageProfile = profile.languageProfile.find(
+      (languageProfile) => languageProfile.id === languageProfileId,
+    );
+
+    if (!languageProfile) {
+      throw new NotFoundException(ERROR_LANGUAGE_NOT_FOUND);
+    }
+
+    languageProfile.isVisible = true;
+
+    await this.languageProfileRepository.save(languageProfile);
+    return;
   }
 }
