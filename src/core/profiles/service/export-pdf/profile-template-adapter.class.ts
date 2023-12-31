@@ -24,7 +24,11 @@ export default class ProfileTemplateAdaptator {
         temporality: this.getTemporality(exp.startDate, exp.endDate),
         description: exp.description,
       })),
-      educations: [],
+      educations: profile.education.map((edu) => ({
+        temporality: edu.endDate ? edu.endDate.getFullYear().toString() : null,
+        title: edu.title,
+        where: edu.entity,
+      })),
       languages: profile.languages.map((lang) => lang.name),
       skillSet: {
         type: SkillSetType.HardSoft,

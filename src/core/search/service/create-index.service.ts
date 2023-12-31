@@ -61,6 +61,13 @@ export class IndexService {
                   description: { type: 'text' },
                 },
               },
+              education: {
+                type: 'nested',
+                properties: {
+                  title: { type: 'text' },
+                  entity: { type: 'text' },
+                },
+              },
             },
           },
         },
