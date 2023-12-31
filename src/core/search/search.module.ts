@@ -5,10 +5,13 @@ import { UsersModule } from '../users/users.module';
 import { envData } from 'src/config/datasource';
 import { OpensearchModule } from 'nestjs-opensearch';
 import { IndexService } from './service/create-index.service';
+import { Portfolio } from '../portfolio/entities/portfolio.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
     UsersModule,
+    TypeOrmModule.forFeature([Portfolio]),
     OpensearchModule.forRoot({
       node: envData.ELASTIC_URL,
       auth: {

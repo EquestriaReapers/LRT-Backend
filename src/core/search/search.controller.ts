@@ -54,6 +54,37 @@ export class SearchController {
   }
 
   @ApiTags('search')
+  @Post('/portfolio')
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'limit', required: false })
+  @ApiQuery({ name: 'random', required: false })
+  public async searchPortfolio(
+    @Body() body: SearchProfileDto,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query('random') random: number,
+  ) {
+    limit = Number(limit) || 10;
+    page = Number(page) || 1;
+    if (page === 0) page = 1;
+
+    const resp = await this.searchService.searchPortfolio(
+      body,
+      page,
+      limit,
+      random,
+    );
+    return resp;
+  }
+
+  @ApiTags('search')
+  @Get('/portfolio')
+  public async getSearchPortfolio() {
+    const resp = await this.searchService.indexPortfolio();
+    console.log(resp);
+  }
+
+  @ApiTags('search')
   @Auth(UserRole.ADMIN)
   @Get('/')
   public async getSearch() {
@@ -66,6 +97,14 @@ export class SearchController {
   @Delete('/')
   public async deleteIndex() {
     const resp = await this.searchService.deleteIndex();
+    console.log(resp);
+  }
+
+  @ApiTags('search')
+  @Auth(UserRole.ADMIN)
+  @Delete('/portfolio')
+  public async deleteIndexPortfolio() {
+    const resp = await this.searchService.deleteIndexPortfolio();
     console.log(resp);
   }
 }

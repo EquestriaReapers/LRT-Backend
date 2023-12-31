@@ -25,9 +25,9 @@ import {
 import { ContactMethod } from './contact-method.entity';
 import { LanguageProfile } from './language-profile.entity';
 import { Career } from 'src/core/career/enum/career.enum';
-import { Education } from 'src/core/education/entities/education.entity';
 import { Portfolio } from 'src/core/portfolio/entities/portfolio.entity';
 import { SkillsProfile } from './skills-profile.entity';
+import { Education } from 'src/core/education/entities/education.entity';
 
 @Entity()
 export class Profile {

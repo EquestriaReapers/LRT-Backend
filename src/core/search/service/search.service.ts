@@ -6,6 +6,7 @@ import { InjectOpensearchClient, OpensearchClient } from 'nestjs-opensearch';
 import { SearchProfileDto } from '../dto/search.profiles.dto';
 import { Career } from '../../career/enum/career.enum';
 import { IndexService } from './create-index.service';
+import { Portfolio } from 'src/core/portfolio/entities/portfolio.entity';
 
 @Injectable()
 export class SearchService {
@@ -15,6 +16,9 @@ export class SearchService {
 
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+
+    @InjectRepository(Portfolio)
+    private readonly portfolioRepository: Repository<Portfolio>,
 
     private readonly indexService: IndexService,
   ) {}
@@ -28,6 +32,7 @@ export class SearchService {
         'skillsProfile.skill',
         'education',
         'portfolio',
+        'education',
       ],
       select: {
         user: {
@@ -44,13 +49,37 @@ export class SearchService {
     return this.UserProfilePresenter(profiles);
   }
 
+  public async getPortfolio() {
+    const portfolio = await this.portfolioRepository.find({
+      relations: ['profile', 'profile.user'],
+      where: {
+        deletedAt: null,
+      },
+    });
+
+    return portfolio;
+  }
+
   async indexProfiles() {
-    await this.indexService.createIndex();
+    await this.indexService.createIndexProfile();
 
     const body = await this.parseAndPrepareData();
 
     const resp = await this.searchClient.bulk({
       index: 'profiles',
+      body,
+    });
+
+    return resp;
+  }
+
+  async indexPortfolio() {
+    await this.indexService.createIndexPortfolio();
+
+    const body = await this.parseAndPreparePortfolioData();
+
+    const resp = await this.searchClient.bulk({
+      index: 'portfolio',
       body,
     });
 
@@ -287,8 +316,119 @@ export class SearchService {
     }
   }
 
+  async searchPortfolio(
+    searchParam: SearchProfileDto,
+    page: number,
+    limit: number,
+    random: number,
+  ) {
+    try {
+      let should: any[] = [];
+      const from = (page - 1) * limit;
+      if (!random) random = Math.floor(Math.random() * 1000);
+
+      if (
+        searchParam &&
+        searchParam.text &&
+        searchParam.text.trim().length > 0
+      ) {
+        should.push(
+          {
+            multi_match: {
+              query: searchParam.text,
+              fields: ['title', 'description', 'location'],
+              type: 'bool_prefix',
+              operator: 'or',
+            },
+          },
+          {
+            nested: {
+              path: 'profile',
+              query: {
+                bool: {
+                  must: {
+                    multi_match: {
+                      query: searchParam.text,
+                      fields: [
+                        'profile.name',
+                        'profile.lastname',
+                        'profile.mainTitle',
+                      ],
+                      type: 'bool_prefix',
+                      operator: 'or',
+                    },
+                  },
+                  must_not: {
+                    exists: {
+                      field: 'profile.deletedAt',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        );
+      } else {
+        should = [{ match_all: {} }];
+      }
+
+      let query: any = {
+        bool: {
+          should,
+          must_not: {
+            exists: {
+              field: 'deletedAt',
+            },
+          },
+        },
+      };
+
+      query = {
+        function_score: {
+          query,
+          functions: [
+            {
+              random_score: { seed: random },
+            },
+          ],
+        },
+      };
+
+      const { body } = await this.searchClient.search({
+        index: 'portfolio',
+        body: {
+          query,
+          from,
+          size: limit,
+        },
+      });
+
+      const totalCount = body.hits.total.value;
+      const hits = body.hits.hits;
+      let data = hits.map((item: any) => item._source);
+
+      return {
+        pagination: {
+          itemCount: body.length,
+          totalItems: totalCount,
+          itemsPerPage: limit,
+          totalPages: Math.ceil(totalCount / limit),
+          currentPage: page,
+          randomSeed: random,
+        },
+        portfolios: data,
+      };
+    } catch (err) {
+      throw err;
+    }
+  }
+
   async deleteIndex() {
     return await this.indexService.deleteIndex();
+  }
+
+  async deleteIndexPortfolio() {
+    return await this.indexService.deleteIndexPortfolio();
   }
 
   private async parseAndPrepareData() {
@@ -307,10 +447,35 @@ export class SearchService {
         countryResidence: doc.countryResidence,
         skills: doc.skills,
         experience: doc.experience,
-        education: doc.education,
         portfolio: doc.portfolio,
+        education: doc.education,
       },
     ]);
+
+    return body;
+  }
+
+  private async parseAndPreparePortfolioData() {
+    const portfolios = await this.getPortfolio();
+
+    const body = portfolios.flatMap((doc) => [
+      { index: { _index: 'portfolio', _id: doc.id } },
+      {
+        id: doc.id,
+        title: doc.title,
+        profileId: doc.profile.id,
+        description: doc.description,
+        location: doc.location,
+        dateEnd: doc.dateEnd,
+        profile: {
+          name: doc.profile.user.name,
+          lastname: doc.profile.user.lastname,
+          mainTitle: doc.profile.mainTitle,
+        },
+      },
+    ]);
+
+    console.log(body);
 
     return body;
   }
