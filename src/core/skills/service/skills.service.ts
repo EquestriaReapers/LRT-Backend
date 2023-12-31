@@ -25,7 +25,7 @@ export class SkillsService {
 
     @InjectRepository(SkillsProfile)
     private readonly skillsProfileRepository: Repository<SkillsProfile>,
-  ) { }
+  ) {}
 
   async create(createSkillDto: CreateSkillDto) {
     const newSkill = await this.skillsRepository.save(createSkillDto);
@@ -58,7 +58,7 @@ export class SkillsService {
     const skillProfile = new SkillsProfile();
     skillProfile.skillId = newSkill.id;
     skillProfile.profileId = user.id;
-    skillProfile.isVisible = false;
+    skillProfile.isVisible = true;
 
     await this.skillsProfileRepository.save(skillProfile);
 

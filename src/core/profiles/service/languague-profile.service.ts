@@ -1,8 +1,15 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Language } from 'src/core/language/entities/language.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { LanguageLevel, LanguageProfile } from '../entities/language-profile.entity';
+import {
+  LanguageLevel,
+  LanguageProfile,
+} from '../entities/language-profile.entity';
 import { Profile } from '../entities/profile.entity';
 import { AddLanguageProfileDto } from '../dto/add-language-profile.dto';
 import { UserActiveInterface } from 'src/common/interface/user-active-interface';
@@ -24,7 +31,7 @@ export default class LanguagueProfileService {
 
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-  ) { }
+  ) {}
 
   async add(
     addLanguageProfile: AddLanguageProfileDto,
@@ -59,6 +66,7 @@ export default class LanguagueProfileService {
       languageId: languageId,
       profileId: profile.id,
       level: level as LanguageLevel,
+      isVisible: true,
     });
   }
 

@@ -27,6 +27,7 @@ import { CreateContactDto } from '../dto/createContact.dto';
 import { SkillsProfile } from '../entities/skills-profile.entity';
 import { LanguageProfile } from '../entities/language-profile.entity';
 import { ERROR_LANGUAGE_NOT_FOUND } from 'src/core/language/messages';
+import { UpdateIsVisibleDto } from '../dto/isVisible.dto';
 
 @Injectable()
 export default class ProfilesService {
@@ -154,7 +155,7 @@ export default class ProfilesService {
     const skillProfile = new SkillsProfile();
     skillProfile.skillId = skillId;
     skillProfile.profileId = user.id;
-    skillProfile.isVisible = false;
+    skillProfile.isVisible = true;
 
     profile.skillsProfile.push(skillProfile);
 
@@ -309,6 +310,7 @@ export default class ProfilesService {
   async updateVisibilitySkill(
     skillId: number,
     user: UserActiveInterface,
+    visible: UpdateIsVisibleDto,
   ): Promise<void> {
     const profile = await this.profileRepository.findOne({
       relations: ['skillsProfile'],
@@ -327,7 +329,7 @@ export default class ProfilesService {
       throw new NotFoundException(SKILL_NOT_FOUND);
     }
 
-    skillProfile.isVisible = true;
+    skillProfile.isVisible = visible.isVisible;
 
     await this.skillsProfileRepository.save(skillProfile);
     return;
@@ -336,6 +338,7 @@ export default class ProfilesService {
   async updateVisibilityLanguage(
     languageProfileId: number,
     user: UserActiveInterface,
+    visible: UpdateIsVisibleDto,
   ): Promise<void> {
     const profile = await this.profileRepository.findOne({
       relations: ['languageProfile', 'languageProfile.language'],
@@ -354,7 +357,7 @@ export default class ProfilesService {
       throw new NotFoundException(ERROR_LANGUAGE_NOT_FOUND);
     }
 
-    languageProfile.isVisible = true;
+    languageProfile.isVisible = visible.isVisible;
 
     await this.languageProfileRepository.save(languageProfile);
     return;

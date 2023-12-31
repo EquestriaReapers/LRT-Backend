@@ -1,7 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, DeleteDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  DeleteDateColumn,
+} from 'typeorm';
 import { Profile } from './profile.entity';
 import { Skill } from 'src/core/skills/entities/skill.entity';
-
 
 @Entity()
 export class SkillsProfile {
@@ -20,7 +25,7 @@ export class SkillsProfile {
   @ManyToOne(() => Skill, (skill) => skill.skillsProfile)
   skill: Skill;
 
-  @Column({ default: false })
+  @Column({ default: true })
   isVisible: boolean;
 
   @DeleteDateColumn({ nullable: true })
