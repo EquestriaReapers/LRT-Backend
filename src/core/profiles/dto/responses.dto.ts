@@ -32,6 +32,23 @@ export class ExperienceData {
   endDate: Date;
 }
 
+export class EducationData {
+  @ApiProperty()
+  id: number;
+  @ApiProperty()
+  profileId: number;
+  @ApiProperty()
+  principal: boolean;
+  @ApiProperty()
+  isUCAB: boolean;
+  @ApiProperty()
+  title: string;
+  @ApiProperty()
+  entity: string;
+  @ApiProperty()
+  endDate: Date;
+}
+
 export class SkillData {
   @ApiProperty()
   id: number;
@@ -285,6 +302,11 @@ export class ResponseProfileGet {
     type: [PortfolioData],
   })
   portfolio: PortfolioData[];
+
+  @ApiProperty({
+    type: [EducationData],
+  })
+  education: EducationData[];
 }
 
 export class SwaggerResponsePagination {

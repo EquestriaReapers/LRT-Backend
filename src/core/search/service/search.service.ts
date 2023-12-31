@@ -27,6 +27,7 @@ export class SearchService {
         'skillsProfile',
         'skillsProfile.skill',
         'portfolio',
+        'education',
       ],
       select: {
         user: {
@@ -188,18 +189,35 @@ export class SearchService {
                   must: {
                     multi_match: {
                       query: searchParam.text,
-                      fields: [
-                        'portfolio.title',
-                        'portfolio.description',
-                        'portfolio.location',
-                      ],
+                      fields: ['portfolio.title', 'portfolio.description'],
+                      type: 'bool_prefix',
+                      must_not: {
+                        exists: {
+                          field: 'portfolio.deletedAt',
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          {
+            nested: {
+              path: 'education',
+              query: {
+                bool: {
+                  must: {
+                    multi_match: {
+                      query: searchParam.text,
+                      fields: ['education.title', 'education.entity'],
                       type: 'bool_prefix',
                       operator: 'or',
                     },
                   },
                   must_not: {
                     exists: {
-                      field: 'portfolio.deletedAt',
+                      field: 'education.deletedAt',
                     },
                   },
                 },
@@ -285,6 +303,7 @@ export class SearchService {
         skills: doc.skills,
         experience: doc.experience,
         portfolio: doc.portfolio,
+        education: doc.education,
       },
     ]);
 
