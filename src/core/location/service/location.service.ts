@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { envData } from 'src/config/datasource';
+import { LocationResponse } from '../dto/response.dto';
 
 @Injectable()
 export class LocationService {
   constructor(private readonly httpService: HttpService) {}
 
-  async findAll(name?: string) {
+  async findAll(name?: string): Promise<LocationResponse> {
     const headers = {
       'X-CSCAPI-KEY': envData.API_COUNTRY_KEY,
     };
