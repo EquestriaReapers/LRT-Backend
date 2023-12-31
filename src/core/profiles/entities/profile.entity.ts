@@ -64,6 +64,12 @@ export class Profile {
   })
   countryResidence: string;
 
+  @ApiProperty()
+  @Column({
+    nullable: true,
+  })
+  website: string;
+
   @ApiProperty({
     type: [ExperienceData],
   })

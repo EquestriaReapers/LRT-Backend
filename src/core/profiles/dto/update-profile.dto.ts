@@ -29,4 +29,8 @@ export class UpdateProfileDto extends PartialType(CreateProfileDTO) {
   @IsOptional()
   countryResidence: string;
 
+  @ApiProperty()
+  @IsString({ message: 'El sitio web debe ser una cadena de texto' })
+  @IsOptional()
+  website: string;
 }
