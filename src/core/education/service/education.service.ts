@@ -9,12 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Education } from '../entities/education.entity';
 import { Repository } from 'typeorm';
 import { UserActiveInterface } from 'src/common/interface/user-active-interface';
-import {
-  EDUCATION_NOT_FOUND,
-  ERROR_EDUCATION_IS_UCAB,
-  ERROR_EDUCATION_PRINCIPAL_ALREADY_EXISTS,
-} from '../message';
-import e from 'express';
+import { EDUCATION_NOT_FOUND, ERROR_EDUCATION_IS_UCAB } from '../message';
 
 @Injectable()
 export class EducationService {
