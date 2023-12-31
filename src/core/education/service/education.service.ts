@@ -14,6 +14,7 @@ import {
   ERROR_EDUCATION_IS_UCAB,
   ERROR_EDUCATION_PRINCIPAL_ALREADY_EXISTS,
 } from '../message';
+import e from 'express';
 
 @Injectable()
 export class EducationService {
@@ -29,6 +30,7 @@ export class EducationService {
     const newEducation = await this.educationRepository.save({
       ...createEducationDto,
       profileId: user.id,
+      isUCAB: false,
     });
 
     return newEducation;
@@ -70,7 +72,7 @@ export class EducationService {
   ): Promise<void> {
     let education;
 
-    const validateEducationIsUCAB = await this.educationRepository.findOne({
+    const currentEducation = await this.educationRepository.findOne({
       where: {
         profileId: user.id,
         id: id,
@@ -78,7 +80,7 @@ export class EducationService {
     });
 
     if (
-      validateEducationIsUCAB.isUCAB === true &&
+      currentEducation.isUCAB === true &&
       (updateEducationDto.principal === true ||
         updateEducationDto.principal === false)
     ) {
@@ -93,7 +95,7 @@ export class EducationService {
       );
     }
 
-    if (validateEducationIsUCAB.isUCAB === false) {
+    if (currentEducation.isUCAB === false) {
       education = await this.educationRepository.update(
         {
           id,
@@ -101,6 +103,7 @@ export class EducationService {
         },
         {
           ...updateEducationDto,
+          isUCAB: false,
         },
       );
     }
@@ -113,14 +116,14 @@ export class EducationService {
   }
 
   async remove(id: number, user: UserActiveInterface): Promise<void> {
-    const verifyEducationUCAB = await this.educationRepository.findOne({
+    const currentEducation = await this.educationRepository.findOne({
       where: {
         profileId: user.id,
-        id: id,
+        id,
       },
     });
 
-    if (verifyEducationUCAB.isUCAB === true) {
+    if (currentEducation.isUCAB) {
       throw new BadRequestException(ERROR_EDUCATION_IS_UCAB);
     }
 
