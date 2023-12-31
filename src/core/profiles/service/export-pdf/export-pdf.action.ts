@@ -68,7 +68,22 @@ export default class ProfileExportPDFAction {
     userId: number,
   ): Promise<ResponseProfileGet> {
     const profile = await this.profileRepository.findOne({
-      where: { userId: userId },
+      where: {
+        userId: userId,
+        /*skillsProfile: {      por los momentos esto se quedara en comentario hasta que el frontend solicite quitar las cosas a la vista del pdf
+          isVisible: true,
+        },
+        languageProfile: {
+          isVisible: true,
+        },
+        experience: {
+          isVisible: true,
+        },
+        education: {
+          isVisible: true,
+        },
+        */
+      },
       relations: [
         'user',
         'skillsProfile',
