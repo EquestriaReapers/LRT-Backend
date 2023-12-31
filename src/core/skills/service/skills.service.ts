@@ -6,7 +6,7 @@ import {
 import { CreateSkillDto } from '../dto/create-skill.dto';
 import { UpdateSkillDto } from '../dto/update-skill.dto';
 import { ILike, Like, Repository } from 'typeorm';
-import { Skill } from '../entities/skill.entity';
+import { Skill, SkillType } from '../entities/skill.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ERROR_SKILLS_ALREADY_EXISTS, SKILL_NOT_FOUND } from '../messages';
 import { UserActiveInterface } from 'src/common/interface/user-active-interface';
@@ -42,6 +42,10 @@ export class SkillsService {
 
     if (skillFound) {
       throw new ConflictException(ERROR_SKILLS_ALREADY_EXISTS);
+    }
+
+    if (!skill.type) {
+      skill.type = SkillType.HARD;
     }
 
     const newSkill = await this.skillsRepository.save(skill);
