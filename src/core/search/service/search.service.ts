@@ -183,27 +183,6 @@ export class SearchService {
           },
           {
             nested: {
-              path: 'portfolio',
-              query: {
-                bool: {
-                  must: {
-                    multi_match: {
-                      query: searchParam.text,
-                      fields: ['portfolio.title', 'portfolio.description'],
-                      type: 'bool_prefix',
-                      must_not: {
-                        exists: {
-                          field: 'portfolio.deletedAt',
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-          {
-            nested: {
               path: 'education',
               query: {
                 bool: {
@@ -218,6 +197,32 @@ export class SearchService {
                   must_not: {
                     exists: {
                       field: 'education.deletedAt',
+                    },
+                  },
+                },
+              },
+            },
+          },
+          {
+            nested: {
+              path: 'portfolio',
+              query: {
+                bool: {
+                  must: {
+                    multi_match: {
+                      query: searchParam.text,
+                      fields: [
+                        'portfolio.title',
+                        'portfolio.description',
+                        'portfolio.location',
+                      ],
+                      type: 'bool_prefix',
+                      operator: 'or',
+                    },
+                  },
+                  must_not: {
+                    exists: {
+                      field: 'portfolio.deletedAt',
                     },
                   },
                 },
