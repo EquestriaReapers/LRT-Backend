@@ -275,6 +275,9 @@ export class ResponseProfileGet {
   @ApiProperty()
   countryResidence: string;
 
+  @ApiProperty()
+  website: string;
+
   @ApiProperty({
     type: [ExperienceData],
   })

@@ -98,7 +98,9 @@ export default class ProfileExportPDFAction {
         },
       },
     });
+
     const { skillsProfile, languageProfile, ...otherProfileProps } = profile;
+
     const mappedProfile = {
       ...otherProfileProps,
       skills: skillsProfile.map(({ skill, ...sp }) => ({
@@ -108,7 +110,7 @@ export default class ProfileExportPDFAction {
         skillProfileId: sp.id,
         isVisible: sp.isVisible,
       })),
-      languages: profile.languageProfile.map(({ language, ...lp }) => ({
+      languages: languageProfile.map(({ language, ...lp }) => ({
         ...lp,
         name: language.name,
       })),
