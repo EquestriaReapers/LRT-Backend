@@ -53,6 +53,7 @@ async function bootstrap() {
     .addTag('skill')
     .addTag('career')
     .addTag('language')
+    .addTag('location')
     .addTag('education')
     .build();
 
