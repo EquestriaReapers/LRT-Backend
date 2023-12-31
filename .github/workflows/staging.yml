@@ -25,7 +25,7 @@ jobs:
               npm install
               npm run build
               npm run migration:generate
-              npm run migration:run
+              npm run migration:runAndRevert
               pm2 restart ucab-profile
               pm2 save   
               echo 'Repository cloned successfully to digital ocean'
@@ -37,7 +37,7 @@ jobs:
               npm install
               npm run build
               npm run migration:generate
-              npm run migration:run
+              npm run migration:runAndRevert
               pm2 restart ucab-profile
               pm2 save
               echo 'Repository already exists previously, pulling changes'
