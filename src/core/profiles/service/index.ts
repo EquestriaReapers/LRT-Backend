@@ -105,6 +105,7 @@ export default class ProfilesService {
       description: updateProfileDto.description,
       mainTitle: updateProfileDto.mainTitle,
       countryResidence: updateProfileDto.countryResidence,
+      website: updateProfileDto.website,
     });
 
     if (profile.affected === 0) throw new NotFoundException(PROFILE_NOT_FOUND);
@@ -196,6 +197,7 @@ export default class ProfilesService {
       description: updateProfileDto.description,
       mainTitle: updateProfileDto.mainTitle,
       countryResidence: updateProfileDto.countryResidence,
+      website: updateProfileDto.website,
     });
 
     if (profile.affected === 0) throw new NotFoundException(PROFILE_NOT_FOUND);

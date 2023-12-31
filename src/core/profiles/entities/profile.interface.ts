@@ -10,6 +10,7 @@ export interface ProfileI {
   description?: string;
   mainTitle?: Career;
   countryResidence?: string;
+  website?: string;
   experience?: ExperienceI[];
   skills?: SkillI[];
 }

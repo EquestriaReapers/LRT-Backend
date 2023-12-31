@@ -17,4 +17,9 @@ export class CreateProfileDTO {
   @IsNotEmpty({ message: 'El país de residencia no puede estar vacío' })
   @IsString({ message: 'El país de residencia debe ser una cadena de texto' })
   countryResidence: string;
+
+  @ApiProperty()
+  @IsNotEmpty({ message: 'El sitio web no puede estar vacío' })
+  @IsString({ message: 'El sitio web debe ser una cadena de texto' })
+  website: string;
 }

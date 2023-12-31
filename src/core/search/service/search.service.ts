@@ -445,6 +445,7 @@ export class SearchService {
         description: doc.description,
         mainTitle: doc.mainTitle,
         countryResidence: doc.countryResidence,
+        website: doc.website,
         skills: doc.skills,
         experience: doc.experience,
         portfolio: doc.portfolio,
