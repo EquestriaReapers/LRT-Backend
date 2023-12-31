@@ -21,7 +21,7 @@ export class LocationService {
 
     let countries = response.data;
 
-    if (name) {
+    if (name && name.length > 0) {
       countries = countries.filter((country) =>
         country.name.toLowerCase().includes(name.toLowerCase()),
       );
