@@ -99,27 +99,21 @@ export default class ProfileExportPDFAction {
       },
     });
 
-    const { skillsProfile, languageProfile, experience, ...otherProfileProps } =
-      profile;
+    const { skillsProfile, languageProfile, ...otherProfileProps } = profile;
 
     const mappedProfile = {
       ...otherProfileProps,
-      skills: skillsProfile
-        .filter((sp) => sp.isVisible)
-        .map(({ skill, ...sp }) => ({
-          id: skill.id,
-          name: skill.name,
-          type: skill.type,
-          skillProfileId: sp.id,
-          isVisible: sp.isVisible,
-        })),
-      languages: languageProfile
-        .filter((lp) => lp.isVisible)
-        .map(({ language, ...lp }) => ({
-          ...lp,
-          name: language.name,
-        })),
-      experience: experience.filter((exp) => exp.isVisible),
+      skills: skillsProfile.map(({ skill, ...sp }) => ({
+        id: skill.id,
+        name: skill.name,
+        type: skill.type,
+        skillProfileId: sp.id,
+        isVisible: sp.isVisible,
+      })),
+      languages: languageProfile.map(({ language, ...lp }) => ({
+        ...lp,
+        name: language.name,
+      })),
     };
 
     return mappedProfile;
