@@ -47,10 +47,15 @@ export interface Professional {
   mainTitle: string;
 }
 
+export interface Lenguague {
+  name: string;
+  level: string | null;
+}
+
 export interface ProfileTemplate extends Professional {
   contactItems: ContactItem[];
   experiences: Experiencie[];
   educations: Education[];
-  languages: string[];
+  languages: Lenguague[];
   skillSet: SkillSet;
 }

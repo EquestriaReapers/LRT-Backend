@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { createPdf } from '@saemhco/nestjs-html-pdf';
 import * as path from 'path';
 import { InternalServerErrorException } from '@nestjs/common';
@@ -6,14 +6,11 @@ import { ERROR_UNKOWN_GENERATING_PDF } from '../../messages';
 import { Buffer } from 'buffer';
 import handlebars from 'handlebars';
 import * as fs from 'fs';
-import { getDummyProfileTemplate } from './fixtures';
-import { SkillSetType } from './types';
 import ProfileTemplateAdaptator from './profile-template-adapter.class';
 import { Profile } from '../../entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ResponseProfileGet } from '../../dto/responses.dto';
-import ProfilesService from '../../service/index';
 
 const FILE_CONFIG = {
   format: 'a4',

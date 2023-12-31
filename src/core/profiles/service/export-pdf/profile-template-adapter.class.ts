@@ -25,7 +25,10 @@ export default class ProfileTemplateAdaptator {
         description: exp.description,
       })),
       educations: [],
-      languages: profile.languages.map((lang) => lang.name),
+      languages: profile.languages.map(({ name, level }) => ({
+        name,
+        level,
+      })),
       skillSet: {
         type: SkillSetType.HardSoft,
         hardSkills: profile.skills

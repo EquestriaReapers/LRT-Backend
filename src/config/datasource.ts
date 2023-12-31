@@ -33,6 +33,7 @@ export const envData = {
   ELASTIC_URL: configService.get('ELASTIC_URL'),
   ELASTIC_USER: configService.get('ELASTIC_USER'),
   ELASTIC_PASSWORD: configService.get('ELASTIC_PASSWORD'),
+  API_COUNTRY_KEY: configService.get('API_COUNTRY_KEY'),
 };
 
 export const AppOS = new DataSource(DataSourceConfig);
