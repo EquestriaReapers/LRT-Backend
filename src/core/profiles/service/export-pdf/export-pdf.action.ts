@@ -70,6 +70,7 @@ export default class ProfileExportPDFAction {
         'user',
         'skills',
         'experience',
+        'education',
         'languageProfile',
         'languageProfile.language',
       ],
