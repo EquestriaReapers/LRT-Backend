@@ -52,6 +52,6 @@ export class Experience {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @Column({ default: false })
+  @Column({ default: true })
   isVisible: boolean;
 }
