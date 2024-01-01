@@ -8,7 +8,7 @@ import { UpdateSkillDto } from '../dto/update-skill.dto';
 import { ILike, Like, Repository } from 'typeorm';
 import { Skill, SkillType } from '../entities/skill.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SKILL_NOT_FOUND } from '../messages';
+import { SKILL_ALREADY_EXISTS, SKILL_NOT_FOUND } from '../messages';
 import { UserActiveInterface } from 'src/common/interface/user-active-interface';
 import { Profile } from 'src/core/profiles/entities/profile.entity';
 import { PROFILE_NOT_FOUND } from 'src/core/profiles/messages';
@@ -41,7 +41,11 @@ export class SkillsService {
     });
 
     if (skillFound) {
-      throw new ConflictException('Skill already exists');
+      if (skillFound.type === SkillType.SOFT) {
+      throw new ConflictException(`${SKILL_ALREADY_EXISTS}`+`blanda`);
+      } else {
+        throw new ConflictException(`${SKILL_ALREADY_EXISTS}`+`dura`);
+      }
     }
 
     if (!skill.type) {
