@@ -37,7 +37,6 @@ import { ForgotPassword } from '../entities/forgotpassword.entity';
 export class AuthService {
   constructor(
     @InjectRepository(EmailVerificationEntity)
-    @InjectRepository(ForgotPassword)
     private readonly emailVerification: Repository<EmailVerificationEntity>,
 
     private readonly usersService: UsersService,
@@ -46,6 +45,7 @@ export class AuthService {
 
     private readonly jwtPayloadService: JwtPayloadService,
 
+    @InjectRepository(ForgotPassword)
     private readonly forgotPassword: Repository<ForgotPassword>,
 
   ) { }

@@ -25,10 +25,16 @@ import {
   SUCCESSFULY_VERIFIED_EMAIL_MESSAGE,
 } from './message';
 import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
+import * as bcrypt from 'bcrypt';
+import * as bcryptjs from 'bcryptjs';
+import { UsersService } from '../users/service/users.service';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService,
+    private readonly usersService: UsersService,
+
+  ) { }
 
   @Post('register')
   @ApiOkResponse({
@@ -102,6 +108,42 @@ export class AuthController {
       return response.status(403).json({
         message: INVALID_TOKEN_EMAIL_MESSAGE,
       });
+    }
+  }
+
+  @Get('email/forgot-password/:email')
+  async sendEmailForgotPassword(@Param('email') email: string): Promise<Object> {
+    try {
+      var isEmailSent = await this.authService.sendEmailForgotPassword(email);
+      if (isEmailSent) {
+        return { status: 'success', code: 'RESULT_SUCCESS', data: null };
+      } else {
+        return { status: 'error', code: 'RESULT_FAIL', message: "Email has not been sent" };
+      }
+    } catch (error) {
+      return { status: 'error', code: 'RESULT_FAIL', message: "Error when sending email" };
+    }
+  }
+
+  @Get('email/reset-password/:token')
+  async resetPasswordFromToken(@Param('token') token: string) {
+
+    try {
+      let user = await this.authService.checkVerificationCode(token);
+      let randomPassword = await this.authService.generateRandomPassword();
+
+      user.password = bcryptjs.hashSync(randomPassword, bcrypt.genSaltSync(8), null);
+      await this.usersService.update(user.id, user);
+
+      var isEmailSent = await this.authService.emailResetedPassword(user.email, randomPassword);
+      if (isEmailSent) {
+        return { status: 'success', code: 'RESULT_SUCCESS', data: null };
+      } else {
+        return { status: 'error', code: 'RESULT_FAIL', message: "Email has not been sent" };
+      }
+
+    } catch (error) {
+      return { status: 'error', code: 'RESULT_FAIL', message: "Unexpected error happen" };
     }
   }
 
