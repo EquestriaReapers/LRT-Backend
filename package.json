@@ -50,7 +50,7 @@
     "mysql2": "^2.3.3",
     "nestjs-meilisearch": "^2.1.5",
     "nestjs-opensearch": "^0.3.2",
-    "nodemailer": "^6.9.7",
+    "nodemailer": "^6.9.8",
     "pg": "^8.11.3",
     "puppeteer": "^21.6.0",
     "reflect-metadata": "^0.1.13",

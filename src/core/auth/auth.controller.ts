@@ -28,7 +28,7 @@ import { ApiInternalServerError } from 'src/common/decorator/internal-server-err
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('register')
   @ApiOkResponse({
@@ -104,4 +104,6 @@ export class AuthController {
       });
     }
   }
+
+
 }

@@ -14,7 +14,7 @@ import * as bcryptjs from 'bcryptjs';
 import { UserRole } from '../../../constants';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EmailVerificationEntity } from '../entities/emailverification.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { JwtPayload } from '../interface/jwt-payload.interface';
 import 'dotenv/config';
 import { JwtPayloadService } from '../../../common/service/jwt.payload.service';
@@ -23,17 +23,21 @@ import * as handlebars from 'handlebars';
 import * as fs from 'fs';
 import * as path from 'path';
 import { USER_NOT_FOUND } from 'src/core/users/messages';
+import * as nodemailer from 'nodemailer';
 import {
   INVALID_TOKEN_EMAIL_MESSAGE,
   SUCCESSFULY_SEND_EMAIL_VERIFICATION_MESSAGE,
   UNAUTHROIZED_BAD_REQUEST_MESSAGE,
   USER_ALREADY_EXISTS_MESSAGE,
 } from '../message';
+import { ForgotPassword } from '../entities/forgotpassword.entity';
+
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(EmailVerificationEntity)
+    @InjectRepository(ForgotPassword)
     private readonly emailVerification: Repository<EmailVerificationEntity>,
 
     private readonly usersService: UsersService,
@@ -41,7 +45,10 @@ export class AuthService {
     private readonly jwtService: JwtService,
 
     private readonly jwtPayloadService: JwtPayloadService,
-  ) {}
+
+    private readonly forgotPassword: Repository<ForgotPassword>,
+
+  ) { }
 
   async register({
     email,
@@ -205,4 +212,114 @@ export class AuthService {
       });
     });
   }
+
+  async createForgottenPasswordToken(email: string): Promise<ForgotPassword> {
+    let userData = await this.usersService.findOneByEmail(email);
+    let forgotPassword = await this.forgotPassword.findOne({ where: { user: userData } });
+
+    if (forgotPassword && ((new Date().getTime() - forgotPassword.timestamp.getTime()) / 60000 < 15)) {
+      throw new HttpException('RESET_PASSWORD.EMAIL_SENDED_RECENTLY', HttpStatus.INTERNAL_SERVER_ERROR);
+    } else {
+      if (!forgotPassword) {
+        forgotPassword = new ForgotPassword();
+        forgotPassword.user = userData;
+      }
+
+      forgotPassword.token = (Math.floor(Math.random() * (9000000)) + 1000000).toString();
+      forgotPassword.timestamp = new Date();
+
+      let ret = await this.forgotPassword.save(forgotPassword);
+
+      if (ret) {
+        return ret;
+      } else {
+        throw new HttpException('LOGIN.ERROR.GENERIC_ERROR', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+  }
+
+  async sendEmailForgotPassword(email: string): Promise<boolean> {
+    let userData = await this.usersService.findOneByEmail(email);
+    if (!userData) throw new HttpException('LOGIN.USER_NOT_FOUND', HttpStatus.NOT_FOUND);
+
+    let tokenModel = await this.createForgottenPasswordToken(email);
+
+    if (tokenModel && tokenModel.token) {
+      const __dirname = path.resolve();
+      const filePath = path.join(
+        __dirname,
+        'src',
+        'core',
+        'auth',
+        'template',
+        'template.html',
+      );
+      const source = fs.readFileSync(filePath, 'utf-8').toString();
+      const template = handlebars.compile(source);
+      const replacements = {
+        resetPasswordLink: `${process.env.BACKEND_BASE_URL}/api/v1/auth/email/reset-password/${tokenModel.token}`,
+      };
+
+      const htmlToSend = template(replacements);
+
+      let mailOptions = {
+        from: '"Company" <' + process.env.EMAIL_USER + '>',
+        to: email,
+        subject: 'Reset password code',
+        text: 'Forgot Password',
+        html: htmlToSend,
+      };
+
+      return !!(await this.sendEmail(mailOptions));
+    } else {
+      throw new HttpException('REGISTER.USER_NOT_REGISTERED', HttpStatus.FORBIDDEN);
+    }
+  }
+
+  async checkVerificationCode(token: string) {
+    let forgotPassword = await this.forgotPassword.findOne({ relations: ["user"], where: { token: token } });
+    if (!forgotPassword) {
+      throw new HttpException('Token no encontrado', HttpStatus.NOT_FOUND);
+    }
+    return forgotPassword.user;
+  }
+
+  async generateRandomPassword() {
+    var length = 8,
+      charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      retVal = "";
+    for (var i = 0, n = charset.length; i < length; ++i) {
+      retVal += charset.charAt(Math.floor(Math.random() * n));
+    }
+    return retVal;
+  }
+
+  async emailResetedPassword(email: string, password: string): Promise<boolean> {
+    let htmlContent = "<p>Tu nueva contraseña es: " + password + " </p>";
+    htmlContent += '<p>Por favor, no respondas a esta notificación, este buzón no está supervisado.</p>';
+
+    var mailOptions = {
+      from: '"Company" <' + process.env.EMAIL_USER + '>',
+      to: email,
+      subject: '"Company" forgotten password confirmation',
+      html: htmlContent,
+    };
+
+    try {
+      var sent = await new Promise<boolean>(async function (resolve, reject) {
+        return await transporter.sendMail(mailOptions, async (error, info) => {
+          if (error) {
+            return reject(false);
+          }
+          resolve(true);
+        });
+      })
+      return sent;
+    } catch (error) {
+      return false;
+    }
+
+  }
+
+
 }
