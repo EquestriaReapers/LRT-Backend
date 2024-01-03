@@ -154,12 +154,14 @@ export class PortfolioService {
       throw new BadRequestException(ERROR_PORTFOLIO_NOT_FOUND);
     }
 
-    const url = new URL(portfolio.imagePrincipal);
-    let filePathPrincipal = url.pathname;
-    if (filePathPrincipal.startsWith('/')) {
-      filePathPrincipal = filePathPrincipal.substring(1);
+    if (portfolio.imagePrincipal && portfolio.imagePrincipal.length > 0) {
+      const url = new URL(portfolio.imagePrincipal);
+      let filePathPrincipal = url.pathname;
+      if (filePathPrincipal.startsWith('/')) {
+        filePathPrincipal = filePathPrincipal.substring(1);
+      }
+      await deleteFile(filePathPrincipal, portfolio.imagePrincipal);
     }
-    await deleteFile(filePathPrincipal, portfolio.imagePrincipal);
 
     if (portfolio.image && portfolio.image.length > 0) {
       for (const imagePath of portfolio.image) {
