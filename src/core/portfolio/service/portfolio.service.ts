@@ -88,23 +88,46 @@ export class PortfolioService {
     const portfolio = await this.portfolioRepository.findOne({
       where: { id, profileId: user.id },
     });
+    let newPaths = [];
+    let newPathPrincipal = null;
 
     if (!portfolio) {
       throw new BadRequestException(ERROR_PORTFOLIO_NOT_FOUND);
     }
 
-    let newPathPrincipal = null;
+    if (!updatePortfolioDto.hasOwnProperty('imagePrincipal')) {
+      newPathPrincipal = portfolio.imagePrincipal;
+    }
+    if (!updatePortfolioDto.hasOwnProperty('image')) {
+      newPaths = portfolio.image;
+    }
+
     if (
       updatePortfolioDto.imagePrincipal &&
-      updatePortfolioDto.imagePrincipal[0].path
+      updatePortfolioDto.imagePrincipal[0].path &&
+      updatePortfolioDto.imagePrincipal !== null &&
+      updatePortfolioDto.imagePrincipal !== undefined
     ) {
       const path = updatePortfolioDto.imagePrincipal[0].path;
       newPathPrincipal =
         envData.BACKEND_BASE_URL + '/' + path.replace(/\\/g, '/');
+
+      if (portfolio.imagePrincipal && portfolio.imagePrincipal.length > 0) {
+        const url = new URL(portfolio.imagePrincipal);
+        let filePathPrincipal = url.pathname;
+        if (filePathPrincipal.startsWith('/')) {
+          filePathPrincipal = filePathPrincipal.substring(1);
+        }
+        await deleteFile(filePathPrincipal, portfolio.imagePrincipal);
+      }
     }
 
-    let newPaths = [];
-    if (updatePortfolioDto.image) {
+    if (
+      updatePortfolioDto.image &&
+      updatePortfolioDto.image.length > 0 &&
+      updatePortfolioDto.image !== null &&
+      updatePortfolioDto.image !== undefined
+    ) {
       for (const file of updatePortfolioDto.image) {
         if (file.path) {
           const newPath =
@@ -112,25 +135,15 @@ export class PortfolioService {
           newPaths.push(newPath);
         }
       }
-    }
-
-    if (portfolio.imagePrincipal && portfolio.imagePrincipal.length > 0) {
-      const url = new URL(portfolio.imagePrincipal);
-      let filePathPrincipal = url.pathname;
-      if (filePathPrincipal.startsWith('/')) {
-        filePathPrincipal = filePathPrincipal.substring(1);
-      }
-      await deleteFile(filePathPrincipal, portfolio.imagePrincipal);
-    }
-
-    if (portfolio.image && portfolio.image.length > 0) {
-      for (const imagePath of portfolio.image) {
-        const imageUrl = new URL(imagePath);
-        let filePath = imageUrl.pathname;
-        if (filePath.startsWith('/')) {
-          filePath = filePath.substring(1);
+      if (portfolio.image && portfolio.image.length > 0) {
+        for (const imagePath of portfolio.image) {
+          const imageUrl = new URL(imagePath);
+          let filePath = imageUrl.pathname;
+          if (filePath.startsWith('/')) {
+            filePath = filePath.substring(1);
+          }
+          await deleteFile(filePath, imagePath);
         }
-        await deleteFile(filePath, imagePath);
       }
     }
 
