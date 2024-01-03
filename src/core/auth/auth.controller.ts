@@ -21,7 +21,12 @@ import {
 } from './dto/responses.dto';
 import { MessageDTO } from 'src/common/dto/response.dto';
 import {
+  ERROR_RESETTING_PASSWORD_MESSAGE,
+  ERROR_SENDING_FORGOT_PASSWORD_EMAIL_MESSAGE,
+  INVALID_RESET_PASSWORD_TOKEN_MESSAGE,
   INVALID_TOKEN_EMAIL_MESSAGE,
+  SUCCESSFULY_RESET_PASSWORD_MESSAGE,
+  SUCCESSFULY_SEND_FORGOT_PASSWORD_EMAIL_MESSAGE,
   SUCCESSFULY_VERIFIED_EMAIL_MESSAGE,
 } from './message';
 import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
@@ -116,9 +121,9 @@ export class AuthController {
     try {
       var isEmailSent = await this.authService.sendEmailForgotPassword(email);
       if (isEmailSent) {
-        return { status: 'success', code: 'RESULT_SUCCESS', data: null };
+        return { status: 'success', code: 'RESULT_SUCCESS', message: SUCCESSFULY_SEND_FORGOT_PASSWORD_EMAIL_MESSAGE };
       } else {
-        return { status: 'error', code: 'RESULT_FAIL', message: "Email has not been sent" };
+        return { status: 'error', code: 'RESULT_FAIL', message: ERROR_SENDING_FORGOT_PASSWORD_EMAIL_MESSAGE };
       }
     } catch (error) {
       return { status: 'error', code: 'RESULT_FAIL', message: "Error when sending email" };
@@ -127,9 +132,12 @@ export class AuthController {
 
   @Get('email/reset-password/:token')
   async resetPasswordFromToken(@Param('token') token: string) {
-
     try {
       let user = await this.authService.checkVerificationCode(token);
+      if (!user) {
+        return { status: 'error', code: 'RESULT_FAIL', message: INVALID_RESET_PASSWORD_TOKEN_MESSAGE };
+      }
+
       let randomPassword = await this.authService.generateRandomPassword();
 
       user.password = bcryptjs.hashSync(randomPassword, bcrypt.genSaltSync(8), null);
@@ -137,15 +145,14 @@ export class AuthController {
 
       var isEmailSent = await this.authService.emailResetedPassword(user.email, randomPassword);
       if (isEmailSent) {
-        return { status: 'success', code: 'RESULT_SUCCESS', data: null };
+        return { status: 'success', code: 'RESULT_SUCCESS', message: SUCCESSFULY_RESET_PASSWORD_MESSAGE };
       } else {
-        return { status: 'error', code: 'RESULT_FAIL', message: "Email has not been sent" };
+        return { status: 'error', code: 'RESULT_FAIL', message: ERROR_RESETTING_PASSWORD_MESSAGE };
       }
 
     } catch (error) {
       return { status: 'error', code: 'RESULT_FAIL', message: "Unexpected error happen" };
     }
   }
-
 
 }

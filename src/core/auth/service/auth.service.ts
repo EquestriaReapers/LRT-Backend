@@ -240,9 +240,16 @@ export class AuthService {
 
   async sendEmailForgotPassword(email: string): Promise<boolean> {
     let userData = await this.usersService.findOneByEmail(email);
+    console.log(userData);
     if (!userData) throw new HttpException('LOGIN.USER_NOT_FOUND', HttpStatus.NOT_FOUND);
 
-    let tokenModel = await this.createForgottenPasswordToken(email);
+    let tokenModel;
+    try {
+      tokenModel = await this.createForgottenPasswordToken(email);
+      console.log(tokenModel);
+    } catch (error) {
+      console.error('Error creating token:', error);
+    }
 
     if (tokenModel && tokenModel.token) {
       const __dirname = path.resolve();
