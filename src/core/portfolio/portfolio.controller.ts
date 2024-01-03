@@ -21,7 +21,10 @@ import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { FilesToBodyInterceptor } from 'src/common/class/customClassMulter';
 import * as express from 'express';
-import { PORTFOLIO_SUCCESSFULLY_DELETED, PORTFOLIO_SUCCESSFULLY_UPDATED } from './message';
+import {
+  PORTFOLIO_SUCCESSFULLY_DELETED,
+  PORTFOLIO_SUCCESSFULLY_UPDATED,
+} from './message';
 
 @ApiTags('portfolio')
 @Controller('portfolio')
@@ -33,7 +36,7 @@ export class PortfolioController {
     return this.portfolioService.findAll(+idProfile);
   }
 
-  @Get(':id')
+  @Get('/project/:id')
   findOne(@Param('id') id: number) {
     return this.portfolioService.findOne(+id);
   }
