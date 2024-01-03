@@ -30,7 +30,7 @@ export class UpdatePortfolioDto extends PartialType(CreatePortfolioDto) {
     },
   )
   @IsOptional()
-  dateEnd: Date;
+  dateEnd: Date | null;
 
   @ApiProperty({
     required: false,
