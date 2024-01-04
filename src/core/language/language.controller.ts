@@ -8,12 +8,13 @@ import {
   Delete,
   NotFoundException,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { LanguageService } from './service/language.service';
 import { CreateLanguageDto } from './dto/create-language.dto';
 import { UpdateLanguageDto } from './dto/update-language.dto';
 import { Auth } from '../auth/decorators/auth.decorator';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Language } from './entities/language.entity';
 import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
 import { ApiException } from '@nanogiants/nestjs-swagger-api-exception-decorator';
@@ -44,8 +45,13 @@ export class LanguageController {
     type: [Language],
   })
   @ApiInternalServerError()
-  findAll() {
-    return this.languageService.findAll();
+  @ApiQuery({
+    name: 'name',
+    required: false,
+    description: 'A parameter. Optional',
+  })
+  findAll(@Query('name') name?: string) {
+    return this.languageService.findAll(name);
   }
 
   @ApiTags('language')
