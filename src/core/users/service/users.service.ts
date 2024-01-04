@@ -47,6 +47,9 @@ export class UsersService {
       website: null,
     });
 
+    await this.AssingUcabEducation(_user.id);
+    await this.principalEducation(_user.id);
+
     const token = await this.jwtPayloadService.createJwtPayload(user);
 
     const response = {
@@ -81,7 +84,6 @@ export class UsersService {
       where: { email },
       select: [
         'id',
-        'documentNumber',
         'name',
         'lastname',
         'email',
@@ -112,7 +114,7 @@ export class UsersService {
     return user;
   }
 
-  async AssingUcabEducation(userId: number) {
+  private async AssingUcabEducation(userId: number) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
     });
@@ -129,12 +131,117 @@ export class UsersService {
       throw new NotFoundException(PROFILE_NOT_FOUND);
     }
 
-    const educationUCAB = await this.httpService
-      .get(`${envData.API_BANNER_URL}email` + '/' + user.email)
+    let educationUCAB = await this.httpService
+      .get(`${envData.API_BANNER_URL}student/email` + '/' + user.email)
       .toPromise()
       .then((response) => response.data);
 
     if (educationUCAB) {
+      const filteredCareers = educationUCAB.StudentCareers.filter(
+        (studentCareers) =>
+          studentCareers.dateGraduated !== null && studentCareers.Career,
+      );
+
+      if (filteredCareers.length === 0) {
+        await this.profileRepository.delete({ userId: user.id });
+        await this.userRepository.delete({ id: user.id });
+        throw new NotFoundException('Este estudiante no se ha graduado');
+      }
+
+      for (const studentCareers of filteredCareers) {
+        await this.educationRepository.save({
+          profileId: profile.id,
+          entity: 'Universidad Catolica Andres Bello',
+          title: this.getMainTitle(studentCareers.Career.name),
+          endDate: studentCareers.dateGraduated,
+          isUCAB: true,
+          principal: false,
+        });
+      }
     }
+
+    return educationUCAB;
+  }
+
+  private async principalEducation(userId: number) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    const profile = await this.profileRepository.findOne({
+      where: { userId: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException(USER_NOT_FOUND);
+    }
+
+    if (!profile) {
+      throw new NotFoundException(PROFILE_NOT_FOUND);
+    }
+
+    const orderedEducation = await this.educationRepository.find({
+      where: { profileId: profile.id },
+      order: { endDate: 'ASC' }, // Ordenar por fecha de finalización en orden descendente
+    });
+
+    if (
+      orderedEducation === null ||
+      !orderedEducation ||
+      orderedEducation.length === 0
+    ) {
+      throw new NotFoundException(
+        'No se encontraron estudios para este usuario',
+      );
+    }
+
+    let educationOld = orderedEducation[0];
+
+    const educationPrincipal = await this.educationRepository.update(
+      {
+        profileId: profile.id,
+        isUCAB: true,
+        id: educationOld.id,
+      },
+      {
+        principal: true,
+      },
+    );
+
+    if (educationPrincipal.affected === 0) {
+      throw new NotFoundException(USER_NOT_FOUND);
+    }
+
+    await this.profileRepository.update(
+      {
+        userId: user.id,
+      },
+      {
+        mainTitle: this.getMainTitle(educationOld.title),
+      },
+    );
+
+    return educationPrincipal;
+  }
+
+  async findByEmailBanner(email: string) {
+    return await this.httpService
+      .get(`${envData.API_BANNER_URL}student/email` + '/' + email)
+      .toPromise()
+      .then((response) => response.data);
+  }
+
+  private getMainTitle(mainTitle: string): string {
+    if (mainTitle) {
+      mainTitle = mainTitle
+        .split('-')
+        .map((word, index) =>
+          index !== 1 ? word.charAt(0).toUpperCase() + word.slice(1) : word,
+        )
+        .join(' ');
+      return mainTitle;
+    }
+
+    return '';
   }
 }

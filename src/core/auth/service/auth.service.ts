@@ -24,10 +24,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { USER_NOT_FOUND } from 'src/core/users/messages';
 import {
+  ERROR_USER_NOT_GRADUATE,
   INVALID_TOKEN_EMAIL_MESSAGE,
   SUCCESSFULY_SEND_EMAIL_VERIFICATION_MESSAGE,
   UNAUTHROIZED_BAD_REQUEST_MESSAGE,
   USER_ALREADY_EXISTS_MESSAGE,
+  USER_NOT_FOUND_BANNER,
 } from '../message';
 
 @Injectable()
@@ -43,31 +45,39 @@ export class AuthService {
     private readonly jwtPayloadService: JwtPayloadService,
   ) {}
 
-  async register({
-    email,
-    password,
-    name,
-    lastname,
-    documentNumber,
-  }: RegisterDto) {
+  async register({ email, password }: RegisterDto) {
     const user = await this.usersService.findOneByEmail(email);
 
     if (user) {
       throw new BadRequestException(USER_ALREADY_EXISTS_MESSAGE);
     }
 
+    const banner = await this.usersService.findByEmailBanner(email);
+
+    if (!banner) {
+      throw new BadRequestException(USER_NOT_FOUND_BANNER);
+    }
+
+    const hasActiveGraduateRole = banner.RoleStudents.some(
+      (roleStudent) =>
+        roleStudent.Role.name === 'graduate' && roleStudent.isActive,
+    );
+
+    if (!hasActiveGraduateRole) {
+      throw new BadRequestException(ERROR_USER_NOT_GRADUATE);
+    }
+
     await this.usersService.create({
       email,
       password: await bcryptjs.hash(password, 10),
-      name,
-      documentNumber,
-      lastname,
+      name: banner.name,
+      lastname: banner.lastname,
       role: UserRole.GRADUATE,
     });
 
     return {
       email,
-      name,
+      name: banner.name,
     };
   }
 

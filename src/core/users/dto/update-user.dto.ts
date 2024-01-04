@@ -17,16 +17,6 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsString({ message: 'El nombre debe ser un string' })
   name: string;
 
-  @ApiProperty({ example: 'V30109748' })
-  @IsOptional()
-  @IsString({ message: 'El número de documento debe ser un string' })
-  @isUniqueDb({
-    table: 'user',
-    column: 'documentNumber',
-    message: 'El número de documento ya existe',
-  })
-  documentNumber: string;
-
   @ApiProperty({ example: 'Winchester' })
   @IsOptional()
   @IsString({ message: 'El apellido debe ser un string' })

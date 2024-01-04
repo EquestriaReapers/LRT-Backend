@@ -11,3 +11,5 @@ export const UNAUTHROIZED_BAD_REQUEST_MESSAGE =
   'Correo o contraseña incorrecta';
 export const ERROR_ON_DECODE_JWT_CODE_MESSAGE = 'Error al decodificar el token';
 export const YOU_NOT_HAVE_PERMISSION_MESSAGE = 'No tienes permiso';
+export const USER_NOT_FOUND_BANNER = 'Usuario no se encuentra en Banner';
+export const ERROR_USER_NOT_GRADUATE = 'El usuario no es un egresado';

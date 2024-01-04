@@ -23,7 +23,6 @@ import {
   UserProfileData,
 } from '../dto/responses.dto';
 import { LanguageProfile } from './language-profile.entity';
-import { Career } from 'src/core/career/enum/career.enum';
 import { ContactMethod } from './contact-method.entity';
 import { Portfolio } from 'src/core/portfolio/entities/portfolio.entity';
 import { SkillsProfile } from './skills-profile.entity';
@@ -52,13 +51,11 @@ export class Profile {
   })
   description: string;
 
-  @ApiProperty({ enum: Career })
+  @ApiProperty()
   @Column({
-    type: 'enum',
-    enum: Career,
     nullable: true,
   })
-  mainTitle: Career;
+  mainTitle: string;
 
   @ApiProperty()
   @Column({
