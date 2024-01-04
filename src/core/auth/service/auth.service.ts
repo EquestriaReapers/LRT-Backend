@@ -165,6 +165,7 @@ export class AuthService {
       where: { email: email },
     });
 
+    const user = await this.usersService.findOneByEmail(email);
     const __dirname = path.resolve();
     const filePath = path.join(
       __dirname,
@@ -174,11 +175,16 @@ export class AuthService {
       'template',
       'template.html',
     );
+
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source);
     const replacements = {
+      user: {
+        name: user.name,
+      },
       verificationLink: `${process.env.BACKEND_BASE_URL}/api/v1/auth/email/verify/${repository.emailToken}`,
     };
+    console.log(replacements.verificationLink);
 
     const htmlToSend = template(replacements);
 
@@ -243,7 +249,7 @@ export class AuthService {
     console.log(userData);
     if (!userData) throw new HttpException('LOGIN.USER_NOT_FOUND', HttpStatus.NOT_FOUND);
 
-    let tokenModel;
+    let tokenModel: { token: string } | undefined;
     try {
       tokenModel = await this.createForgottenPasswordToken(email);
       console.log(tokenModel);
@@ -259,11 +265,14 @@ export class AuthService {
         'core',
         'auth',
         'template',
-        'template.html',
+        'recoverPassword.html',
       );
       const source = fs.readFileSync(filePath, 'utf-8').toString();
       const template = handlebars.compile(source);
       const replacements = {
+        user: {
+          name: userData.name,
+        },
         resetPasswordLink: `${process.env.BACKEND_BASE_URL}/api/v1/auth/email/reset-password/${tokenModel.token}`,
       };
 
@@ -272,7 +281,7 @@ export class AuthService {
       let mailOptions = {
         from: '"Company" <' + process.env.EMAIL_USER + '>',
         to: email,
-        subject: 'Reset password code',
+        subject: 'Recupera tu contraseña',
         text: 'Forgot Password',
         html: htmlToSend,
       };

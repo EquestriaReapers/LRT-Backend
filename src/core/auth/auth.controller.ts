@@ -140,7 +140,7 @@ export class AuthController {
 
       let randomPassword = await this.authService.generateRandomPassword();
 
-      user.password = bcryptjs.hashSync(randomPassword, bcrypt.genSaltSync(8), null);
+      user.password = bcryptjs.hashSync(randomPassword, bcrypt.genSaltSync(8));
       await this.usersService.update(user.id, user);
 
       var isEmailSent = await this.authService.emailResetedPassword(user.email, randomPassword);
