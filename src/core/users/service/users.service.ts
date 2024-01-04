@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Param } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { User } from '../entities/user.entity';
@@ -8,6 +8,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcryptjs from 'bcryptjs';
 import { JwtPayloadService } from '../../../common/service/jwt.payload.service';
 import { USER_NOT_FOUND } from '../messages';
+import { Education } from 'src/core/education/entities/education.entity';
+import { PROFILE_NOT_FOUND } from 'src/core/profiles/messages';
+import { HttpService } from '@nestjs/axios';
+import { envData } from 'src/config/datasource';
 export class UsersService {
   constructor(
     @InjectRepository(User)
@@ -15,6 +19,11 @@ export class UsersService {
 
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+
+    @InjectRepository(Education)
+    private readonly educationRepository: Repository<Education>,
+
+    private readonly httpService: HttpService,
 
     private readonly jwtPayloadService: JwtPayloadService,
   ) {}
@@ -101,5 +110,31 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  async AssingUcabEducation(userId: number) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    const profile = await this.profileRepository.findOne({
+      where: { userId: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException(USER_NOT_FOUND);
+    }
+
+    if (!profile) {
+      throw new NotFoundException(PROFILE_NOT_FOUND);
+    }
+
+    const educationUCAB = await this.httpService
+      .get(`${envData.API_BANNER_URL}email` + '/' + user.email)
+      .toPromise()
+      .then((response) => response.data);
+
+    if (educationUCAB) {
+    }
   }
 }
