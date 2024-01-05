@@ -17,16 +17,6 @@ export class CreateUserDto {
   @IsString({ message: 'El nombre debe ser un string' })
   name: string;
 
-  @ApiProperty({ example: 'V30109748' })
-  @IsString({ message: 'El número de documento debe ser un string' })
-  @IsNotEmpty({ message: 'El número de documento es requerido' })
-  @isUniqueDb({
-    table: 'user',
-    column: 'documentNumber',
-    message: 'El número de documento ya existe',
-  })
-  documentNumber: string;
-
   @ApiProperty({ example: 'Winchester' })
   @IsNotEmpty()
   @IsString({ message: 'El apellido debe ser un string' })
