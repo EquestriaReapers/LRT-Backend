@@ -268,7 +268,11 @@ export default class ProfilesService {
       throw new BadRequestException(ERROR_LIMITE_METHOD_CONTACT);
     }
 
+    const highestId = Math.max(...profile.contactMethods.map((cm) => cm.id), 0);
+
     const contactMethod = new ContactMethod();
+
+    contactMethod.id = highestId + 1;
     contactMethod.id = profile.contactMethods.length + 1;
     contactMethod.email = createContactMethodDto.email;
 
