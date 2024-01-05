@@ -8,19 +8,13 @@ import {
   Delete,
   UseInterceptors,
   Response,
-  UseGuards,
 } from '@nestjs/common';
 import { PortfolioService } from './service/portfolio.service';
 import { CreatePortfolioDto } from './dto/create-portfolio.dto';
 import { UpdatePortfolioDto } from './dto/update-portfolio.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import {
-  UserRole,
-  editFileName,
-  imageFileFilter,
-  validateImageFile,
-} from 'src/constants';
+import { UserRole, editFileName, imageFileFilter } from 'src/constants';
 import { ActiveUser } from 'src/common/decorator/active-user-decorator';
 import { UserActiveInterface } from 'src/common/interface/user-active-interface';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
@@ -42,7 +36,7 @@ export class PortfolioController {
     return this.portfolioService.findAll(+idProfile);
   }
 
-  @Get(':id')
+  @Get('/project/:id')
   findOne(@Param('id') id: number) {
     return this.portfolioService.findOne(+id);
   }
@@ -101,6 +95,21 @@ export class PortfolioController {
     @Response() response: express.Response,
   ) {
     await this.portfolioService.update(+id, updatePortfolioDto, user);
+    return response.status(200).send({
+      message: PORTFOLIO_SUCCESSFULLY_UPDATED,
+    });
+  }
+
+  @Auth(UserRole.GRADUATE)
+  @Delete('/image/:id/:indexImage')
+  async removeImage(
+    @Param('id') id: number,
+    @Param('indexImage') indexImage: number,
+    @ActiveUser() user: UserActiveInterface,
+    @Response() response: express.Response,
+  ) {
+    await this.portfolioService.removeImage(+id, +indexImage, user);
+
     return response.status(200).send({
       message: PORTFOLIO_SUCCESSFULLY_UPDATED,
     });
