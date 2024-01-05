@@ -55,7 +55,6 @@ export class AuthService {
       password: await bcryptjs.hash(password, 10),
       name,
       lastname,
-      documentNumber,
       role: UserRole.GRADUATE,
     });
 
