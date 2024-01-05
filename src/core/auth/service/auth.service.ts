@@ -300,41 +300,27 @@ export class AuthService {
     return forgotPassword.user;
   }
 
-  async generateRandomPassword() {
-    var length = 8,
-      charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-      retVal = "";
-    for (var i = 0, n = charset.length; i < length; ++i) {
-      retVal += charset.charAt(Math.floor(Math.random() * n));
-    }
-    return retVal;
-  }
 
-  async emailResetedPassword(email: string, password: string): Promise<boolean> {
-    let htmlContent = "<p>Tu nueva contraseña es: " + password + " </p>";
-    htmlContent += '<p>Por favor, no respondas a esta notificación, este buzón no está supervisado.</p>';
 
-    var mailOptions = {
-      from: '"Company" <' + process.env.EMAIL_USER + '>',
-      to: email,
-      subject: '"Company" forgotten password confirmation',
-      html: htmlContent,
-    };
-
-    try {
-      var sent = await new Promise<boolean>(async function (resolve, reject) {
-        return await transporter.sendMail(mailOptions, async (error, info) => {
-          if (error) {
-            return reject(false);
-          }
-          resolve(true);
-        });
-      })
-      return sent;
-    } catch (error) {
-      return false;
+  async resetPassword(token: string, newPassword: string): Promise<boolean> {
+    let forgotPassword = await this.forgotPassword.findOne({ relations: ["user"], where: { token: token } });
+    if (!forgotPassword) {
+      throw new HttpException('Token no encontrado', HttpStatus.NOT_FOUND);
     }
 
+    // Hash the new password before saving it to the database
+    const hashedPassword = await bcryptjs.hash(newPassword, 10);
+
+    // Update the user's password
+    await this.usersService.update(forgotPassword.user.id, {
+      ...forgotPassword.user,
+      password: hashedPassword,
+    });
+
+    // Delete the token from the database
+    await this.forgotPassword.delete({ token: token });
+
+    return true;
   }
 
 

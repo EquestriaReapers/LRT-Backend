@@ -8,6 +8,8 @@ import {
   BadRequestException,
   UnauthorizedException,
   ForbiddenException,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from './service/auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -33,6 +35,7 @@ import { ApiInternalServerError } from 'src/common/decorator/internal-server-err
 import * as bcrypt from 'bcrypt';
 import * as bcryptjs from 'bcryptjs';
 import { UsersService } from '../users/service/users.service';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
@@ -130,29 +133,15 @@ export class AuthController {
     }
   }
 
-  @Get('email/reset-password/:token')
-  async resetPasswordFromToken(@Param('token') token: string) {
-    try {
-      let user = await this.authService.checkVerificationCode(token);
-      if (!user) {
-        return { status: 'error', code: 'RESULT_FAIL', message: INVALID_RESET_PASSWORD_TOKEN_MESSAGE };
-      }
+  @Post('reset-password')
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    const { token, newPassword } = resetPasswordDto;
+    const result = await this.authService.resetPassword(token, newPassword);
 
-      let randomPassword = await this.authService.generateRandomPassword();
-
-      user.password = bcryptjs.hashSync(randomPassword, bcrypt.genSaltSync(8));
-      await this.usersService.update(user.id, user);
-
-      var isEmailSent = await this.authService.emailResetedPassword(user.email, randomPassword);
-      if (isEmailSent) {
-        return { status: 'success', code: 'RESULT_SUCCESS', message: SUCCESSFULY_RESET_PASSWORD_MESSAGE };
-      } else {
-        return { status: 'error', code: 'RESULT_FAIL', message: ERROR_RESETTING_PASSWORD_MESSAGE };
-      }
-
-    } catch (error) {
-      return { status: 'error', code: 'RESULT_FAIL', message: "Unexpected error happen" };
+    if (result) {
+      return { message: SUCCESSFULY_RESET_PASSWORD_MESSAGE };
+    } else {
+      throw new HttpException(ERROR_RESETTING_PASSWORD_MESSAGE, HttpStatus.BAD_REQUEST);
     }
   }
-
 }
