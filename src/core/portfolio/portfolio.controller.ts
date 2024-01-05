@@ -67,7 +67,6 @@ export class PortfolioController {
     ),
     FilesToBodyInterceptor,
   )
-  @UseGuards(validateImageFile)
   async create(
     @Body() createPortfolioDto: CreatePortfolioDto,
     @ActiveUser() user: UserActiveInterface,
