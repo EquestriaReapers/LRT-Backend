@@ -95,7 +95,6 @@ export class PortfolioController {
     ),
     FilesToBodyInterceptor,
   )
-  @UseGuards(validateImageFile)
   async update(
     @Param('id') id: number,
     @Body() updatePortfolioDto: UpdatePortfolioDto,
