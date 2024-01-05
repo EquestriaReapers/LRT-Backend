@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 import { Profile } from 'src/core/profiles/entities/profile.entity';
 import { PROFILE_NOT_FOUND } from 'src/core/profiles/messages';
 import { envData } from 'src/config/datasource';
-import { ERROR_PORTFOLIO_NOT_FOUND } from '../message';
+import { ERROR_IMAGE_NOT_FOUND, ERROR_PORTFOLIO_NOT_FOUND } from '../message';
 import { URL } from 'url';
 import { deleteFile } from 'src/common/utils/create file-upload-util';
 @Injectable()
@@ -122,29 +122,8 @@ export class PortfolioService {
       }
     }
 
-    if (
-      updatePortfolioDto.image &&
-      updatePortfolioDto.image.length > 0 &&
-      updatePortfolioDto.image !== null &&
-      updatePortfolioDto.image !== undefined
-    ) {
-      for (const file of updatePortfolioDto.image) {
-        if (file.path) {
-          const newPath =
-            envData.BACKEND_BASE_URL + '/' + file.path.replace(/\\/g, '/');
-          newPaths.push(newPath);
-        }
-      }
-      if (portfolio.image && portfolio.image.length > 0) {
-        for (const imagePath of portfolio.image) {
-          const imageUrl = new URL(imagePath);
-          let filePath = imageUrl.pathname;
-          if (filePath.startsWith('/')) {
-            filePath = filePath.substring(1);
-          }
-          await deleteFile(filePath, imagePath);
-        }
-      }
+    if (updatePortfolioDto.image && updatePortfolioDto.image.length > 0) {
+      newPaths = await this.addImage(updatePortfolioDto, portfolio);
     }
 
     await this.portfolioRepository.save({
@@ -158,6 +137,71 @@ export class PortfolioService {
     });
 
     return;
+  }
+
+  async addImage(updatePortfolioDto, portfolio: Portfolio) {
+    let newPaths = [];
+    let arrayImagePortofolio = portfolio.image;
+
+    if (updatePortfolioDto.image) {
+      for (const file of updatePortfolioDto.image) {
+        if (file.path) {
+          const newPath =
+            envData.BACKEND_BASE_URL + '/' + file.path.replace(/\\/g, '/');
+          newPaths.push(newPath);
+        }
+      }
+
+      if (arrayImagePortofolio && arrayImagePortofolio.length > 2) {
+        throw new BadRequestException(
+          'Solo se pueden agregar 3 imagenes por proyecto',
+        );
+      } else {
+        arrayImagePortofolio.push(...newPaths);
+      }
+    } else {
+      throw new BadRequestException('No se ha enviado ninguna imagen');
+    }
+
+    return arrayImagePortofolio;
+  }
+
+  async removeImage(
+    id: number,
+    index: number,
+    user: UserActiveInterface,
+  ): Promise<void> {
+    const portfolio = await this.portfolioRepository.findOne({
+      where: { id, profileId: user.id },
+    });
+
+    if (!portfolio) {
+      throw new BadRequestException(ERROR_PORTFOLIO_NOT_FOUND);
+    }
+
+    if (portfolio.image && portfolio.image.length > 0) {
+      if (
+        !portfolio.image[index] ||
+        portfolio.image[index] === null ||
+        portfolio.image[index] === undefined
+      ) {
+        throw new BadRequestException(ERROR_IMAGE_NOT_FOUND);
+      }
+
+      const imageUrl = new URL(portfolio.image[index]);
+      let filePath = imageUrl.pathname;
+      if (filePath.startsWith('/')) {
+        filePath = filePath.substring(1);
+      }
+      await deleteFile(filePath, portfolio.image[index]);
+    }
+
+    portfolio.image.splice(index, 1);
+
+    await this.portfolioRepository.save({
+      id,
+      image: portfolio.image,
+    });
   }
 
   async remove(id: number, user: UserActiveInterface): Promise<void> {
