@@ -25,24 +25,22 @@ import { MessageDTO } from 'src/common/dto/response.dto';
 import {
   ERROR_RESETTING_PASSWORD_MESSAGE,
   ERROR_SENDING_FORGOT_PASSWORD_EMAIL_MESSAGE,
-  INVALID_RESET_PASSWORD_TOKEN_MESSAGE,
   INVALID_TOKEN_EMAIL_MESSAGE,
   SUCCESSFULY_RESET_PASSWORD_MESSAGE,
   SUCCESSFULY_SEND_FORGOT_PASSWORD_EMAIL_MESSAGE,
   SUCCESSFULY_VERIFIED_EMAIL_MESSAGE,
 } from './message';
 import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
-import * as bcrypt from 'bcrypt';
-import * as bcryptjs from 'bcryptjs';
+
 import { UsersService } from '../users/service/users.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService,
+  constructor(
+    private readonly authService: AuthService,
     private readonly usersService: UsersService,
-
-  ) { }
+  ) {}
 
   @Post('register')
   @ApiOkResponse({
@@ -120,28 +118,48 @@ export class AuthController {
   }
 
   @Get('email/forgot-password/:email')
-  async sendEmailForgotPassword(@Param('email') email: string): Promise<Object> {
+  async sendEmailForgotPassword(
+    @Param('email') email: string,
+  ): Promise<Object> {
     try {
-      var isEmailSent = await this.authService.sendEmailForgotPassword(email);
+      const isEmailSent = await this.authService.sendEmailForgotPassword(email);
       if (isEmailSent) {
-        return { status: 'success', code: 'RESULT_SUCCESS', message: SUCCESSFULY_SEND_FORGOT_PASSWORD_EMAIL_MESSAGE };
+        return {
+          status: 'success',
+          code: 'RESULT_SUCCESS',
+          message: SUCCESSFULY_SEND_FORGOT_PASSWORD_EMAIL_MESSAGE,
+        };
       } else {
-        return { status: 'error', code: 'RESULT_FAIL', message: ERROR_SENDING_FORGOT_PASSWORD_EMAIL_MESSAGE };
+        return {
+          status: 'error',
+          code: 'RESULT_FAIL',
+          message: ERROR_SENDING_FORGOT_PASSWORD_EMAIL_MESSAGE,
+        };
       }
     } catch (error) {
-      return { status: 'error', code: 'RESULT_FAIL', message: "Error when sending email" };
+      return {
+        status: 'error',
+        code: 'RESULT_FAIL',
+        message: error.message,
+      };
     }
   }
 
-  @Post('reset-password')
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-    const { token, newPassword } = resetPasswordDto;
+  @Post('reset-password/:token')
+  async resetPassword(
+    @Param('token') token: string,
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ) {
+    const { newPassword } = resetPasswordDto;
     const result = await this.authService.resetPassword(token, newPassword);
 
     if (result) {
       return { message: SUCCESSFULY_RESET_PASSWORD_MESSAGE };
     } else {
-      throw new HttpException(ERROR_RESETTING_PASSWORD_MESSAGE, HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        ERROR_RESETTING_PASSWORD_MESSAGE,
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 }

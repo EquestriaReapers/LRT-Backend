@@ -23,15 +23,15 @@ import * as handlebars from 'handlebars';
 import * as fs from 'fs';
 import * as path from 'path';
 import { USER_NOT_FOUND } from 'src/core/users/messages';
-import * as nodemailer from 'nodemailer';
 import {
   INVALID_TOKEN_EMAIL_MESSAGE,
+  REGISTER_USER_NOT_REGISTERED,
+  RESET_PASSWORD_EMAIL_SENDED_RECENTLY,
   SUCCESSFULY_SEND_EMAIL_VERIFICATION_MESSAGE,
   UNAUTHROIZED_BAD_REQUEST_MESSAGE,
   USER_ALREADY_EXISTS_MESSAGE,
 } from '../message';
 import { ForgotPassword } from '../entities/forgotpassword.entity';
-
 
 @Injectable()
 export class AuthService {
@@ -47,8 +47,7 @@ export class AuthService {
 
     @InjectRepository(ForgotPassword)
     private readonly forgotPassword: Repository<ForgotPassword>,
-
-  ) { }
+  ) {}
 
   async register({ email, password, name, lastname }: RegisterDto) {
     const user = await this.usersService.findOneByEmail(email);
@@ -177,7 +176,6 @@ export class AuthService {
       },
       verificationLink: `${process.env.BACKEND_BASE_URL}/api/v1/auth/email/verify/${repository.emailToken}`,
     };
-    console.log(replacements.verificationLink);
 
     const htmlToSend = template(replacements);
 
@@ -185,7 +183,7 @@ export class AuthService {
       const mailOptions = {
         from: '"Company" <' + process.env.EMAIL_USER + '>',
         to: email,
-        subject: 'Verify Email',
+        subject: 'Verifica tu correo',
         text: 'Verify Email',
         html: htmlToSend,
       };
@@ -214,17 +212,27 @@ export class AuthService {
 
   async createForgottenPasswordToken(email: string): Promise<ForgotPassword> {
     let userData = await this.usersService.findOneByEmail(email);
-    let forgotPassword = await this.forgotPassword.findOne({ where: { user: userData } });
+    let forgotPassword = await this.forgotPassword.findOne({
+      where: { user: userData },
+    });
 
-    if (forgotPassword && ((new Date().getTime() - forgotPassword.timestamp.getTime()) / 60000 < 15)) {
-      throw new HttpException('RESET_PASSWORD.EMAIL_SENDED_RECENTLY', HttpStatus.INTERNAL_SERVER_ERROR);
+    if (
+      forgotPassword &&
+      (new Date().getTime() - forgotPassword.timestamp.getTime()) / 60000 < 15
+    ) {
+      throw new HttpException(
+        RESET_PASSWORD_EMAIL_SENDED_RECENTLY,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     } else {
       if (!forgotPassword) {
         forgotPassword = new ForgotPassword();
         forgotPassword.user = userData;
       }
 
-      forgotPassword.token = (Math.floor(Math.random() * (9000000)) + 1000000).toString();
+      forgotPassword.token = (
+        Math.floor(Math.random() * 9000000) + 1000000
+      ).toString();
       forgotPassword.timestamp = new Date();
 
       let ret = await this.forgotPassword.save(forgotPassword);
@@ -232,22 +240,25 @@ export class AuthService {
       if (ret) {
         return ret;
       } else {
-        throw new HttpException('LOGIN.ERROR.GENERIC_ERROR', HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(
+          'LOGIN.ERROR.GENERIC_ERROR',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
     }
   }
 
   async sendEmailForgotPassword(email: string): Promise<boolean> {
     let userData = await this.usersService.findOneByEmail(email);
-    console.log(userData);
-    if (!userData) throw new HttpException('LOGIN.USER_NOT_FOUND', HttpStatus.NOT_FOUND);
+    if (!userData)
+      throw new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
 
     let tokenModel: { token: string } | undefined;
     try {
       tokenModel = await this.createForgottenPasswordToken(email);
-      console.log(tokenModel);
     } catch (error) {
       console.error('Error creating token:', error);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
 
     if (tokenModel && tokenModel.token) {
@@ -281,22 +292,29 @@ export class AuthService {
 
       return !!(await this.sendEmail(mailOptions));
     } else {
-      throw new HttpException('REGISTER.USER_NOT_REGISTERED', HttpStatus.FORBIDDEN);
+      throw new HttpException(
+        REGISTER_USER_NOT_REGISTERED,
+        HttpStatus.FORBIDDEN,
+      );
     }
   }
 
   async checkVerificationCode(token: string) {
-    let forgotPassword = await this.forgotPassword.findOne({ relations: ["user"], where: { token: token } });
+    let forgotPassword = await this.forgotPassword.findOne({
+      relations: ['user'],
+      where: { token: token },
+    });
     if (!forgotPassword) {
       throw new HttpException('Token no encontrado', HttpStatus.NOT_FOUND);
     }
     return forgotPassword.user;
   }
 
-
-
   async resetPassword(token: string, newPassword: string): Promise<boolean> {
-    let forgotPassword = await this.forgotPassword.findOne({ relations: ["user"], where: { token: token } });
+    let forgotPassword = await this.forgotPassword.findOne({
+      relations: ['user'],
+      where: { token: token },
+    });
     if (!forgotPassword) {
       throw new HttpException('Token no encontrado', HttpStatus.NOT_FOUND);
     }
@@ -315,6 +333,4 @@ export class AuthService {
 
     return true;
   }
-
-
 }
