@@ -8,20 +8,29 @@ import {
   Delete,
   UseInterceptors,
   Response,
+  UseGuards,
 } from '@nestjs/common';
 import { PortfolioService } from './service/portfolio.service';
 import { CreatePortfolioDto } from './dto/create-portfolio.dto';
 import { UpdatePortfolioDto } from './dto/update-portfolio.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { UserRole, editFileName, imageFileFilter } from 'src/constants';
+import {
+  UserRole,
+  editFileName,
+  imageFileFilter,
+  validateImageFile,
+} from 'src/constants';
 import { ActiveUser } from 'src/common/decorator/active-user-decorator';
 import { UserActiveInterface } from 'src/common/interface/user-active-interface';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { FilesToBodyInterceptor } from 'src/common/class/customClassMulter';
 import * as express from 'express';
-import { PORTFOLIO_SUCCESSFULLY_DELETED, PORTFOLIO_SUCCESSFULLY_UPDATED } from './message';
+import {
+  PORTFOLIO_SUCCESSFULLY_DELETED,
+  PORTFOLIO_SUCCESSFULLY_UPDATED,
+} from './message';
 
 @ApiTags('portfolio')
 @Controller('portfolio')
@@ -58,11 +67,12 @@ export class PortfolioController {
     ),
     FilesToBodyInterceptor,
   )
-  create(
+  @UseGuards(validateImageFile)
+  async create(
     @Body() createPortfolioDto: CreatePortfolioDto,
     @ActiveUser() user: UserActiveInterface,
   ) {
-    return this.portfolioService.create(createPortfolioDto, user);
+    return await this.portfolioService.create(createPortfolioDto, user);
   }
 
   @Auth(UserRole.GRADUATE)
@@ -85,6 +95,7 @@ export class PortfolioController {
     ),
     FilesToBodyInterceptor,
   )
+  @UseGuards(validateImageFile)
   async update(
     @Param('id') id: number,
     @Body() updatePortfolioDto: UpdatePortfolioDto,
