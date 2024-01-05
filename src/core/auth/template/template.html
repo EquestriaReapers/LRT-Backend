@@ -9,19 +9,19 @@
     .center-text {
       text-align: center;
       font-weight: 600;
-      /* Semi-Bold */
+
     }
 
     .first-paragraph {
       text-align: justify;
       font-weight: 500;
-      /* Medium */
+
     }
 
     .other-paragraphs {
       text-align: justify;
       font-weight: 300;
-      /* Light */
+
     }
 
     .center-button {
@@ -38,6 +38,7 @@
     }
 
     .footer {
+      margin: 0;
       height: 50px;
       background-color: #71C8E9;
     }
@@ -61,26 +62,42 @@
       width: 50px;
       background-color: #007935;
     }
+
+    .content {
+      width: 80%;
+      margin: 0 auto;
+      text-align: justify;
+    }
+
+    .image-container {
+      text-align: center;
+
+    }
   </style>
 </head>
 
 <body>
-  <table class="full-table">
+  <table class="full-table" cellspacing="0" cellpadding="0">
     <tr>
       <td class="margin-left"></td>
       <td>
-        <h1 class="center-text">Confirmación de correo</h1>
-        <p class="first-paragraph">Hola, {{user.name}}</p>
-        <p class="other-paragraphs">¡Bienvenido/a a Egresados UCAB! Tu cuenta ha sido creada con éxito, y nos complace
-          tenerte como parte de nuestra comunidad. Con tu cuenta, tendrás acceso a recursos, oportunidades de empleo,
-          eventos
-          exclusivos y la posibilidad de mantener viva tu conexión con la Universidad Católica Andrés Bello.</p>
-        <p class="other-paragraphs">Recuerda que tu cuenta es personal y confidencial, así que mantén tus credenciales
-          seguras. Si necesitas ayuda, no dudes en contactar a nuestro equipo de soporte. ¡Disfruta de todos los
-          beneficios que
-          nuestra plataforma tiene para ofrecerte en Egresados UCAB!</p>
-        <p class="other-paragraphs">¡Saludos cordiales!</p>
-        <a href="{{verificationLink}}" class="center-button">Confirmar correo</a>
+        <div class="content">
+          <div class="image-container">
+            <img src="https://www.ucab.edu.ve/wp-content/uploads/2019/04/Logo_UCAB_3.png" alt="Logo UCAB"
+              style="width: auto; height: 100px;" />
+          </div>
+          <h1 class="center-text">Confirmación de correo</h1>
+          <p class="first-paragraph">Hola, {{user.name}}</p>
+          <p class="other-paragraphs">¡Bienvenido/a a Egresados UCAB! Tu cuenta ha sido creada con éxito, y nos complace
+            tenerte como parte de nuestra comunidad. Con tu cuenta, tendrás acceso a recursos, oportunidades de empleo,
+            eventos exclusivos y la posibilidad de mantener viva tu conexión con la Universidad Católica Andrés Bello.
+          </p>
+          <p class="other-paragraphs">Recuerda que tu cuenta es personal y confidencial, así que mantén tus credenciales
+            seguras. Si necesitas ayuda, no dudes en contactar a nuestro equipo de soporte. ¡Disfruta de todos los
+            beneficios que nuestra plataforma tiene para ofrecerte en Egresados UCAB!</p>
+          <p class="other-paragraphs">¡Saludos cordiales!</p>
+          <a href="{{verificationLink}}" class="center-button">Confirmar correo</a>
+        </div>
         <div class="footer"></div>
       </td>
       <td class="margin-right"></td>
