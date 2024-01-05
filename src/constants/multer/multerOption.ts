@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { extname } from 'path';
 
 export const imageFileFilter = (req, file, callback) => {
@@ -19,11 +20,7 @@ export const editFileName = (req, file, callback) => {
 
 export function validateImageFile(req, res, next) {
   if (req.file && !req.file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-    return res
-      .status(400)
-      .send({
-        message: 'Solo se permite subir imágenes en formato .jpg, .jpeg o .png',
-      });
+    throw new BadRequestException('Solo se permite subir imagenes');
   }
   next();
 }
