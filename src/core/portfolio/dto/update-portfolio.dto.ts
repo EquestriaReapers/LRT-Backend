@@ -12,13 +12,16 @@ import { ApiProperty } from '@nestjs/swagger';
 import { ApiFile, ApiFiles } from 'src/common/class/customClassMulter';
 
 export class UpdatePortfolioDto extends PartialType(CreatePortfolioDto) {
-  @ApiProperty()
-  @IsOptional()
+  @ApiProperty({
+    required: false,
+  })
   @IsString({ message: 'El título debe ser una cadena de texto' })
+  @IsOptional()
   title: string;
 
-  @ApiProperty()
-  @IsOptional()
+  @ApiProperty({
+    required: false,
+  })
   @IsDateString(
     {},
     {
@@ -26,16 +29,21 @@ export class UpdatePortfolioDto extends PartialType(CreatePortfolioDto) {
         'La fecha de finalización debe ser una fecha válida ejem 2023-02-01',
     },
   )
-  dateEnd: Date;
-
-  @ApiProperty()
   @IsOptional()
+  dateEnd: Date | null;
+
+  @ApiProperty({
+    required: false,
+  })
   @IsString({ message: 'La ubicación debe ser una cadena de texto' })
+  @IsOptional()
   location: string;
 
-  @ApiProperty()
-  @IsOptional()
+  @ApiProperty({
+    required: false,
+  })
   @IsString({ message: 'La descripción debe ser una cadena de texto' })
+  @IsOptional()
   description: string;
 
   @ApiFiles({ required: false })

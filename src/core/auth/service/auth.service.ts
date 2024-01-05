@@ -50,13 +50,7 @@ export class AuthService {
 
   ) { }
 
-  async register({
-    email,
-    password,
-    name,
-    lastname,
-    documentNumber,
-  }: RegisterDto) {
+  async register({ email, password, name, lastname }: RegisterDto) {
     const user = await this.usersService.findOneByEmail(email);
 
     if (user) {
@@ -67,7 +61,6 @@ export class AuthService {
       email,
       password: await bcryptjs.hash(password, 10),
       name,
-      documentNumber,
       lastname,
       role: UserRole.GRADUATE,
     });
