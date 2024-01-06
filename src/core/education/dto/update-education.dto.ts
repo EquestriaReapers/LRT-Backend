@@ -24,6 +24,11 @@ export class UpdateEducationDto extends PartialType(CreateEducationDto) {
   entity: string;
 
   @ApiProperty()
+  @IsBoolean({ message: 'isVisible debe ser un valor booleano' })
+  @IsOptional()
+  isVisible: boolean;
+
+  @ApiProperty()
   @IsDateString(
     {},
     {

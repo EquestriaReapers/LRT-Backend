@@ -26,6 +26,7 @@ export class EducationService {
       ...createEducationDto,
       profileId: user.id,
       isUCAB: false,
+      isVisible: true,
     });
 
     return newEducation;
