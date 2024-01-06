@@ -55,9 +55,29 @@ export class SkillsController {
     required: false,
     description: 'A parameter. Optional',
   })
-  async findAll(@Query('name') name?: string, @Query('type') type?: SkillType) {
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'A parameter. Optional',
+  })
+  @ApiQuery({
+    name: 'exclude',
+    required: false,
+    description: 'A parameter. Optional',
+  })
+  async findAll(
+    @Query('name') name?: string,
+    @Query('type') type?: SkillType,
+    @Query('limit') limit?: number,
+    @Query('exclude') exclude?: Array<string>,
+  ) {
     try {
-      const skills = await this.skillsService.findAll(name, type);
+      const skills = await this.skillsService.findAll(
+        name,
+        type,
+        limit,
+        exclude,
+      );
 
       return skills;
     } catch (error) {
