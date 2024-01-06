@@ -32,6 +32,10 @@ export class Education {
   isUCAB: boolean;
 
   @ApiProperty()
+  @Column('bool', { default: false })
+  isVisible: boolean;
+
+  @ApiProperty()
   @Column()
   title: string;
 
