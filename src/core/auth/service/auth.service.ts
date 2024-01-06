@@ -47,7 +47,7 @@ export class AuthService {
 
     @InjectRepository(ForgotPassword)
     private readonly forgotPassword: Repository<ForgotPassword>,
-  ) {}
+  ) { }
 
   async register({ email, password, name, lastname }: RegisterDto) {
     const user = await this.usersService.findOneByEmail(email);
@@ -273,13 +273,22 @@ export class AuthService {
       );
       const source = fs.readFileSync(filePath, 'utf-8').toString();
       const template = handlebars.compile(source);
-      const replacements = {
-        user: {
-          name: userData.name,
-        },
-        resetPasswordLink: `${process.env.BACKEND_BASE_URL}/api/v1/auth/email/reset-password/${tokenModel.token}`,
-      };
-
+      let replacements;
+      if (process.env.EMAIL_LOCAL_TESTING_MODE === 'true') {
+        replacements = {
+          user: {
+            name: userData.name,
+          },
+          resetPasswordLink: `${process.env.EMAIL_LOCAL_BASE_URL}/new-password${tokenModel.token}`,
+        };
+      } else {
+        replacements = {
+          user: {
+            name: userData.name,
+          },
+          resetPasswordLink: `${process.env.FRONTEND_URL}/new-password${tokenModel.token}`,
+        };
+      }
       const htmlToSend = template(replacements);
 
       let mailOptions = {
@@ -319,16 +328,16 @@ export class AuthService {
       throw new HttpException('Token no encontrado', HttpStatus.NOT_FOUND);
     }
 
-    // Hash the new password before saving it to the database
+
     const hashedPassword = await bcryptjs.hash(newPassword, 10);
 
-    // Update the user's password
+
     await this.usersService.update(forgotPassword.user.id, {
       ...forgotPassword.user,
       password: hashedPassword,
     });
 
-    // Delete the token from the database
+
     await this.forgotPassword.delete({ token: token });
 
     return true;

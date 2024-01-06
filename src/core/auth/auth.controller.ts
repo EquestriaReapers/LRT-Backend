@@ -34,13 +34,14 @@ import { ApiInternalServerError } from 'src/common/decorator/internal-server-err
 
 import { UsersService } from '../users/service/users.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { envData } from 'src/config/datasource';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
-  ) {}
+  ) { }
 
   @Post('register')
   @ApiOkResponse({
@@ -107,9 +108,11 @@ export class AuthController {
   ) {
     const verified = await this.authService.verifyEmail(token);
     if (verified) {
-      return response.status(200).json({
-        message: SUCCESSFULY_VERIFIED_EMAIL_MESSAGE,
-      });
+      if (envData.EMAIL_LOCAL_TESTING_MODE === 'true') {
+        return response.redirect(`${envData.EMAIL_LOCAL_BASE_URL}/login`);
+      } else {
+        return response.redirect(`${envData.FRONTEND_URL}/login`);
+      }
     } else {
       return response.status(403).json({
         message: INVALID_TOKEN_EMAIL_MESSAGE,
