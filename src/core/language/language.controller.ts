@@ -25,21 +25,8 @@ import { UserRole } from 'src/constants';
 export class LanguageController {
   constructor(private readonly languageService: LanguageService) {}
 
-  @ApiTags('admin-language')
-  @Post()
-  @Auth(UserRole.ADMIN)
-  @ApiOkResponse({
-    description: 'Create a new language successfully',
-    type: Language,
-  })
-  @ApiInternalServerError()
-  create(@Body() createLanguageDto: CreateLanguageDto) {
-    return this.languageService.create(createLanguageDto);
-  }
-
   @ApiTags('language')
   @Get()
-  @Auth(UserRole.GRADUATE)
   @ApiOkResponse({
     description: 'Returns an array of ALL languages',
     type: [Language],
@@ -56,7 +43,6 @@ export class LanguageController {
 
   @ApiTags('language')
   @Get(':id')
-  @Auth(UserRole.GRADUATE)
   @ApiOkResponse({
     description: 'Return one language',
     type: Language,
@@ -67,6 +53,18 @@ export class LanguageController {
   @ApiInternalServerError()
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.languageService.findOne(id);
+  }
+
+  @ApiTags('admin-language')
+  @Post()
+  @Auth(UserRole.ADMIN)
+  @ApiOkResponse({
+    description: 'Create a new language successfully',
+    type: Language,
+  })
+  @ApiInternalServerError()
+  create(@Body() createLanguageDto: CreateLanguageDto) {
+    return this.languageService.create(createLanguageDto);
   }
 
   @ApiTags('admin-language')
