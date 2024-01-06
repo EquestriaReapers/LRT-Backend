@@ -56,6 +56,10 @@ export class SkillData {
   name: string;
   @ApiProperty({ enum: SkillType })
   type: SkillType;
+  @ApiProperty()
+  skillProfileId: number;
+  @ApiProperty()
+  isVisible: boolean;
 }
 
 export class AddSkillResponse {
@@ -101,6 +105,20 @@ export class LanguageProfileData {
   level: string;
   @ApiProperty()
   languageId: number;
+}
+
+export class SkillProfileData {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  profileId: number;
+
+  @ApiProperty()
+  skillId: number;
+
+  @ApiProperty()
+  isVisible: boolean;
 }
 
 export class ResponseProfile {
@@ -199,6 +217,32 @@ export class MethodContact {
   email: string;
 }
 
+export class PortfolioData {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  profileId: number;
+
+  @ApiProperty()
+  title: string;
+
+  @ApiProperty()
+  description: string;
+
+  @ApiProperty()
+  location: string;
+
+  @ApiProperty()
+  dateEnd: Date;
+
+  @ApiProperty()
+  imagePrincipal: string;
+
+  @ApiProperty()
+  image: string[];
+}
+
 export class ResponseMethodContactDTO {
   @ApiProperty({
     type: ProfileData,
@@ -231,6 +275,9 @@ export class ResponseProfileGet {
   @ApiProperty()
   countryResidence: string;
 
+  @ApiProperty()
+  website: string;
+
   @ApiProperty({
     type: [ExperienceData],
   })
@@ -239,7 +286,7 @@ export class ResponseProfileGet {
   @ApiProperty({
     type: [SkillData],
   })
-  skills: Skill[];
+  skills: SkillData[];
 
   @ApiProperty({
     type: [LanguageProfileDataExtend],
@@ -258,6 +305,11 @@ export class ResponseProfileGet {
     type: [EducationData],
   })
   education: EducationData[];
+
+  @ApiProperty({
+    type: [PortfolioData],
+  })
+  portfolio: PortfolioData[];
 }
 
 export class SwaggerResponsePagination {

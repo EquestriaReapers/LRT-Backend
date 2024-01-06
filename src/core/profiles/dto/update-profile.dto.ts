@@ -1,5 +1,5 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { CreateProfileDTO } from './create-profile.dto';
 import { Career } from 'src/core/career/enum/career.enum';
 
@@ -28,4 +28,9 @@ export class UpdateProfileDto extends PartialType(CreateProfileDTO) {
   @IsString({ message: 'El país de residencia debe ser una cadena de texto' })
   @IsOptional()
   countryResidence: string;
+
+  @ApiProperty()
+  @IsString({ message: 'El sitio web debe ser una cadena de texto' })
+  @IsOptional()
+  website: string;
 }

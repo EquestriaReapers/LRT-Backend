@@ -18,13 +18,6 @@ export class RegisterDto {
   lastname: string;
 
   @ApiProperty({
-    description: 'Cedula de identidad',
-  })
-  @IsString({ message: 'La cedula debe ser un string' })
-  @MinLength(2)
-  documentNumber: string;
-
-  @ApiProperty({
     description: 'Email',
   })
   @IsEmail({}, { message: 'El correo debe ser un email válido' })

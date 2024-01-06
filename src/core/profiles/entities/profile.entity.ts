@@ -17,13 +17,17 @@ import {
   EducationData,
   ExperienceData,
   LanguageProfileData,
+  PortfolioData,
   SkillData,
+  SkillProfileData,
   UserProfileData,
 } from '../dto/responses.dto';
 import { LanguageProfile } from './language-profile.entity';
 import { Career } from 'src/core/career/enum/career.enum';
 import { ContactMethod } from './contact-method.entity';
 import { Education } from 'src/core/education/entities/education.entity';
+import { Portfolio } from 'src/core/portfolio/entities/portfolio.entity';
+import { SkillsProfile } from './skills-profile.entity';
 
 @Entity()
 export class Profile {
@@ -62,6 +66,12 @@ export class Profile {
   })
   countryResidence: string;
 
+  @ApiProperty()
+  @Column({
+    nullable: true,
+  })
+  website: string;
+
   @ApiProperty({
     type: [ExperienceData],
   })
@@ -84,6 +94,12 @@ export class Profile {
   )
   languageProfile: LanguageProfile[];
 
+  @ApiProperty({
+    type: [SkillProfileData],
+  })
+  @OneToMany(() => SkillsProfile, (skillsProfile) => skillsProfile.profile)
+  skillsProfile: SkillsProfile[];
+
   @ApiProperty()
   @DeleteDateColumn()
   deletedAt: Date;
@@ -97,4 +113,8 @@ export class Profile {
   })
   @OneToMany(() => Education, (education) => education.profile)
   education: Education[];
+
+  @ApiProperty({ type: [PortfolioData] })
+  @OneToMany(() => Portfolio, (portfolio) => portfolio.profile)
+  portfolio: Portfolio[];
 }

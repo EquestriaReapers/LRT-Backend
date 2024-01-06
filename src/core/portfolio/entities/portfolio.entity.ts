@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Profile } from '../../profiles/entities/profile.entity';
+import { Profile } from 'src/core/profiles/entities/profile.entity';
 import {
   Column,
   DeleteDateColumn,
@@ -10,48 +10,45 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class Experience {
+export class Portfolio {
   @ApiProperty()
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @ApiProperty()
   @Column()
   profileId: number;
 
-  @ManyToOne(() => Profile, (profile) => profile.experience)
+  @ManyToOne(() => Profile, (profile) => profile.portfolio)
   @JoinColumn({ name: 'profileId' })
   profile: Profile;
 
   @ApiProperty()
   @Column()
-  businessName: string;
+  title: string;
 
   @ApiProperty()
-  @Column()
-  role: string;
+  @Column('text')
+  description: string;
 
   @ApiProperty()
   @Column()
   location: string;
 
   @ApiProperty()
-  @Column()
-  description: string;
-
-  @ApiProperty()
-  @Column()
-  startDate: Date;
+  @Column('date')
+  dateEnd: Date;
 
   @ApiProperty()
   @Column({
-    default: null,
+    nullable: true,
   })
-  endDate: Date;
+  imagePrincipal: string;
 
+  @ApiProperty()
+  @Column('text', { array: true, nullable: true })
+  image: string[];
+
+  @ApiProperty()
   @DeleteDateColumn()
   deletedAt: Date;
-
-  @Column({ default: true })
-  isVisible: boolean;
 }

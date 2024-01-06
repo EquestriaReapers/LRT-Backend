@@ -11,12 +11,13 @@ import ProfileTemplateAdaptator from './service/export-pdf/profile-template-adap
 import { Language } from '../language/entities/language.entity';
 import { LanguageModule } from '../language/language.module';
 import LanguagueProfileService from './service/languague-profile.service';
+import { SkillsProfile } from './entities/skills-profile.entity';
 
 @Module({
   imports: [
     UsersModule,
     LanguageModule,
-    TypeOrmModule.forFeature([Skill, LanguageProfile, Language]),
+    TypeOrmModule.forFeature([Skill, LanguageProfile, Language, SkillsProfile]),
   ],
   controllers: [ProfilesController],
   providers: [
@@ -28,4 +29,4 @@ import LanguagueProfileService from './service/languague-profile.service';
   ],
   exports: [ProfilesService],
 })
-export class ProfilesModule {}
+export class ProfilesModule { }

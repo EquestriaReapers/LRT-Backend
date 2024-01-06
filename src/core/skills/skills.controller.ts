@@ -38,6 +38,66 @@ import { UserActiveInterface } from 'src/common/interface/user-active-interface'
 export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
 
+  @ApiTags('skill')
+  @Get()
+  @ApiOkResponse({
+    description: 'Returns an array of ALL skills',
+    type: [Skill],
+  })
+  @ApiInternalServerError()
+  @ApiQuery({
+    name: 'name',
+    required: false,
+    description: 'A parameter. Optional',
+  })
+  @ApiQuery({
+    name: 'type',
+    required: false,
+    description: 'A parameter. Optional',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'A parameter. Optional',
+  })
+  @ApiQuery({
+    name: 'exclude',
+    required: false,
+    description: 'A parameter. Optional',
+  })
+  async findAll(
+    @Query('name') name?: string,
+    @Query('type') type?: SkillType,
+    @Query('limit') limit?: number,
+    @Query('exclude') exclude?: Array<string>,
+  ) {
+    try {
+      const skills = await this.skillsService.findAll(
+        name,
+        type,
+        limit,
+        exclude,
+      );
+
+      return skills;
+    } catch (error) {
+      throw new NotFoundException(INTERNAL_SERVER_ERROR);
+    }
+  }
+  @ApiTags('skill')
+  @Auth(UserRole.GRADUATE || UserRole.ADMIN)
+  @ApiOkResponse({
+    description: 'Return one skill',
+    type: Skill,
+  })
+  @ApiInternalServerError()
+  @ApiException(() => NotFoundException, {
+    description: 'Skill not found',
+  })
+  findOne(@Param('id') id: string) {
+    return this.skillsService.findOne(+id);
+  }
+
   @ApiTags('admin-skill')
   @Auth(UserRole.ADMIN)
   @Post()
@@ -73,48 +133,6 @@ export class SkillsController {
       console.log(error);
       throw new NotFoundException(INTERNAL_SERVER_ERROR);
     }
-  }
-
-  @ApiTags('skill')
-  @Auth(UserRole.GRADUATE)
-  @Get()
-  @ApiOkResponse({
-    description: 'Returns an array of ALL skills',
-    type: [Skill],
-  })
-  @ApiInternalServerError()
-  @ApiQuery({
-    name: 'name',
-    required: false,
-    description: 'A parameter. Optional',
-  })
-  @ApiQuery({
-    name: 'type',
-    required: false,
-    description: 'A parameter. Optional',
-  })
-  async findAll(@Query('name') name?: string, @Query('type') type?: SkillType) {
-    try {
-      const skills = await this.skillsService.findAll(name, type);
-
-      return skills;
-    } catch (error) {
-      throw new NotFoundException(INTERNAL_SERVER_ERROR);
-    }
-  }
-  @ApiTags('skill')
-  @Auth(UserRole.GRADUATE || UserRole.ADMIN)
-  @Get(':id')
-  @ApiOkResponse({
-    description: 'Return one skill',
-    type: Skill,
-  })
-  @ApiInternalServerError()
-  @ApiException(() => NotFoundException, {
-    description: 'Skill not found',
-  })
-  findOne(@Param('id') id: string) {
-    return this.skillsService.findOne(+id);
   }
 
   @ApiTags('admin-skill')

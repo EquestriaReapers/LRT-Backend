@@ -21,7 +21,13 @@ export class SearchService {
 
   public async getProfiles() {
     const profiles = await this.profileRepository.find({
-      relations: ['user', 'experience', 'skills', 'education'],
+      relations: [
+        'user',
+        'experience',
+        'skillsProfile',
+        'skillsProfile.skill',
+        'portfolio',
+      ],
       select: {
         user: {
           name: true,
@@ -34,7 +40,7 @@ export class SearchService {
       },
     });
 
-    return profiles;
+    return this.UserProfilePresenter(profiles);
   }
 
   async indexProfiles() {
@@ -196,6 +202,32 @@ export class SearchService {
               },
             },
           },
+          {
+            nested: {
+              path: 'portfolio',
+              query: {
+                bool: {
+                  must: {
+                    multi_match: {
+                      query: searchParam.text,
+                      fields: [
+                        'portfolio.title',
+                        'portfolio.description',
+                        'portfolio.location',
+                      ],
+                      type: 'bool_prefix',
+                      operator: 'or',
+                    },
+                  },
+                  must_not: {
+                    exists: {
+                      field: 'portfolio.deletedAt',
+                    },
+                  },
+                },
+              },
+            },
+          },
         );
       } else {
         should = [{ match_all: {} }];
@@ -272,9 +304,11 @@ export class SearchService {
         description: doc.description,
         mainTitle: doc.mainTitle,
         countryResidence: doc.countryResidence,
+        website: doc.website,
         skills: doc.skills,
         experience: doc.experience,
         education: doc.education,
+        portfolio: doc.portfolio,
       },
     ]);
 
@@ -355,5 +389,32 @@ export class SearchService {
         email: item.email,
       },
     }));
+  }
+
+  private UserProfilePresenter(profiles: Profile[]) {
+    return profiles.map((profile) => {
+      const { skillsProfile, languageProfile, ...otherProfileProps } = profile;
+
+      const mappedProfile = {
+        ...otherProfileProps,
+        languages: languageProfile
+          ? languageProfile.map(({ language, ...lp }) => ({
+              ...lp,
+              name: language.name,
+            }))
+          : [],
+        skills: skillsProfile
+          ? skillsProfile.map(({ skill, ...sp }) => ({
+              id: skill.id,
+              name: skill.name,
+              type: skill.type,
+              skillProfileId: sp.id,
+              isVisible: sp.isVisible,
+            }))
+          : [],
+      };
+
+      return mappedProfile;
+    });
   }
 }

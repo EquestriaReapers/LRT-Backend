@@ -5,13 +5,14 @@ import {
 } from '@nestjs/common';
 import { CreateSkillDto } from '../dto/create-skill.dto';
 import { UpdateSkillDto } from '../dto/update-skill.dto';
-import { ILike, Like, Repository } from 'typeorm';
-import { Skill } from '../entities/skill.entity';
+import { ILike, In, Like, Not, Repository } from 'typeorm';
+import { Skill, SkillType } from '../entities/skill.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SKILL_NOT_FOUND } from '../messages';
+import { SKILL_ALREADY_EXISTS, SKILL_NOT_FOUND } from '../messages';
 import { UserActiveInterface } from 'src/common/interface/user-active-interface';
 import { Profile } from 'src/core/profiles/entities/profile.entity';
 import { PROFILE_NOT_FOUND } from 'src/core/profiles/messages';
+import { SkillsProfile } from 'src/core/profiles/entities/skills-profile.entity';
 
 @Injectable()
 export class SkillsService {
@@ -21,6 +22,9 @@ export class SkillsService {
 
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+
+    @InjectRepository(SkillsProfile)
+    private readonly skillsProfileRepository: Repository<SkillsProfile>,
   ) {}
 
   async create(createSkillDto: CreateSkillDto) {
@@ -37,13 +41,21 @@ export class SkillsService {
     });
 
     if (skillFound) {
-      throw new ConflictException('Skill already exists');
+      if (skillFound.type === SkillType.SOFT) {
+        throw new ConflictException(`${SKILL_ALREADY_EXISTS}` + `blanda`);
+      } else {
+        throw new ConflictException(`${SKILL_ALREADY_EXISTS}` + `dura`);
+      }
+    }
+
+    if (!skill.type) {
+      skill.type = SkillType.HARD;
     }
 
     const newSkill = await this.skillsRepository.save(skill);
 
     const profile = await this.profileRepository.findOne({
-      relations: ['skills'],
+      relations: ['skillsProfile'],
       where: { userId: user.id },
     });
 
@@ -51,16 +63,25 @@ export class SkillsService {
       throw new NotFoundException(PROFILE_NOT_FOUND);
     }
 
-    profile.skills.push(newSkill);
+    const skillProfile = new SkillsProfile();
+    skillProfile.skillId = newSkill.id;
+    skillProfile.profileId = user.id;
+    skillProfile.isVisible = true;
 
-    await this.profileRepository.save(profile);
+    await this.skillsProfileRepository.save(skillProfile);
 
     return {
       skill: newSkill,
+      isVisible: skillProfile.isVisible,
     };
   }
 
-  async findAll(name?: string, type?: string) {
+  async findAll(
+    name?: string,
+    type?: string,
+    limit?: number,
+    exclude?: string[],
+  ) {
     const queryOptions: any = {};
 
     if (name) {
@@ -73,6 +94,17 @@ export class SkillsService {
       queryOptions.where = {
         ...queryOptions.where,
         type,
+      };
+    }
+
+    if (limit) {
+      queryOptions.take = limit;
+    }
+
+    if (exclude) {
+      queryOptions.where = {
+        ...queryOptions.where,
+        id: Not(In(exclude)),
       };
     }
 

@@ -35,6 +35,7 @@ export class UsersService {
       description: null,
       mainTitle: null,
       countryResidence: null,
+      website: null,
     });
 
     const token = await this.jwtPayloadService.createJwtPayload(user);
@@ -71,7 +72,6 @@ export class UsersService {
       where: { email },
       select: [
         'id',
-        'documentNumber',
         'name',
         'lastname',
         'email',

@@ -24,6 +24,7 @@
     "migration:generate": "npm run build && npm run typeorm migration:generate ./src/config/migrations/$npm_config_name",
     "migration:run": "npm run typeorm -- migration:run",
     "migration:revert": "npm run typeorm -- migration:revert",
+    "migration:runAndRevert": "npm run typeorm -- migration:run && npm run typeorm -- migration:revert",
     "schema:sync": "npm run typeorm -- schema:sync"
   },
   "dependencies": {
@@ -45,6 +46,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "dotenv": "^16.3.1",
+    "fs-extra": "^11.2.0",
     "handlebars": "^4.7.8",
     "morgan": "^1.10.0",
     "mysql2": "^2.3.3",

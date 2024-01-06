@@ -65,10 +65,26 @@ export default class ProfileExportPDFAction {
     userId: number,
   ): Promise<ResponseProfileGet> {
     const profile = await this.profileRepository.findOne({
-      where: { userId: userId },
+      where: {
+        userId: userId,
+        /*skillsProfile: {      por los momentos esto se quedara en comentario hasta que el frontend solicite quitar las cosas a la vista del pdf
+          isVisible: true,
+        },
+        languageProfile: {
+          isVisible: true,
+        },
+        experience: {
+          isVisible: true,
+        },
+        education: {
+          isVisible: true,
+        },
+        */
+      },
       relations: [
         'user',
-        'skills',
+        'skillsProfile',
+        'skillsProfile.skill',
         'experience',
         'education',
         'languageProfile',
@@ -82,15 +98,25 @@ export default class ProfileExportPDFAction {
         },
       },
     });
-    const { languageProfile, ...otherProfileProps } = profile;
 
-    return {
+    const { skillsProfile, languageProfile, ...otherProfileProps } = profile;
+
+    const mappedProfile = {
       ...otherProfileProps,
-      languages: profile.languageProfile.map(({ language, ...lp }) => ({
+      skills: skillsProfile.map(({ skill, ...sp }) => ({
+        id: skill.id,
+        name: skill.name,
+        type: skill.type,
+        skillProfileId: sp.id,
+        isVisible: sp.isVisible,
+      })),
+      languages: languageProfile.map(({ language, ...lp }) => ({
         ...lp,
         name: language.name,
       })),
     };
+
+    return mappedProfile;
   }
 
   private getTemplatePath() {

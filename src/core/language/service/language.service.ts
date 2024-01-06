@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateLanguageDto } from '../dto/create-language.dto';
 import { UpdateLanguageDto } from '../dto/update-language.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { Language } from '../entities/language.entity';
 import { ERROR_LANGUAGE_NOT_FOUND } from '../messages';
 
@@ -17,8 +17,16 @@ export class LanguageService {
     return await this.languageRepository.save(createLanguageDto);
   }
 
-  async findAll(): Promise<Language[]> {
-    return this.languageRepository.find();
+  async findAll(name?: string): Promise<Language[]> {
+    const queryOptions: any = {};
+
+    if (name) {
+      queryOptions.where = {
+        name: ILike(`%${name}%`),
+      };
+    }
+
+    return this.languageRepository.find(queryOptions);
   }
 
   async findOne(id: number): Promise<Language> {

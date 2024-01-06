@@ -45,19 +45,22 @@ import {
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { ApiQuery } from '@nestjs/swagger';
 import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
-import { LanguageLevel, LanguageProfile } from './entities/language-profile.entity';
+import {
+  LanguageLevel,
+  LanguageProfile,
+} from './entities/language-profile.entity';
 import { Career } from '../career/enum/career.enum';
 import { AddLanguageProfileDto } from './dto/add-language-profile.dto';
 import LanguagueProfileService from './service/languague-profile.service';
 import { CreateContactDto } from './dto/createContact.dto';
-import { Skill } from '../skills/entities/skill.entity';
+import { UpdateIsVisibleDto } from './dto/isVisible.dto';
 
 @Controller('profiles')
 export class ProfilesController {
   constructor(
     private readonly profilesService: ProfilesService,
     private readonly languagueProfileService: LanguagueProfileService,
-  ) { }
+  ) {}
 
   @ApiTags('profile')
   @Get('export-pdf/:id')
@@ -320,6 +323,50 @@ export class ProfilesController {
 
     return response.status(200).json({
       message: PROFILE_SUCCESFULLY_DELETE_METHOD_CONTACT,
+    });
+  }
+
+  @ApiTags('profile')
+  @Auth(UserRole.GRADUATE)
+  @ApiOkResponse({
+    description: 'Update visibility of a skill in my profile',
+    type: MessageDTO,
+  })
+  @Patch('/my-profile/skills/:id/visibility')
+  async updateSkillVisibility(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateIsVisible: UpdateIsVisibleDto,
+    @ActiveUser() user: UserActiveInterface,
+    @Response() response: express.Response,
+  ) {
+    await this.profilesService.updateVisibilitySkill(id, user, updateIsVisible);
+
+    return response.status(200).json({
+      message: 'Skill visibility successfully updated',
+    });
+  }
+
+  @ApiTags('profile')
+  @Auth(UserRole.GRADUATE)
+  @ApiOkResponse({
+    description: 'Update visibility of a language in my profile',
+    type: MessageDTO,
+  })
+  @Patch('/my-profile/languages/:id/visibility')
+  async updateLanguageVisibility(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateIsVisible: UpdateIsVisibleDto,
+    @ActiveUser() user: UserActiveInterface,
+    @Response() response: express.Response,
+  ) {
+    await this.profilesService.updateVisibilityLanguage(
+      id,
+      user,
+      updateIsVisible,
+    );
+
+    return response.status(200).json({
+      message: 'El lenguaje seleccionado ahora es visible en CV',
     });
   }
 }

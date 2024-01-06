@@ -8,6 +8,8 @@ import { SkillType } from 'src/core/skills/entities/skill.entity';
 const ContactMethodTypeToIcon = {
   [TypeContact.PHONE]: Icon.Call,
   [TypeContact.EMAIL]: Icon.Mail,
+  [TypeContact.GLOBE]: Icon.Globe,
+  
 };
 
 @Injectable()
@@ -53,6 +55,8 @@ export default class ProfileTemplateAdaptator {
         iconName: Icon.Location,
         text: profile.countryResidence,
       });
+
+
     }
 
     const otherContactMethods = [];
@@ -65,7 +69,15 @@ export default class ProfileTemplateAdaptator {
       });
     }
 
-    return [...countryLocationMethod, ...otherContactMethods];
+    const globeContactMethod = [];
+    if (profile.website) {
+      globeContactMethod.push({
+        iconName: ContactMethodTypeToIcon['globe'],
+        text: profile.website,
+      });
+    }
+
+    return [...countryLocationMethod, ...otherContactMethods, ...globeContactMethod];
   }
 
   private getTemporality(startDate: Date, endDate: Date): string {
