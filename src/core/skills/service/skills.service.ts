@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateSkillDto } from '../dto/create-skill.dto';
 import { UpdateSkillDto } from '../dto/update-skill.dto';
-import { ILike, Like, Repository } from 'typeorm';
+import { ILike, In, Like, Not, Repository } from 'typeorm';
 import { Skill, SkillType } from '../entities/skill.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SKILL_ALREADY_EXISTS, SKILL_NOT_FOUND } from '../messages';
@@ -42,9 +42,9 @@ export class SkillsService {
 
     if (skillFound) {
       if (skillFound.type === SkillType.SOFT) {
-      throw new ConflictException(`${SKILL_ALREADY_EXISTS}`+`blanda`);
+        throw new ConflictException(`${SKILL_ALREADY_EXISTS}` + `blanda`);
       } else {
-        throw new ConflictException(`${SKILL_ALREADY_EXISTS}`+`dura`);
+        throw new ConflictException(`${SKILL_ALREADY_EXISTS}` + `dura`);
       }
     }
 
@@ -76,7 +76,12 @@ export class SkillsService {
     };
   }
 
-  async findAll(name?: string, type?: string) {
+  async findAll(
+    name?: string,
+    type?: string,
+    limit?: number,
+    exclude?: string[],
+  ) {
     const queryOptions: any = {};
 
     if (name) {
@@ -89,6 +94,17 @@ export class SkillsService {
       queryOptions.where = {
         ...queryOptions.where,
         type,
+      };
+    }
+
+    if (limit) {
+      queryOptions.take = limit;
+    }
+
+    if (exclude) {
+      queryOptions.where = {
+        ...queryOptions.where,
+        id: Not(In(exclude)),
       };
     }
 
