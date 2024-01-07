@@ -106,6 +106,9 @@ export class SearchService {
 
       let { career, skills, countryResidence, language } = searchParam;
 
+      skills = this.slugifyArray(skills);
+      language = this.slugifyArray(language);
+
       if (!random) random = Math.floor(Math.random() * 1000);
 
       career = this.getValidatedCarreras(career);
@@ -640,5 +643,17 @@ export class SearchService {
       .replace(/[^\w-]+/g, '') // Remove all non-word chars
       .replace(/--+/g, '-') // Replace multiple - with single -
       .trim();
+  }
+
+  private slugifyArray(strings: string[]): string[] {
+    return strings.map((text) =>
+      text
+        .toString()
+        .toLowerCase()
+        .replace(/\s+/g, '-') // Replace spaces with -
+        .replace(/[^\w-]+/g, '') // Remove all non-word chars
+        .replace(/--+/g, '-') // Replace multiple - with single -
+        .trim(),
+    );
   }
 }

@@ -90,6 +90,19 @@ export class SkillsService {
       };
     }
 
+    if (exclude) {
+      if (!Array.isArray(exclude)) {
+        exclude = [exclude];
+      }
+
+      const excludeConditions = exclude.map((name) => ({ name: Not(name) }));
+
+      queryOptions.where = {
+        ...queryOptions.where,
+        ...excludeConditions,
+      };
+    }
+
     if (type) {
       queryOptions.where = {
         ...queryOptions.where,
@@ -99,13 +112,6 @@ export class SkillsService {
 
     if (limit) {
       queryOptions.take = limit;
-    }
-
-    if (exclude) {
-      queryOptions.where = {
-        ...queryOptions.where,
-        name: Not(In(exclude)),
-      };
     }
 
     return await this.skillsRepository.find(queryOptions);
