@@ -500,6 +500,8 @@ export class SearchService {
       },
     ]);
 
+    console.log(body);
+
     return body;
   }
 
@@ -631,6 +633,8 @@ export class SearchService {
             }))
           : [],
       };
+
+      console.log(mappedProfile);
 
       return mappedProfile;
     });
