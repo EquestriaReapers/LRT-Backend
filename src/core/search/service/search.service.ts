@@ -10,6 +10,7 @@ import { Portfolio } from 'src/core/portfolio/entities/portfolio.entity';
 import { Language } from 'src/core/language/entities/language.entity';
 import { match } from 'assert';
 import { Console } from 'console';
+import { text } from 'stream/consumers';
 
 @Injectable()
 export class SearchService {
@@ -96,10 +97,6 @@ export class SearchService {
     page: number,
     limit: number,
     random: number,
-    career: string[],
-    skills: string[],
-    countryResidence: string[],
-    language: string[],
     searchExclude: boolean,
   ) {
     try {
@@ -108,6 +105,8 @@ export class SearchService {
       let filter = [];
 
       let must = [];
+
+      let { career, skills, countryResidence, language } = searchParam;
 
       if (!random) random = Math.floor(Math.random() * 1000);
 
@@ -122,8 +121,8 @@ export class SearchService {
       if (career) {
         career.forEach((mainTitle) => {
           filter.push({
-            match: {
-              mainTitle,
+            term: {
+              mainTitleCode: mainTitle,
             },
           });
         });
@@ -136,7 +135,7 @@ export class SearchService {
               path: 'skills',
               query: {
                 term: {
-                  'skills.name': skill,
+                  'skills.nameCode': skill,
                 },
               },
             },
@@ -161,7 +160,7 @@ export class SearchService {
               path: 'language',
               query: {
                 term: {
-                  'language.name.keyword': language,
+                  'language.nameCode': language,
                 },
               },
             },
@@ -490,12 +489,14 @@ export class SearchService {
         email: doc.user.email,
         description: doc.description,
         mainTitle: doc.mainTitle,
+        mainTitleCode: doc.mainTitleCode,
         countryResidence: doc.countryResidence,
         website: doc.website,
         skills: doc.skills,
         experience: doc.experience,
         portfolio: doc.portfolio,
         education: doc.education,
+        language: doc.languages,
       },
     ]);
 
@@ -609,16 +610,19 @@ export class SearchService {
 
       const mappedProfile = {
         ...otherProfileProps,
+        mainTitleCode: profile.mainTitle,
         languages: languageProfile
           ? languageProfile.map(({ language, ...lp }) => ({
               ...lp,
               name: language.name,
+              nameCode: language.name,
             }))
           : [],
         skills: skillsProfile
           ? skillsProfile.map(({ skill, ...sp }) => ({
               id: skill.id,
               name: skill.name,
+              nameCode: skill.name,
               type: skill.type,
               skillProfileId: sp.id,
               isVisible: sp.isVisible,

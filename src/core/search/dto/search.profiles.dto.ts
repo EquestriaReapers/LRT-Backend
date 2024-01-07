@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsArray, IsOptional, IsString } from 'class-validator';
 
 export class SearchProfileDto {
   @ApiProperty({
@@ -9,4 +9,36 @@ export class SearchProfileDto {
   @IsOptional()
   @IsString()
   text: string;
+
+  @ApiProperty({
+    description: 'The name of the profiles that you want to search',
+  })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  skills: string[];
+
+  @ApiProperty({
+    description: 'The name of the profiles that you want to search',
+  })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  career: string[];
+
+  @ApiProperty({
+    description: 'The name of the profiles that you want to search',
+  })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  countryResidence: string[];
+
+  @ApiProperty({
+    description: 'The name of the profiles that you want to search',
+  })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  language: string[];
 }
