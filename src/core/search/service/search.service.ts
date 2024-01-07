@@ -7,6 +7,9 @@ import { SearchProfileDto } from '../dto/search.profiles.dto';
 import { Career } from '../../career/enum/career.enum';
 import { IndexService } from './create-index.service';
 import { Portfolio } from 'src/core/portfolio/entities/portfolio.entity';
+import { Language } from 'src/core/language/entities/language.entity';
+import { match } from 'assert';
+import { Console } from 'console';
 
 @Injectable()
 export class SearchService {
@@ -21,6 +24,9 @@ export class SearchService {
     private readonly portfolioRepository: Repository<Portfolio>,
 
     private readonly indexService: IndexService,
+
+    @InjectRepository(Language)
+    private readonly languageRepository: Repository<Language>,
   ) {}
 
   public async getProfiles() {
@@ -93,11 +99,15 @@ export class SearchService {
     career: string[],
     skills: string[],
     countryResidence: string[],
+    language: string[],
+    searchExclude: boolean,
   ) {
     try {
       const from = (page - 1) * limit;
 
       let filter = [];
+
+      let must = [];
 
       if (!random) random = Math.floor(Math.random() * 1000);
 
@@ -107,10 +117,12 @@ export class SearchService {
 
       countryResidence = await this.validateQueryArrayCountry(countryResidence);
 
+      language = await this.validateQueryArray(language);
+
       if (career) {
         career.forEach((mainTitle) => {
           filter.push({
-            match: {
+            term: {
               mainTitle,
             },
           });
@@ -123,7 +135,7 @@ export class SearchService {
             nested: {
               path: 'skills',
               query: {
-                match: {
+                term: {
                   'skills.name': skill,
                 },
               },
@@ -137,6 +149,21 @@ export class SearchService {
           filter.push({
             match: {
               countryResidence,
+            },
+          });
+        });
+      }
+
+      if (language && Array.isArray(language)) {
+        language.forEach((language) => {
+          filter.push({
+            nested: {
+              path: 'language',
+              query: {
+                term: {
+                  'language.name': language,
+                },
+              },
             },
           });
         });
@@ -428,6 +455,26 @@ export class SearchService {
 
   async deleteIndexPortfolio() {
     return await this.indexService.deleteIndexPortfolio();
+  }
+
+  private async validateQueryArray(column: string[] | null) {
+    if (column) {
+      column = Array.isArray(column) ? column : [column];
+
+      const validationQuery = await this.languageRepository.find({
+        where: {
+          name: In(column),
+        },
+      });
+
+      if (!validationQuery) {
+        throw new BadRequestException(`Valor invaldo para ${column}`);
+      }
+    } else {
+      column = null;
+    }
+
+    return column;
   }
 
   private async parseAndPrepareData() {

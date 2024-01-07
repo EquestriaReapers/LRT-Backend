@@ -7,11 +7,12 @@ import { OpensearchModule } from 'nestjs-opensearch';
 import { IndexService } from './service/create-index.service';
 import { Portfolio } from '../portfolio/entities/portfolio.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Language } from '../language/entities/language.entity';
 
 @Module({
   imports: [
     UsersModule,
-    TypeOrmModule.forFeature([Portfolio]),
+    TypeOrmModule.forFeature([Portfolio, Language]),
     OpensearchModule.forRoot({
       node: envData.ELASTIC_URL,
       auth: {
