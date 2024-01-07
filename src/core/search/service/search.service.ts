@@ -97,8 +97,7 @@ export class SearchService {
     page: number,
     limit: number,
     random: number,
-    isExclusiveSkills: boolean,
-    isExclusiveLanguages: boolean,
+    searchExclude: boolean,
   ) {
     try {
       const from = (page - 1) * limit;
@@ -119,199 +118,178 @@ export class SearchService {
 
       language = await this.validateQueryArray(language);
 
-      if (career && Array.isArray(career)) {
-        filter.push({
-          bool: {
-            should: career.map((career) => ({
-              term: {
-                mainTitleCode: career,
-              },
-            })),
-          },
-        });
-
-        if (skills && Array.isArray(skills)) {
-          if (isExclusiveSkills) {
-            skills.forEach((skill) => {
-              filter.push({
-                nested: {
-                  path: 'skills',
-                  query: {
-                    term: {
-                      'skills.nameCode': skill,
-                    },
-                  },
-                },
-              });
-            });
-          } else {
-            const shouldClauses = skills.map((skill) => ({
-              term: {
-                'skills.nameCode': skill,
-              },
-            }));
-
-            filter.push({
-              nested: {
-                path: 'skills',
-                query: {
-                  bool: {
-                    should: shouldClauses,
-                  },
-                },
-              },
-            });
-          }
-        }
-
-        if (countryResidence && Array.isArray(countryResidence)) {
+      if (career) {
+        career.forEach((mainTitle) => {
           filter.push({
-            bool: {
-              should: countryResidence.map((countryResidence) => ({
-                match: {
-                  countryResidence,
-                },
-              })),
+            term: {
+              mainTitleCode: mainTitle,
             },
           });
-        }
+        });
+      }
 
-        if (language && Array.isArray(language)) {
-          language.forEach((language) => {
-            filter.push({
-              nested: {
-                path: 'language',
-                query: {
-                  term: {
-                    'language.nameCode': language,
-                  },
+      if (skills && Array.isArray(skills)) {
+        skills.forEach((skill) => {
+          filter.push({
+            nested: {
+              path: 'skills',
+              query: {
+                term: {
+                  'skills.nameCode': skill,
                 },
               },
-            });
+            },
           });
-        }
+        });
+      }
 
-        let should: any[] = [];
+      if (countryResidence && Array.isArray(countryResidence)) {
+        countryResidence.forEach((countryResidence) => {
+          filter.push({
+            match: {
+              countryResidence,
+            },
+          });
+        });
+      }
 
-        if (
-          searchParam &&
-          searchParam.text &&
-          searchParam.text.trim().length > 0
-        ) {
-          should.push(
-            {
-              multi_match: {
-                query: searchParam.text,
-                fields: [
-                  'name',
-                  'lastname',
-                  'email',
-                  'description',
-                  'mainTitle',
-                  'countryResidence',
-                ],
-                type: 'bool_prefix',
-                operator: 'or',
-              },
-            },
-            {
-              nested: {
-                path: 'skills',
-                query: {
-                  bool: {
-                    must: {
-                      match: { 'skills.name': searchParam.text },
-                    },
-                    must_not: {
-                      exists: {
-                        field: 'skills.deletedAt',
-                      },
-                    },
-                  },
+      if (language && Array.isArray(language)) {
+        language.forEach((language) => {
+          filter.push({
+            nested: {
+              path: 'language',
+              query: {
+                term: {
+                  'language.nameCode': language,
                 },
               },
             },
-            {
-              nested: {
-                path: 'experience',
-                query: {
-                  bool: {
-                    must: {
-                      multi_match: {
-                        query: searchParam.text,
-                        fields: [
-                          'experience.businessName',
-                          'experience.role',
-                          'experience.location',
-                          'experience.description',
-                        ],
-                        type: 'bool_prefix',
-                        operator: 'or',
-                      },
-                    },
-                    must_not: {
-                      exists: {
-                        field: 'experience.deletedAt',
-                      },
-                    },
-                  },
-                },
-              },
-            },
-            {
-              nested: {
-                path: 'education',
-                query: {
-                  bool: {
-                    must: {
-                      multi_match: {
-                        query: searchParam.text,
-                        fields: ['education.title', 'education.entity'],
-                        type: 'bool_prefix',
-                        operator: 'or',
-                      },
-                    },
-                    must_not: {
-                      exists: {
-                        field: 'education.deletedAt',
-                      },
-                    },
-                  },
-                },
-              },
-            },
-            {
-              nested: {
-                path: 'portfolio',
-                query: {
-                  bool: {
-                    must: {
-                      multi_match: {
-                        query: searchParam.text,
-                        fields: [
-                          'portfolio.title',
-                          'portfolio.description',
-                          'portfolio.location',
-                        ],
-                        type: 'bool_prefix',
-                        operator: 'or',
-                      },
-                    },
-                    must_not: {
-                      exists: {
-                        field: 'portfolio.deletedAt',
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          );
-        } else {
-          should = [{ match_all: {} }];
-        }
+          });
+        });
+      }
 
-        let query: any = {
+      let should: any[] = [];
+
+      if (
+        searchParam &&
+        searchParam.text &&
+        searchParam.text.trim().length > 0
+      ) {
+        should.push(
+          {
+            multi_match: {
+              query: searchParam.text,
+              fields: [
+                'name',
+                'lastname',
+                'email',
+                'description',
+                'mainTitle',
+                'countryResidence',
+              ],
+              type: 'bool_prefix',
+              operator: 'or',
+            },
+          },
+          {
+            nested: {
+              path: 'skills',
+              query: {
+                bool: {
+                  must: {
+                    match: { 'skills.name': searchParam.text },
+                  },
+                  must_not: {
+                    exists: {
+                      field: 'skills.deletedAt',
+                    },
+                  },
+                },
+              },
+            },
+          },
+          {
+            nested: {
+              path: 'experience',
+              query: {
+                bool: {
+                  must: {
+                    multi_match: {
+                      query: searchParam.text,
+                      fields: [
+                        'experience.businessName',
+                        'experience.role',
+                        'experience.location',
+                        'experience.description',
+                      ],
+                      type: 'bool_prefix',
+                      operator: 'or',
+                    },
+                  },
+                  must_not: {
+                    exists: {
+                      field: 'experience.deletedAt',
+                    },
+                  },
+                },
+              },
+            },
+          },
+          {
+            nested: {
+              path: 'education',
+              query: {
+                bool: {
+                  must: {
+                    multi_match: {
+                      query: searchParam.text,
+                      fields: ['education.title', 'education.entity'],
+                      type: 'bool_prefix',
+                      operator: 'or',
+                    },
+                  },
+                  must_not: {
+                    exists: {
+                      field: 'education.deletedAt',
+                    },
+                  },
+                },
+              },
+            },
+          },
+          {
+            nested: {
+              path: 'portfolio',
+              query: {
+                bool: {
+                  must: {
+                    multi_match: {
+                      query: searchParam.text,
+                      fields: [
+                        'portfolio.title',
+                        'portfolio.description',
+                        'portfolio.location',
+                      ],
+                      type: 'bool_prefix',
+                      operator: 'or',
+                    },
+                  },
+                  must_not: {
+                    exists: {
+                      field: 'portfolio.deletedAt',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        );
+      } else {
+        should = [{ match_all: {} }];
+      }
+
+      let query: any = {
+        bool: {
           should,
           filter,
           must_not: {
@@ -319,45 +297,45 @@ export class SearchService {
               field: 'deletedAt',
             },
           },
-        };
+        },
+      };
 
-        query = {
-          function_score: {
-            query,
-            functions: [
-              {
-                random_score: { seed: random },
-              },
-            ],
-          },
-        };
+      query = {
+        function_score: {
+          query,
+          functions: [
+            {
+              random_score: { seed: random },
+            },
+          ],
+        },
+      };
 
-        const { body } = await this.searchClient.search({
-          index: 'profiles',
-          body: {
-            query,
-            from,
-            size: limit,
-          },
-        });
+      const { body } = await this.searchClient.search({
+        index: 'profiles',
+        body: {
+          query,
+          from,
+          size: limit,
+        },
+      });
 
-        const totalCount = body.hits.total.value;
-        const hits = body.hits.hits;
-        let data = hits.map((item: any) => item._source);
-        data = this.formatedData(data);
+      const totalCount = body.hits.total.value;
+      const hits = body.hits.hits;
+      let data = hits.map((item: any) => item._source);
+      data = this.formatedData(data);
 
-        return {
-          pagination: {
-            itemCount: body.length,
-            totalItems: totalCount,
-            itemsPerPage: limit,
-            totalPages: Math.ceil(totalCount / limit),
-            currentPage: page,
-            randomSeed: random,
-          },
-          profiles: data,
-        };
-      }
+      return {
+        pagination: {
+          itemCount: body.length,
+          totalItems: totalCount,
+          itemsPerPage: limit,
+          totalPages: Math.ceil(totalCount / limit),
+          currentPage: page,
+          randomSeed: random,
+        },
+        profiles: data,
+      };
     } catch (err) {
       throw err;
     }
