@@ -8,7 +8,6 @@ import { Career } from '../../career/enum/career.enum';
 import { IndexService } from './create-index.service';
 import { Portfolio } from 'src/core/portfolio/entities/portfolio.entity';
 import { Language } from 'src/core/language/entities/language.entity';
-import { match } from 'assert';
 
 @Injectable()
 export class SearchService {
@@ -119,228 +118,227 @@ export class SearchService {
       language = await this.validateQueryArray(language);
 
       if (career) {
-          filter.push({
-            bool: {
-              should: career.map((career) => ({
-                term: {
-                  mainTitleCode: career,
-                },
-              })),
-            },
-          }
-        );
-      
-
-      if (skills && Array.isArray(skills)) {
-        skills.forEach((skill) => {
-          filter.push({
-            nested: {
-              path: 'skills',
-              query: {
-                term: {
-                  'skills.nameCode': skill,
-                },
-              },
-            },
-          });
-        });
-      }
-
-      if (countryResidence && Array.isArray(countryResidence)) {
         filter.push({
           bool: {
-            should: countryResidence.map((countryResidence) => ({
-              match: {
-                countryResidence,
+            should: career.map((career) => ({
+              term: {
+                mainTitleCode: career,
               },
             })),
           },
         });
-      }
 
-      if (language && Array.isArray(language)) {
-        language.forEach((language) => {
-          filter.push({
-            nested: {
-              path: 'language',
-              query: {
-                term: {
-                  'language.nameCode': language,
+        if (skills && Array.isArray(skills)) {
+          skills.forEach((skill) => {
+            filter.push({
+              nested: {
+                path: 'skills',
+                query: {
+                  term: {
+                    'skills.nameCode': skill,
+                  },
                 },
               },
+            });
+          });
+        }
+
+        if (countryResidence && Array.isArray(countryResidence)) {
+          filter.push({
+            bool: {
+              should: countryResidence.map((countryResidence) => ({
+                match: {
+                  countryResidence,
+                },
+              })),
             },
           });
-        });
-      }
+        }
 
-      let should: any[] = [];
-
-      if (
-        searchParam &&
-        searchParam.text &&
-        searchParam.text.trim().length > 0
-      ) {
-        should.push(
-          {
-            multi_match: {
-              query: searchParam.text,
-              fields: [
-                'name',
-                'lastname',
-                'email',
-                'description',
-                'mainTitle',
-                'countryResidence',
-              ],
-              type: 'bool_prefix',
-              operator: 'or',
-            },
-          },
-          {
-            nested: {
-              path: 'skills',
-              query: {
-                bool: {
-                  must: {
-                    match: { 'skills.name': searchParam.text },
-                  },
-                  must_not: {
-                    exists: {
-                      field: 'skills.deletedAt',
-                    },
+        if (language && Array.isArray(language)) {
+          language.forEach((language) => {
+            filter.push({
+              nested: {
+                path: 'language',
+                query: {
+                  term: {
+                    'language.nameCode': language,
                   },
                 },
               },
-            },
-          },
-          {
-            nested: {
-              path: 'experience',
-              query: {
-                bool: {
-                  must: {
-                    multi_match: {
-                      query: searchParam.text,
-                      fields: [
-                        'experience.businessName',
-                        'experience.role',
-                        'experience.location',
-                        'experience.description',
-                      ],
-                      type: 'bool_prefix',
-                      operator: 'or',
-                    },
-                  },
-                  must_not: {
-                    exists: {
-                      field: 'experience.deletedAt',
-                    },
-                  },
-                },
-              },
-            },
-          },
-          {
-            nested: {
-              path: 'education',
-              query: {
-                bool: {
-                  must: {
-                    multi_match: {
-                      query: searchParam.text,
-                      fields: ['education.title', 'education.entity'],
-                      type: 'bool_prefix',
-                      operator: 'or',
-                    },
-                  },
-                  must_not: {
-                    exists: {
-                      field: 'education.deletedAt',
-                    },
-                  },
-                },
-              },
-            },
-          },
-          {
-            nested: {
-              path: 'portfolio',
-              query: {
-                bool: {
-                  must: {
-                    multi_match: {
-                      query: searchParam.text,
-                      fields: [
-                        'portfolio.title',
-                        'portfolio.description',
-                        'portfolio.location',
-                      ],
-                      type: 'bool_prefix',
-                      operator: 'or',
-                    },
-                  },
-                  must_not: {
-                    exists: {
-                      field: 'portfolio.deletedAt',
-                    },
-                  },
-                },
-              },
-            },
-          },
-        );
-      } else {
-        should = [{ match_all: {} }];
-      }
+            });
+          });
+        }
 
-      let query: any = {
-        bool: {
-          should,
-          filter,
-          must_not: {
-            exists: {
-              field: 'deletedAt',
-            },
-          },
-        },
-      };
+        let should: any[] = [];
 
-      query = {
-        function_score: {
-          query,
-          functions: [
+        if (
+          searchParam &&
+          searchParam.text &&
+          searchParam.text.trim().length > 0
+        ) {
+          should.push(
             {
-              random_score: { seed: random },
+              multi_match: {
+                query: searchParam.text,
+                fields: [
+                  'name',
+                  'lastname',
+                  'email',
+                  'description',
+                  'mainTitle',
+                  'countryResidence',
+                ],
+                type: 'bool_prefix',
+                operator: 'or',
+              },
             },
-          ],
-        },
-      };
+            {
+              nested: {
+                path: 'skills',
+                query: {
+                  bool: {
+                    must: {
+                      match: { 'skills.name': searchParam.text },
+                    },
+                    must_not: {
+                      exists: {
+                        field: 'skills.deletedAt',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            {
+              nested: {
+                path: 'experience',
+                query: {
+                  bool: {
+                    must: {
+                      multi_match: {
+                        query: searchParam.text,
+                        fields: [
+                          'experience.businessName',
+                          'experience.role',
+                          'experience.location',
+                          'experience.description',
+                        ],
+                        type: 'bool_prefix',
+                        operator: 'or',
+                      },
+                    },
+                    must_not: {
+                      exists: {
+                        field: 'experience.deletedAt',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            {
+              nested: {
+                path: 'education',
+                query: {
+                  bool: {
+                    must: {
+                      multi_match: {
+                        query: searchParam.text,
+                        fields: ['education.title', 'education.entity'],
+                        type: 'bool_prefix',
+                        operator: 'or',
+                      },
+                    },
+                    must_not: {
+                      exists: {
+                        field: 'education.deletedAt',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            {
+              nested: {
+                path: 'portfolio',
+                query: {
+                  bool: {
+                    must: {
+                      multi_match: {
+                        query: searchParam.text,
+                        fields: [
+                          'portfolio.title',
+                          'portfolio.description',
+                          'portfolio.location',
+                        ],
+                        type: 'bool_prefix',
+                        operator: 'or',
+                      },
+                    },
+                    must_not: {
+                      exists: {
+                        field: 'portfolio.deletedAt',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          );
+        } else {
+          should = [{ match_all: {} }];
+        }
 
-      const { body } = await this.searchClient.search({
-        index: 'profiles',
-        body: {
-          query,
-          from,
-          size: limit,
-        },
-      });
+        let query: any = {
+          bool: {
+            should,
+            filter,
+            must_not: {
+              exists: {
+                field: 'deletedAt',
+              },
+            },
+          },
+        };
 
-      const totalCount = body.hits.total.value;
-      const hits = body.hits.hits;
-      let data = hits.map((item: any) => item._source);
-      data = this.formatedData(data);
+        query = {
+          function_score: {
+            query,
+            functions: [
+              {
+                random_score: { seed: random },
+              },
+            ],
+          },
+        };
 
-      return {
-        pagination: {
-          itemCount: body.length,
-          totalItems: totalCount,
-          itemsPerPage: limit,
-          totalPages: Math.ceil(totalCount / limit),
-          currentPage: page,
-          randomSeed: random,
-        },
-        profiles: data,
-      };
+        const { body } = await this.searchClient.search({
+          index: 'profiles',
+          body: {
+            query,
+            from,
+            size: limit,
+          },
+        });
+
+        const totalCount = body.hits.total.value;
+        const hits = body.hits.hits;
+        let data = hits.map((item: any) => item._source);
+        data = this.formatedData(data);
+
+        return {
+          pagination: {
+            itemCount: body.length,
+            totalItems: totalCount,
+            itemsPerPage: limit,
+            totalPages: Math.ceil(totalCount / limit),
+            currentPage: page,
+            randomSeed: random,
+          },
+          profiles: data,
+        };
+      }
     } catch (err) {
       throw err;
     }
