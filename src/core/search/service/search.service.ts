@@ -123,7 +123,7 @@ export class SearchService {
       if (career) {
         career.forEach((mainTitle) => {
           filter.push({
-            term: {
+            match: {
               mainTitle,
             },
           });
