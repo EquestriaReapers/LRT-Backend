@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateSkillDto } from '../dto/create-skill.dto';
 import { UpdateSkillDto } from '../dto/update-skill.dto';
-import { ILike, In, Like, Not, Repository } from 'typeorm';
+import { And, ILike, In, Like, Not, Repository } from 'typeorm';
 import { Skill, SkillType } from '../entities/skill.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SKILL_ALREADY_EXISTS, SKILL_NOT_FOUND } from '../messages';
@@ -104,7 +104,7 @@ export class SkillsService {
     if (exclude) {
       queryOptions.where = {
         ...queryOptions.where,
-        id: Not(In(exclude)),
+        name: Not(In(exclude)),
       };
     }
 
