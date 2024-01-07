@@ -183,7 +183,7 @@ export class AuthService {
       const mailOptions = {
         from: '"Ucab Profile" <' + process.env.EMAIL_USER + '>',
         to: email,
-        subject: 'Verifica tu correo',
+        subject: 'Confirma tu correo electronico en UCAB Profile!',
         text: 'Verify Email',
         html: htmlToSend,
       };
