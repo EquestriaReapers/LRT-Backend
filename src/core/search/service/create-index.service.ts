@@ -45,11 +45,13 @@ export class IndexService {
               email: { type: 'text' },
               description: { type: 'text' },
               mainTitle: { type: 'text' },
+              mainTitleCode: { type: 'keyword' },
               countryResidence: { type: 'text' },
               skills: {
                 type: 'nested',
                 properties: {
-                  name: { type: 'keyword' },
+                  name: { type: 'text' },
+                  nameCode: { type: 'keyword' },
                   type: { type: 'text' },
                 },
               },
@@ -75,6 +77,14 @@ export class IndexService {
                 properties: {
                   title: { type: 'text' },
                   entity: { type: 'text' },
+                },
+              },
+              language: {
+                type: 'nested',
+                properties: {
+                  name: { type: 'text' },
+                  nameCode: { type: 'keyword' },
+                  level: { type: 'text' },
                 },
               },
             },
