@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateSkillDto } from '../dto/create-skill.dto';
 import { UpdateSkillDto } from '../dto/update-skill.dto';
-import { And, ILike, In, Like, Not, Repository } from 'typeorm';
+import { Raw, Repository } from 'typeorm';
 import { Skill, SkillType } from '../entities/skill.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SKILL_ALREADY_EXISTS, SKILL_NOT_FOUND } from '../messages';
@@ -84,22 +84,30 @@ export class SkillsService {
   ) {
     const queryOptions: any = {};
 
-    if (name) {
-      queryOptions.where = {
-        name: ILike(`%${name}%`),
-      };
-    }
-
-    if (exclude) {
+    if (name && exclude) {
       if (!Array.isArray(exclude)) {
         exclude = [exclude];
       }
 
-      const excludeConditions = exclude.map((name) => ({ name: Not(name) }));
+      queryOptions.where = {
+        name: Raw(
+          (alias) =>
+            `${alias} ILIKE '%${name}%' AND ${alias} NOT IN ('${exclude.join(
+              "','",
+            )}')`,
+        ),
+      };
+    } else if (name) {
+      queryOptions.where = {
+        name: Raw((alias) => `${alias} ILIKE '%${name}%'`),
+      };
+    } else if (exclude) {
+      if (!Array.isArray(exclude)) {
+        exclude = [exclude];
+      }
 
       queryOptions.where = {
-        ...queryOptions.where,
-        ...excludeConditions,
+        name: Raw((alias) => `${alias} NOT IN ('${exclude.join("','")}')`),
       };
     }
 
@@ -114,7 +122,11 @@ export class SkillsService {
       queryOptions.take = limit;
     }
 
-    return await this.skillsRepository.find(queryOptions);
+    try {
+      return await this.skillsRepository.find(queryOptions);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async findOne(id: number) {
