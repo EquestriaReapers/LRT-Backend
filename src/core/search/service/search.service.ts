@@ -119,14 +119,17 @@ export class SearchService {
       language = await this.validateQueryArray(language);
 
       if (career) {
-        career.forEach((mainTitle) => {
           filter.push({
-            term: {
-              mainTitleCode: mainTitle,
+            bool: {
+              should: career.map((career) => ({
+                term: {
+                  mainTitleCode: career,
+                },
+              })),
             },
-          });
-        });
-      }
+          }
+        );
+      
 
       if (skills && Array.isArray(skills)) {
         skills.forEach((skill) => {
