@@ -118,7 +118,7 @@ export class SearchService {
 
       language = await this.validateQueryArray(language);
 
-      if (career && Array.isArray(career)) {
+      if (career) {
         filter.push({
           bool: {
             should: career.map((career) => ({
@@ -311,11 +311,13 @@ export class SearchService {
         }
 
         let query: any = {
-          should,
-          filter,
-          must_not: {
-            exists: {
-              field: 'deletedAt',
+          bool: {
+            should,
+            filter,
+            must_not: {
+              exists: {
+                field: 'deletedAt',
+              },
             },
           },
         };
