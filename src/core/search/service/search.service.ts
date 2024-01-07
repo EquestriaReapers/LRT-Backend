@@ -8,6 +8,7 @@ import { Career } from '../../career/enum/career.enum';
 import { IndexService } from './create-index.service';
 import { Portfolio } from 'src/core/portfolio/entities/portfolio.entity';
 import { Language } from 'src/core/language/entities/language.entity';
+import { match } from 'assert';
 
 @Injectable()
 export class SearchService {
@@ -145,8 +146,12 @@ export class SearchService {
       if (countryResidence && Array.isArray(countryResidence)) {
         countryResidence.forEach((countryResidence) => {
           filter.push({
-            match: {
-              countryResidence,
+            bool: {
+              should: {
+                match: {
+                  countryResidence,
+                },
+              },
             },
           });
         });
