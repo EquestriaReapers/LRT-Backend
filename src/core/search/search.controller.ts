@@ -25,7 +25,6 @@ export class SearchController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'random', required: false })
-  @ApiQuery({ name: 'searchExclude', required: false })
   public async search(
     @Body() body: SearchProfileDto,
     @Query('page') page: number,
