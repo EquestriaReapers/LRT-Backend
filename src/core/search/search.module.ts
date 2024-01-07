@@ -33,5 +33,6 @@ import { UserProfilePresenter } from './service/user-profile-presenter.class';
     UserProfileCacheUpdater,
     UserProfilePresenter,
   ],
+  exports: [SearchService, IndexService, UserProfileCacheUpdater],
 })
 export class SearchModule {}
