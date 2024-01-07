@@ -612,14 +612,14 @@ export class SearchService {
           ? languageProfile.map(({ language, ...lp }) => ({
               ...lp,
               name: language.name,
-              nameCode: language.name,
+              nameCode: this.slugify(language.name),
             }))
           : [],
         skills: skillsProfile
           ? skillsProfile.map(({ skill, ...sp }) => ({
               id: skill.id,
               name: skill.name,
-              nameCode: skill.name,
+              nameCode: this.slugify(skill.name),
               type: skill.type,
               skillProfileId: sp.id,
               isVisible: sp.isVisible,
@@ -629,5 +629,15 @@ export class SearchService {
 
       return mappedProfile;
     });
+  }
+
+  private slugify(text: string) {
+    return text
+      .toString()
+      .toLowerCase()
+      .replace(/\s+/g, '-') // Replace spaces with -
+      .replace(/[^\w-]+/g, '') // Remove all non-word chars
+      .replace(/--+/g, '-') // Replace multiple - with single -
+      .trim();
   }
 }
