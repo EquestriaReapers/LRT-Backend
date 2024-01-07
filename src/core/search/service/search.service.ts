@@ -502,8 +502,6 @@ export class SearchService {
       },
     ]);
 
-    console.log(body);
-
     return body;
   }
 
