@@ -331,7 +331,11 @@ export class SearchService {
 
         let query: any = {
           bool: {
-            should,
+            must: {
+              bool: {
+                should,
+              },
+            },
             filter,
             must_not: {
               exists: {
