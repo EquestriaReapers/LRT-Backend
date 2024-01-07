@@ -31,8 +31,7 @@ export class SearchController {
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('random') random: number,
-    @Query('isExclusiveSkills') isExclusiveSkills: boolean,
-    @Query('isExclusiveLanguages') isExclusiveLanguages: boolean,
+    @Query('searchExclude') searchExclude: boolean,
   ) {
     limit = Number(limit) || 10;
     page = Number(page) || 1;
@@ -43,8 +42,7 @@ export class SearchController {
       page,
       limit,
       random,
-      isExclusiveSkills,
-      isExclusiveLanguages,
+      searchExclude,
     );
     return resp;
   }

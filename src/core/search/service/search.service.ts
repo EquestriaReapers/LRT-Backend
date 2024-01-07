@@ -96,8 +96,7 @@ export class SearchService {
     page: number,
     limit: number,
     random: number,
-    isExclusiveSkills: boolean,
-    isExclusiveLanguages: boolean,
+    searchExclude: boolean,
   ) {
     try {
       const from = (page - 1) * limit;
@@ -130,37 +129,18 @@ export class SearchService {
         });
 
         if (skills && Array.isArray(skills)) {
-          if (isExclusiveSkills) {
-            skills.forEach((skill) => {
-              filter.push({
-                nested: {
-                  path: 'skills',
-                  query: {
-                    term: {
-                      'skills.nameCode': skill,
-                    },
-                  },
-                },
-              });
-            });
-          } else {
-            const shouldClauses = skills.map((skill) => ({
-              term: {
-                'skills.nameCode': skill,
-              },
-            }));
-
+          skills.forEach((skill) => {
             filter.push({
               nested: {
                 path: 'skills',
                 query: {
-                  bool: {
-                    should: shouldClauses,
+                  term: {
+                    'skills.nameCode': skill,
                   },
                 },
               },
             });
-          }
+          });
         }
 
         if (countryResidence && Array.isArray(countryResidence)) {
