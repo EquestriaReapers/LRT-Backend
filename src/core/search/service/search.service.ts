@@ -96,7 +96,7 @@ export class SearchService {
     page: number,
     limit: number,
     random: number,
-    searchExclude: boolean,
+    isExclusiveSkills: boolean,
   ) {
     try {
       const from = (page - 1) * limit;
@@ -130,18 +130,37 @@ export class SearchService {
       }
 
       if (skills && Array.isArray(skills)) {
-        skills.forEach((skill) => {
+        if (isExclusiveSkills) {
+          skills.forEach((skill) => {
+            filter.push({
+              nested: {
+                path: 'skills',
+                query: {
+                  term: {
+                    'skills.nameCode': skill,
+                  },
+                },
+              },
+            });
+          });
+        } else {
+          const shouldClauses = skills.map((skill) => ({
+            term: {
+              'skills.nameCode': skill,
+            },
+          }));
+
           filter.push({
             nested: {
               path: 'skills',
               query: {
-                term: {
-                  'skills.nameCode': skill,
+                bool: {
+                  should: shouldClauses,
                 },
               },
             },
           });
-        });
+        }
       }
 
       if (countryResidence && Array.isArray(countryResidence)) {
