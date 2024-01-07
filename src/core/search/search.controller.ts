@@ -44,6 +44,7 @@ export class SearchController {
       limit,
       random,
       isExclusiveSkills,
+      isExclusiveLanguages,
     );
     return resp;
   }

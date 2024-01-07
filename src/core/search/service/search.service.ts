@@ -97,6 +97,7 @@ export class SearchService {
     limit: number,
     random: number,
     isExclusiveSkills: boolean,
+    isExclusiveLanguages: boolean,
   ) {
     try {
       const from = (page - 1) * limit;
@@ -176,18 +177,37 @@ export class SearchService {
       }
 
       if (language && Array.isArray(language)) {
-        language.forEach((language) => {
+        if (isExclusiveLanguages) {
+          language.forEach((language) => {
+            filter.push({
+              nested: {
+                path: 'language',
+                query: {
+                  term: {
+                    'language.nameCode': language,
+                  },
+                },
+              },
+            });
+          });
+        } else {
+          const shouldClauses = language.map((language) => ({
+            term: {
+              'language.nameCode': language,
+            },
+          }));
+
           filter.push({
             nested: {
               path: 'language',
               query: {
-                term: {
-                  'language.nameCode': language,
+                bool: {
+                  should: shouldClauses,
                 },
               },
             },
           });
-        });
+        }
       }
 
       let should: any[] = [];
