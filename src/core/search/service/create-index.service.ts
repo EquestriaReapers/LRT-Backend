@@ -49,7 +49,7 @@ export class IndexService {
               skills: {
                 type: 'nested',
                 properties: {
-                  name: { type: 'text' },
+                  name: { type: 'keyword' },
                   type: { type: 'text' },
                 },
               },

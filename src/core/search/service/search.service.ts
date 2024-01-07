@@ -136,7 +136,7 @@ export class SearchService {
               path: 'skills',
               query: {
                 term: {
-                  'skills.name.keyword': skill,
+                  'skills.name': skill,
                 },
               },
             },
