@@ -175,38 +175,19 @@ export class SearchService {
           });
         }
 
-        if (language && Array.isArray(language) && language.length > 0) {
-          if (isExclusiveLanguages) {
-            language.forEach((language) => {
-              filter.push({
-                nested: {
-                  path: 'language',
-                  query: {
-                    term: {
-                      'language.nameCode': language,
-                    },
-                  },
-                },
-              });
-            });
-          } else {
-            const shouldClauses = language.map((language) => ({
-              term: {
-                'language.nameCode': language,
-              },
-            }));
-
+        if (language && Array.isArray(language)) {
+          language.forEach((language) => {
             filter.push({
               nested: {
                 path: 'language',
                 query: {
-                  bool: {
-                    should: shouldClauses,
+                  term: {
+                    'language.nameCode': language,
                   },
                 },
               },
             });
-          }
+          });
         }
 
         let should: any[] = [];
