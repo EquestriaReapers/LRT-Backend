@@ -31,11 +31,13 @@ export class SearchService {
     const profiles = await this.profileRepository.find({
       relations: [
         'user',
-        'experience',
         'skillsProfile',
         'skillsProfile.skill',
+        'experience',
         'portfolio',
         'education',
+        'languageProfile',
+        'languageProfile.language',
       ],
       select: {
         user: {
@@ -521,8 +523,6 @@ export class SearchService {
         },
       },
     ]);
-
-    console.log(body);
 
     return body;
   }
