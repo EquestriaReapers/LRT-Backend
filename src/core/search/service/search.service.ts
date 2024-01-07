@@ -334,17 +334,11 @@ export class SearchService {
         }
 
         let query: any = {
-          bool: {
-            must: {
-              bool: {
-                should,
-              },
-            },
-            filter,
-            must_not: {
-              exists: {
-                field: 'deletedAt',
-              },
+          should,
+          filter,
+          must_not: {
+            exists: {
+              field: 'deletedAt',
             },
           },
         };
