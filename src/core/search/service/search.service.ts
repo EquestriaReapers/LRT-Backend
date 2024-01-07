@@ -118,7 +118,7 @@ export class SearchService {
 
       language = await this.validateQueryArray(language);
 
-      if (career) {
+      if (career && Array.isArray(career) && career.length > 0) {
         filter.push({
           bool: {
             should: career.map((career) => ({
@@ -129,7 +129,7 @@ export class SearchService {
           },
         });
 
-        if (skills && Array.isArray(skills)) {
+        if (skills && Array.isArray(skills) && skills.length > 0) {
           if (isExclusiveSkills) {
             skills.forEach((skill) => {
               filter.push({
