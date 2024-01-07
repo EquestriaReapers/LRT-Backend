@@ -136,7 +136,7 @@ export class SearchService {
               path: 'skills',
               query: {
                 term: {
-                  'skills.name': skill,
+                  'skills.name.keyword': skill,
                 },
               },
             },
@@ -161,7 +161,7 @@ export class SearchService {
               path: 'language',
               query: {
                 term: {
-                  'language.name': language,
+                  'language.name.keyword': language,
                 },
               },
             },
