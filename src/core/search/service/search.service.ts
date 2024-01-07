@@ -8,9 +8,6 @@ import { Career } from '../../career/enum/career.enum';
 import { IndexService } from './create-index.service';
 import { Portfolio } from 'src/core/portfolio/entities/portfolio.entity';
 import { Language } from 'src/core/language/entities/language.entity';
-import { match } from 'assert';
-import { Console } from 'console';
-import { text } from 'stream/consumers';
 
 @Injectable()
 export class SearchService {
