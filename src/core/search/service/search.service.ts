@@ -163,7 +163,11 @@ export class SearchService {
           }
         }
 
-        if (countryResidence && Array.isArray(countryResidence)) {
+        if (
+          countryResidence &&
+          Array.isArray(countryResidence) &&
+          countryResidence.length > 0
+        ) {
           filter.push({
             bool: {
               should: countryResidence.map((countryResidence) => ({
@@ -175,7 +179,7 @@ export class SearchService {
           });
         }
 
-        if (language && Array.isArray(language)) {
+        if (language && Array.isArray(language) && language.length > 0) {
           if (isExclusiveLanguages) {
             language.forEach((language) => {
               filter.push({
