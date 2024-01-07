@@ -145,8 +145,12 @@ export class SearchService {
       if (countryResidence && Array.isArray(countryResidence)) {
         countryResidence.forEach((countryResidence) => {
           filter.push({
-            match: {
-              countryResidence,
+            bool: {
+              should: {
+                match: {
+                  countryResidence,
+                },
+              },
             },
           });
         });
