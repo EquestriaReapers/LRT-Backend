@@ -106,9 +106,6 @@ export class SearchService {
 
       let { career, skills, countryResidence, language } = searchParam;
 
-      skills = this.slugifyArray(skills);
-      language = this.slugifyArray(language);
-
       if (!random) random = Math.floor(Math.random() * 1000);
 
       career = this.getValidatedCarreras(career);
@@ -470,6 +467,8 @@ export class SearchService {
       if (!validationQuery) {
         throw new BadRequestException(`Valor invaldo para ${column}`);
       }
+
+      column = this.slugifyArray(column);
     } else {
       column = null;
     }
@@ -548,6 +547,8 @@ export class SearchService {
       if (!validationQuery) {
         throw new BadRequestException(`Valor invaldo para ${relationName}`);
       }
+
+      relations = this.slugifyArray(relations);
     } else {
       relations = null;
     }
