@@ -8,6 +8,7 @@ import { Career } from '../../career/enum/career.enum';
 import { IndexService } from './create-index.service';
 import { Portfolio } from 'src/core/portfolio/entities/portfolio.entity';
 import { Language } from 'src/core/language/entities/language.entity';
+import { UserProfilePresenter } from './user-profile-presenter.class';
 
 @Injectable()
 export class SearchService {
@@ -25,6 +26,8 @@ export class SearchService {
 
     @InjectRepository(Language)
     private readonly languageRepository: Repository<Language>,
+
+    private readonly userProfilePresenter: UserProfilePresenter,
   ) {}
 
   public async getProfiles() {
@@ -51,7 +54,7 @@ export class SearchService {
       },
     });
 
-    return this.UserProfilePresenter(profiles);
+    return this.presentProfiles(profiles);
   }
 
   public async getPortfolio() {
@@ -102,9 +105,9 @@ export class SearchService {
     try {
       const from = (page - 1) * limit;
 
-      let filter = [];
+      const filter = [];
 
-      let must = [];
+      const must = [];
 
       let { career, skills, countryResidence, language } = searchParam;
 
@@ -476,7 +479,7 @@ export class SearchService {
 
       const totalCount = body.hits.total.value;
       const hits = body.hits.hits;
-      let data = hits.map((item: any) => item._source);
+      const data = hits.map((item: any) => item._source);
 
       return {
         pagination: {
@@ -652,44 +655,8 @@ export class SearchService {
     }));
   }
 
-  private UserProfilePresenter(profiles: Profile[]) {
-    return profiles.map((profile) => {
-      const { skillsProfile, languageProfile, ...otherProfileProps } = profile;
-
-      const mappedProfile = {
-        ...otherProfileProps,
-        mainTitleCode: profile.mainTitle,
-        languages: languageProfile
-          ? languageProfile.map(({ language, ...lp }) => ({
-              ...lp,
-              name: language.name,
-              nameCode: this.slugify(language.name),
-            }))
-          : [],
-        skills: skillsProfile
-          ? skillsProfile.map(({ skill, ...sp }) => ({
-              id: skill.id,
-              name: skill.name,
-              nameCode: this.slugify(skill.name),
-              type: skill.type,
-              skillProfileId: sp.id,
-              isVisible: sp.isVisible,
-            }))
-          : [],
-      };
-
-      return mappedProfile;
-    });
-  }
-
-  private slugify(text: string) {
-    return text
-      .toString()
-      .toLowerCase()
-      .replace(/\s+/g, '-') // Replace spaces with -
-      .replace(/[^\w-]+/g, '') // Remove all non-word chars
-      .replace(/--+/g, '-') // Replace multiple - with single -
-      .trim();
+  private presentProfiles(profiles: Profile[]) {
+    return profiles.map((profile) => this.userProfilePresenter.format(profile));
   }
 
   private slugifyArray(strings: string[]): string[] {

@@ -8,6 +8,8 @@ import { IndexService } from './service/create-index.service';
 import { Portfolio } from '../portfolio/entities/portfolio.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Language } from '../language/entities/language.entity';
+import { UserProfileCacheUpdater } from './service/user-profile-cache-updater.class';
+import { UserProfilePresenter } from './service/user-profile-presenter.class';
 
 @Module({
   imports: [
@@ -25,6 +27,11 @@ import { Language } from '../language/entities/language.entity';
     }),
   ],
   controllers: [SearchController],
-  providers: [SearchService, IndexService],
+  providers: [
+    SearchService,
+    IndexService,
+    UserProfileCacheUpdater,
+    UserProfilePresenter,
+  ],
 })
 export class SearchModule {}
