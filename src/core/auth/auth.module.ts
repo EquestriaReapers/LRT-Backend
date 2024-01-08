@@ -7,6 +7,7 @@ import { envData } from '../../config/datasource';
 import { EmailVerificationEntity } from './entities/emailverification.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtPayloadService } from '../../common/service/jwt.payload.service';
+import { ForgotPassword } from './entities/forgotpassword.entity';
 
 @Module({
   imports: [
@@ -16,10 +17,10 @@ import { JwtPayloadService } from '../../common/service/jwt.payload.service';
       secret: envData.JWTSECRET,
       signOptions: { expiresIn: '31d' },
     }),
-    TypeOrmModule.forFeature([EmailVerificationEntity]),
+    TypeOrmModule.forFeature([EmailVerificationEntity, ForgotPassword]),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtPayloadService],
   exports: [AuthService],
 })
-export class AuthModule {}
+export class AuthModule { }
