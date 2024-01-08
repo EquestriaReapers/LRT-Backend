@@ -270,7 +270,7 @@ export class ResponseProfileGet {
   description: string;
 
   @ApiProperty()
-  mainTitle: Career;
+  mainTitle: string;
 
   @ApiProperty()
   countryResidence: string;
