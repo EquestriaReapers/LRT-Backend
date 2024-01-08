@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { envData } from 'src/config/datasource';
+import { CareerI } from '../carrer.interface';
 
 @Injectable()
 export class CareerService {
@@ -18,7 +19,7 @@ export class CareerService {
       .toPromise()
       .then((response) => response.data);
 
-    return careers;
+    return this.convertToDictinoary(await careers);
   }
 
   async findOneByid(id: number) {
@@ -27,6 +28,20 @@ export class CareerService {
       .toPromise()
       .then((response) => response.data);
 
-    return career;
+    return this.slugToName(career.name);
+  }
+
+  private convertToDictinoary(career: CareerI[]): Record<string, string> {
+    const dictionary: Record<string, string> = {};
+    career.forEach((c) => {
+      dictionary[c.name] = this.slugToName(c.name);
+    });
+    return dictionary;
+  }
+  // input ingenieria-iunformatica --> ouput: Ingenieria informatica
+  private slugToName(slug: string): string {
+    const words = slug.split('-');
+    const capitalizedWords = words.map((w) => w[0].toUpperCase() + w.slice(1));
+    return capitalizedWords.join(' ');
   }
 }
