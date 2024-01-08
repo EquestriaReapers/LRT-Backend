@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -170,6 +171,14 @@ export default class ProfilesService {
       throw new NotFoundException(ERROR_PROFILE_SKILL_NOT_FOUND);
     }
 
+    const existingSkillProfile = profile.skillsProfile.find(
+      (skillProfile) => skillProfile.skillId === skillId,
+    );
+
+    if (existingSkillProfile) {
+      throw new ConflictException('Esta habilidad ya existe en el perfil');
+    }
+
     const skillProfile = new SkillsProfile();
     skillProfile.skillId = skillId;
     skillProfile.profileId = user.id;
@@ -184,7 +193,6 @@ export default class ProfilesService {
 
     return response;
   }
-
   async removeSkillProfile(
     skillId: number,
     user: UserActiveInterface,
