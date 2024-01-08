@@ -543,7 +543,7 @@ export class SearchService {
         email: doc.user.email,
         description: doc.description,
         mainTitle: doc.mainTitle,
-        mainTitleCode: doc.mainTitleCode,
+        mainTitleCode: this.slugify(doc.mainTitle),
         countryResidence: doc.countryResidence,
         website: doc.website,
         skills: doc.skills,
@@ -629,26 +629,12 @@ export class SearchService {
   }
 
   private async getValidatedCarreras(_carrerasRaw: any) {
-    let careers = await this.httpService
-      .get(`${envData.API_BANNER_URL}career`)
-      .toPromise()
-      .then((response) => response.data);
-
-    careers = this.slugifyArray(careers.name);
-
     if (_carrerasRaw) {
       const carrerasRaw = Array.isArray(_carrerasRaw)
         ? _carrerasRaw
         : [_carrerasRaw];
       return carrerasRaw.map((carreraRaw: string) => {
         const carreraLower = carreraRaw.toLowerCase();
-
-        if (!careers.includes(carreraLower)) {
-          throw new Error(
-            `La carrera ${carreraLower} no está incluida en la lista de carreras válidas`,
-          );
-        }
-
         return carreraLower;
       });
     }
@@ -669,6 +655,19 @@ export class SearchService {
 
   private presentProfiles(profiles: Profile[]) {
     return profiles.map((profile) => this.userProfilePresenter.format(profile));
+  }
+
+  private slugify(text: string | null) {
+    if (text) {
+      return text
+        .toString()
+        .toLowerCase()
+        .replace(/\s+/g, '-') // Replace spaces with -
+        .replace(/[^\w-]+/g, '') // Remove all non-word chars
+        .replace(/--+/g, '-') // Replace multiple - with single -
+        .trim();
+    }
+    return null;
   }
 
   private slugifyArray(strings: string[]): string[] {
