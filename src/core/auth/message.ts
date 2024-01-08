@@ -9,6 +9,7 @@ export const NO_TOKEN_PROVIDED_MESSAGE = 'No proporciono un token';
 export const INVALID_TOKEN = 'Token invalido';
 export const UNAUTHROIZED_BAD_REQUEST_MESSAGE =
   'Correo o contraseña incorrecta';
+export const UNAUTHROIZED_VERFICATION_MESSAGE = 'Correo no verificado';
 export const ERROR_ON_DECODE_JWT_CODE_MESSAGE = 'Error al decodificar el token';
 export const YOU_NOT_HAVE_PERMISSION_MESSAGE = 'No tienes permiso';
 export const USER_NOT_FOUND_BANNER = 'Usuario no se encuentra en Banner';

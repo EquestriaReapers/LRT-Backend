@@ -30,6 +30,7 @@ import {
   RESET_PASSWORD_EMAIL_SENDED_RECENTLY,
   SUCCESSFULY_SEND_EMAIL_VERIFICATION_MESSAGE,
   UNAUTHROIZED_BAD_REQUEST_MESSAGE,
+  UNAUTHROIZED_VERFICATION_MESSAGE,
   USER_ALREADY_EXISTS_MESSAGE,
   USER_NOT_FOUND_BANNER,
 } from '../message';
@@ -49,7 +50,7 @@ export class AuthService {
 
     @InjectRepository(ForgotPassword)
     private readonly forgotPassword: Repository<ForgotPassword>,
-  ) { }
+  ) {}
 
   async register({ email, password }: RegisterDto) {
     const user = await this.usersService.findOneByEmail(email);
@@ -96,7 +97,7 @@ export class AuthService {
     const isPasswordValid = await bcryptjs.compare(password, user.password);
 
     if (!user.verified) {
-      throw new UnauthorizedException(UNAUTHROIZED_BAD_REQUEST_MESSAGE);
+      throw new UnauthorizedException(UNAUTHROIZED_VERFICATION_MESSAGE);
     }
 
     if (!isPasswordValid) {
@@ -345,15 +346,12 @@ export class AuthService {
       throw new HttpException('Token no encontrado', HttpStatus.NOT_FOUND);
     }
 
-
     const hashedPassword = await bcryptjs.hash(newPassword, 10);
-
 
     await this.usersService.update(forgotPassword.user.id, {
       ...forgotPassword.user,
       password: hashedPassword,
     });
-
 
     await this.forgotPassword.delete({ token: token });
 
