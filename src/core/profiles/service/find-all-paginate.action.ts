@@ -12,12 +12,16 @@ import {
 } from '../dto/responses.dto';
 import { FindAllPayload } from '../dto/find-all-payload.interface';
 import { Career } from 'src/core/career/enum/career.enum';
+import { HttpService } from '@nestjs/axios';
+import { envData } from 'src/config/datasource';
 
 @Injectable()
 export default class FindAllPaginateAction {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+
+    private readonly httpService: HttpService,
   ) {}
 
   async execute({
@@ -30,7 +34,7 @@ export default class FindAllPaginateAction {
     const { page, limit, skip } = this.getPaginationData(opt);
     if (!random) random = Math.random();
 
-    carrera = await this.validateCarrera(carrera);
+    carrera = await this.getValidatedCarreras(carrera);
 
     skills = await this.validateQueryArrayRelation(skills, 'skills');
 
@@ -68,7 +72,7 @@ export default class FindAllPaginateAction {
     random: number,
     limit: number,
     skip: number,
-    carrera: Career[],
+    carrera: string[],
     skills: string[],
     countryResidence: string[],
   ): Promise<Profile[]> {
@@ -258,25 +262,28 @@ export default class FindAllPaginateAction {
     return column;
   }
 
-  private async validateCarrera(carrera: any) {
-    if (carrera) {
-      carrera = Array.isArray(carrera) ? carrera : [carrera];
+  private async getValidatedCarreras(_carrerasRaw: any) {
+    let careers = await this.httpService
+      .get(`${envData.API_BANNER_URL}career`)
+      .toPromise()
+      .then((response) => response.data);
 
-      carrera = carrera.map((c: string) => {
-        const carreraLower = c.toLowerCase() as Career;
+    if (_carrerasRaw) {
+      const carrerasRaw = Array.isArray(_carrerasRaw)
+        ? _carrerasRaw
+        : [_carrerasRaw];
+      return carrerasRaw.map((carreraRaw: string) => {
+        const carreraLower = carreraRaw.toLowerCase();
 
-        if (!Object.values(Career).includes(carreraLower)) {
-          throw new BadRequestException(
-            `Valor inválido para carrera: ${carreraLower}`,
+        if (!careers.includes(carreraLower)) {
+          throw new Error(
+            `La carrera ${carreraLower} no está incluida en la lista de carreras válidas`,
           );
         }
 
         return carreraLower;
       });
-    } else {
-      carrera = null;
     }
-
-    return carrera;
+    return null;
   }
 }

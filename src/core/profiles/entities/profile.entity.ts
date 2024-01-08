@@ -52,13 +52,11 @@ export class Profile {
   })
   description: string;
 
-  @ApiProperty({ enum: Career })
+  @ApiProperty()
   @Column({
-    type: 'enum',
-    enum: Career,
     nullable: true,
   })
-  mainTitle: Career;
+  mainTitle: string;
 
   @ApiProperty()
   @Column({

@@ -7,6 +7,7 @@ import { OpensearchModule } from 'nestjs-opensearch';
 import { IndexService } from './service/create-index.service';
 import { Portfolio } from '../portfolio/entities/portfolio.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { HttpModule } from '@nestjs/axios';
 import { Language } from '../language/entities/language.entity';
 import { UserProfileCacheUpdater } from './service/user-profile-cache-updater.class';
 import { UserProfilePresenter } from './service/user-profile-presenter.class';
@@ -14,6 +15,7 @@ import { UserProfilePresenter } from './service/user-profile-presenter.class';
 @Module({
   imports: [
     UsersModule,
+    HttpModule,
     TypeOrmModule.forFeature([Portfolio, Language]),
     OpensearchModule.forRoot({
       node: envData.ELASTIC_URL,

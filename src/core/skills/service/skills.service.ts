@@ -42,9 +42,9 @@ export class SkillsService {
 
     if (skillFound) {
       if (skillFound.type === SkillType.SOFT) {
-        throw new ConflictException(`${SKILL_ALREADY_EXISTS}` + `blanda`);
+        throw new ConflictException(`${SKILL_ALREADY_EXISTS}` + ` blanda`);
       } else {
-        throw new ConflictException(`${SKILL_ALREADY_EXISTS}` + `dura`);
+        throw new ConflictException(`${SKILL_ALREADY_EXISTS}` + ` dura`);
       }
     }
 

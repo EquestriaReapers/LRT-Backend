@@ -86,7 +86,18 @@ export default class ProfilesService {
       order: {
         id: 'DESC',
         experience: {
-          id: 'DESC',
+          id: 'ASC',
+        },
+        education: {
+          id: 'ASC',
+        },
+        portfolio: {
+          id: 'ASC',
+        },
+        skillsProfile: {
+          skill: {
+            id: 'ASC',
+          },
         },
       },
     });
