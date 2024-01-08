@@ -634,6 +634,8 @@ export class SearchService {
       .toPromise()
       .then((response) => response.data);
 
+    careers = this.slugifyArray(careers);
+
     if (_carrerasRaw) {
       const carrerasRaw = Array.isArray(_carrerasRaw)
         ? _carrerasRaw
