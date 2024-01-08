@@ -35,6 +35,9 @@ export const envData = {
   ELASTIC_PASSWORD: configService.get('ELASTIC_PASSWORD'),
   API_COUNTRY_KEY: configService.get('API_COUNTRY_KEY'),
   API_BANNER_URL: configService.get('API_BANNER_URL'),
+  FRONTEND_URL: configService.get('FRONTEND_URL'),
+  EMAIL_LOCAL_TESTING_MODE: configService.get('EMAIL_LOCAL_TESTING_MODE'),
+  EMAIL_LOCAL_BASE_URL: configService.get('EMAIL_LOCAL_BASE_URL'),
 };
 
 export const AppOS = new DataSource(DataSourceConfig);

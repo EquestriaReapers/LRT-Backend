@@ -25,17 +25,13 @@ export class SearchController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'random', required: false })
-  @ApiQuery({ name: 'career', required: false })
-  @ApiQuery({ name: 'skills', required: false })
-  @ApiQuery({ name: 'countryResidence', required: false })
   public async search(
     @Body() body: SearchProfileDto,
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('random') random: number,
-    @Query('career') career: Career[],
-    @Query('skills') skills: string[],
-    @Query('countryResidence') countryResidence: string[],
+    @Query('isExclusiveSkills') isExclusiveSkills: boolean,
+    @Query('isExclusiveLanguages') isExclusiveLanguages: boolean,
   ) {
     limit = Number(limit) || 10;
     page = Number(page) || 1;
@@ -46,9 +42,8 @@ export class SearchController {
       page,
       limit,
       random,
-      career,
-      skills,
-      countryResidence,
+      isExclusiveSkills,
+      isExclusiveLanguages,
     );
     return resp;
   }
