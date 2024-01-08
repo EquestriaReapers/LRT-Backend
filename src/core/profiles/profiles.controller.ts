@@ -49,7 +49,6 @@ import {
   LanguageLevel,
   LanguageProfile,
 } from './entities/language-profile.entity';
-import { Career } from '../career/enum/career.enum';
 import { AddLanguageProfileDto } from './dto/add-language-profile.dto';
 import LanguagueProfileService from './service/languague-profile.service';
 import { CreateContactDto } from './dto/createContact.dto';
@@ -102,7 +101,7 @@ export class ProfilesController {
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('random') random: number,
-    @Query('carrera') carrera: Career[],
+    @Query('carrera') carrera: string[],
     @Query('skills') skills: string[],
     @Query('countryResidence') countryResidence: string[],
   ) {

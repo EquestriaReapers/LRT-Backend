@@ -1,6 +1,6 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { CareerService } from './service/career.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('career')
 @Controller('career')
@@ -8,12 +8,13 @@ export class CareerController {
   constructor(private readonly careerService: CareerService) {}
 
   @Get('')
-  findAll() {
-    return this.careerService.findAll();
+  @ApiQuery({ name: 'search', required: false })
+  findAll(@Query('search') search: string) {
+    return this.careerService.findAll(search);
   }
 
-  @Get('/:name')
-  findOneByName(@Param('name') name: string) {
-    return this.careerService.findOneByName(name);
+  @Get('/:id')
+  findOneByName(@Param('id') id: number) {
+    return this.careerService.findOneByid(id);
   }
 }

@@ -7,12 +7,14 @@ import { User } from './entities/user.entity';
 import { ConfigService } from '@nestjs/config';
 import { Profile } from '../profiles/entities/profile.entity';
 import { JwtPayloadService } from '../../common/service/jwt.payload.service';
-import { config } from 'dotenv';
+import { HttpModule } from '@nestjs/axios';
+import { Education } from '../education/entities/education.entity';
 
 const configService = new ConfigService();
 
 @Module({
   imports: [
+    HttpModule,
     DbValidatorsModule.register({
       type: configService.get('DB_TYPE'),
       host: configService.get('DB_HOST'),
@@ -21,7 +23,7 @@ const configService = new ConfigService();
       password: configService.get('DB_PASSWORD'),
       database: configService.get('DB_NAME'),
     }),
-    TypeOrmModule.forFeature([User, Profile]),
+    TypeOrmModule.forFeature([User, Profile, Education]),
   ],
   controllers: [UsersController],
   providers: [UsersService, JwtPayloadService],

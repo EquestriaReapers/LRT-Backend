@@ -4,9 +4,10 @@ import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InjectOpensearchClient, OpensearchClient } from 'nestjs-opensearch';
 import { SearchProfileDto } from '../dto/search.profiles.dto';
-import { Career } from '../../career/enum/career.enum';
 import { IndexService } from './create-index.service';
 import { Portfolio } from 'src/core/portfolio/entities/portfolio.entity';
+import { HttpService } from '@nestjs/axios';
+import { envData } from 'src/config/datasource';
 import { Language } from 'src/core/language/entities/language.entity';
 import { UserProfilePresenter } from './user-profile-presenter.class';
 
@@ -24,6 +25,7 @@ export class SearchService {
 
     private readonly indexService: IndexService,
 
+    private readonly httpService: HttpService,
     @InjectRepository(Language)
     private readonly languageRepository: Repository<Language>,
 
@@ -113,7 +115,7 @@ export class SearchService {
 
       if (!random) random = Math.floor(Math.random() * 1000);
 
-      career = this.getValidatedCarreras(career);
+      career = await this.getValidatedCarreras(career);
 
       skills = await this.validateQueryArrayRelation(skills, 'skills');
 
@@ -540,7 +542,7 @@ export class SearchService {
         email: doc.user.email,
         description: doc.description,
         mainTitle: doc.mainTitle,
-        mainTitleCode: doc.mainTitleCode,
+        mainTitleCode: this.slugify(doc.mainTitle),
         countryResidence: doc.countryResidence,
         website: doc.website,
         skills: doc.skills,
@@ -625,18 +627,13 @@ export class SearchService {
     return column;
   }
 
-  private getValidatedCarreras(_carrerasRaw: any) {
+  private async getValidatedCarreras(_carrerasRaw: any) {
     if (_carrerasRaw) {
       const carrerasRaw = Array.isArray(_carrerasRaw)
         ? _carrerasRaw
         : [_carrerasRaw];
       return carrerasRaw.map((carreraRaw: string) => {
-        const carreraLower = carreraRaw.toLowerCase() as Career;
-        if (!Object.values(Career).includes(carreraLower)) {
-          throw new BadRequestException(
-            `Valor inválido para carrera: ${carreraLower}`,
-          );
-        }
+        const carreraLower = carreraRaw.toLowerCase();
         return carreraLower;
       });
     }
@@ -657,6 +654,19 @@ export class SearchService {
 
   private presentProfiles(profiles: Profile[]) {
     return profiles.map((profile) => this.userProfilePresenter.format(profile));
+  }
+
+  private slugify(text: string | null) {
+    if (text) {
+      return text
+        .toString()
+        .toLowerCase()
+        .replace(/\s+/g, '-') // Replace spaces with -
+        .replace(/[^\w-]+/g, '') // Remove all non-word chars
+        .replace(/--+/g, '-') // Replace multiple - with single -
+        .trim();
+    }
+    return null;
   }
 
   private slugifyArray(strings: string[]): string[] {

@@ -70,7 +70,7 @@ export class AddSkillResponse {
   @ApiProperty()
   description: string;
   @ApiProperty()
-  mainTitle: Career;
+  mainTitle: string;
   @ApiProperty()
   countryResidence: string;
   @ApiProperty()
@@ -137,7 +137,7 @@ export class ResponseProfile {
   description: string;
 
   @ApiProperty()
-  mainTitle: Career;
+  mainTitle: string;
 
   @ApiProperty()
   countryResidence: string;
@@ -194,7 +194,7 @@ export class ProfileData {
   @ApiProperty()
   description: string;
   @ApiProperty()
-  mainTitle: Career;
+  mainTitle: string;
   @ApiProperty()
   countryResidence: string;
   @ApiProperty()
