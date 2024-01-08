@@ -28,6 +28,7 @@ import { SkillsProfile } from '../entities/skills-profile.entity';
 import { LanguageProfile } from '../entities/language-profile.entity';
 import { ERROR_LANGUAGE_NOT_FOUND } from 'src/core/language/messages';
 import { UpdateIsVisibleDto } from '../dto/isVisible.dto';
+import { UserProfileCacheUpdater } from 'src/core/search/service/user-profile-cache-updater.class';
 
 @Injectable()
 export default class ProfilesService {
@@ -49,6 +50,7 @@ export default class ProfilesService {
 
     private readonly findAllPaginateAction: FindAllPaginateAction,
     private readonly exportPdfAction: ExportPDFAction,
+    private readonly userProfileCacheUpdater: UserProfileCacheUpdater,
   ) {}
 
   async findAllPaginate(
@@ -138,6 +140,9 @@ export default class ProfilesService {
       }
     }
 
+    // Update profile cache
+    await this.userProfileCacheUpdater.updateOneProfile(user.id);
+
     return;
   }
 
@@ -161,7 +166,12 @@ export default class ProfilesService {
 
     profile.skillsProfile.push(skillProfile);
 
-    return await this.skillsProfileRepository.save(skillProfile);
+    const response = await this.skillsProfileRepository.save(skillProfile);
+
+    // Update profile cache
+    await this.userProfileCacheUpdater.updateOneProfile(user.id);
+
+    return response;
   }
 
   async removeSkillProfile(
@@ -186,6 +196,10 @@ export default class ProfilesService {
     }
 
     await this.skillsProfileRepository.remove(skillProfile);
+
+    // Update profile cache
+    await this.userProfileCacheUpdater.updateOneProfile(user.id);
+
     return;
   }
 
@@ -230,6 +244,9 @@ export default class ProfilesService {
       }
     }
 
+    // Update profile cache
+    await this.userProfileCacheUpdater.updateOneProfile(userId);
+
     return;
   }
 
@@ -237,6 +254,9 @@ export default class ProfilesService {
     const profile = await this.profileRepository.softDelete(id);
 
     if (!profile) throw new NotFoundException(PROFILE_NOT_FOUND);
+
+    // Update profile cache
+    await this.userProfileCacheUpdater.updateOneProfile(id);
 
     return profile;
   }
