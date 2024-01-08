@@ -98,7 +98,6 @@ export class PortfolioService {
     if (!updatePortfolioDto.hasOwnProperty('imagePrincipal')) {
       newPathPrincipal = portfolio.imagePrincipal;
     }
-
     if (!updatePortfolioDto.hasOwnProperty('image')) {
       newPaths = portfolio.image;
     }

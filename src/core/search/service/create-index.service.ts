@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectOpensearchClient, OpensearchClient } from 'nestjs-opensearch';
+import { map } from 'rxjs';
 
 @Injectable()
 export class IndexService {
@@ -8,7 +9,7 @@ export class IndexService {
     private readonly searchClient: OpensearchClient,
   ) {}
 
-  async createIndex() {
+  async createIndexProfile() {
     const checkIndex = await this.searchClient.indices.exists({
       index: 'profiles',
     });
@@ -44,11 +45,13 @@ export class IndexService {
               email: { type: 'text' },
               description: { type: 'text' },
               mainTitle: { type: 'text' },
+              mainTitleCode: { type: 'keyword' },
               countryResidence: { type: 'text' },
               skills: {
                 type: 'nested',
                 properties: {
                   name: { type: 'text' },
+                  nameCode: { type: 'keyword' },
                   type: { type: 'text' },
                 },
               },
@@ -69,6 +72,71 @@ export class IndexService {
                   location: { type: 'text' },
                 },
               },
+              education: {
+                type: 'nested',
+                properties: {
+                  title: { type: 'text' },
+                  entity: { type: 'text' },
+                },
+              },
+              language: {
+                type: 'nested',
+                properties: {
+                  name: { type: 'text' },
+                  nameCode: { type: 'keyword' },
+                  level: { type: 'text' },
+                },
+              },
+            },
+          },
+        },
+      });
+    }
+  }
+
+  async createIndexPortfolio() {
+    const checkIndex = await this.searchClient.indices.exists({
+      index: 'portfolio',
+    });
+
+    if (checkIndex.statusCode === 404) {
+      const index = await this.searchClient.indices.create({
+        index: 'portfolio',
+        body: {
+          settings: {
+            analysis: {
+              filter: {
+                autocomplete_filter: {
+                  type: 'edge_ngram',
+                  min_gram: 1,
+                  max_gram: 20,
+                },
+              },
+              analyzer: {
+                autocomplete: {
+                  type: 'custom',
+                  tokenizer: 'standard',
+                  filter: ['lowercase', 'autocomplete_filter'],
+                },
+              },
+            },
+          },
+          mappings: {
+            properties: {
+              id: { type: 'integer' },
+              profileId: { type: 'integer' },
+              title: { type: 'text' },
+              description: { type: 'text' },
+              location: { type: 'text' },
+              dateEnd: { type: 'date' },
+              profile: {
+                type: 'nested',
+                properties: {
+                  name: { type: 'text' },
+                  lastname: { type: 'text' },
+                  mainTitle: { type: 'text' },
+                },
+              },
             },
           },
         },
@@ -79,6 +147,14 @@ export class IndexService {
   async deleteIndex() {
     const resp = await this.searchClient.indices.delete({
       index: 'profiles',
+    });
+
+    return resp;
+  }
+
+  async deleteIndexPortfolio() {
+    const resp = await this.searchClient.indices.delete({
+      index: 'portfolio',
     });
 
     return resp;

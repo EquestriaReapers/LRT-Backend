@@ -9,6 +9,7 @@ import {
   NotFoundException,
   Response,
   Query,
+  HttpException,
 } from '@nestjs/common';
 import { SkillsService } from './service/skills.service';
 import { CreateSkillDto } from './dto/create-skill.dto';
@@ -130,8 +131,7 @@ export class SkillsController {
 
       return response;
     } catch (error) {
-      console.log(error);
-      throw new NotFoundException(INTERNAL_SERVER_ERROR);
+      throw new HttpException(error.message, error.status);
     }
   }
 

@@ -9,6 +9,7 @@ import { PortfolioController } from './portfolio.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Portfolio } from './entities/portfolio.entity';
 import { Profile } from '../profiles/entities/profile.entity';
+import { CleanBodyMiddleware } from 'src/common/utils/clean-body';
 import { validateImageFile } from 'src/constants';
 
 @Module({
@@ -18,6 +19,7 @@ import { validateImageFile } from 'src/constants';
 })
 export class PortfolioModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CleanBodyMiddleware).forRoutes(PortfolioController);
     consumer
       .apply(validateImageFile)
       .forRoutes(
