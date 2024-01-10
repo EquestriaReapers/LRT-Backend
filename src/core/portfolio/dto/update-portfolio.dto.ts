@@ -53,4 +53,9 @@ export class UpdatePortfolioDto extends PartialType(CreatePortfolioDto) {
   @ApiFile({ required: false })
   @IsOptional()
   imagePrincipal: Express.Multer.File;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString({ message: 'La URL debe ser una cadena de texto' })
+  url: string;
 }

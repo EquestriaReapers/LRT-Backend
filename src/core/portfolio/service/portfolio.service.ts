@@ -18,7 +18,7 @@ export class PortfolioService {
     private readonly portfolioRepository: Repository<Portfolio>,
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-  ) {}
+  ) { }
 
   async create(
     createPortfolioDto: CreatePortfolioDto,
@@ -61,6 +61,7 @@ export class PortfolioService {
       profileId: user.id,
       imagePrincipal: newPathPrincipal,
       image: newPaths,
+      url: createPortfolioDto.url,
     });
 
     return newPortfolio;
@@ -134,6 +135,7 @@ export class PortfolioService {
       dateEnd: updatePortfolioDto.dateEnd,
       imagePrincipal: newPathPrincipal,
       image: newPaths,
+      url: updatePortfolioDto.url,
     });
 
     return;

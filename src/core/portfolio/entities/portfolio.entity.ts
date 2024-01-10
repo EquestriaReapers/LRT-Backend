@@ -49,6 +49,10 @@ export class Portfolio {
   image: string[];
 
   @ApiProperty()
+  @Column({ nullable: true })
+  url: string;
+
+  @ApiProperty()
   @DeleteDateColumn()
   deletedAt: Date;
 }
