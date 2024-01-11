@@ -224,6 +224,60 @@ export class UsersService {
     return educationPrincipal;
   }
 
+  async updateEducationOnLogin(email: string) {
+    const externalEducationData = await this.findByEmailBanner(email);
+
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (!user) {
+      throw new NotFoundException(PROFILE_NOT_FOUND);
+    }
+
+    const profile = await this.profileRepository.findOne({
+      where: { userId: user.id },
+    });
+
+    const currentEducation = await this.educationRepository.find({
+      where: { profileId: profile.id },
+    });
+
+    const currentEducationNames = currentEducation.map(
+      (education) => education.title,
+    );
+
+    let newEducations = [];
+
+    if (externalEducationData) {
+      const filteredCareers = externalEducationData.StudentCareers.filter(
+        (studentCareers) =>
+          studentCareers.dateGraduated !== null && studentCareers.Career,
+      );
+
+      if (filteredCareers.length > 0) {
+        newEducations = filteredCareers.filter(
+          (career) =>
+            !currentEducationNames.includes(
+              this.getMainTitle(career.Career.name),
+            ),
+        );
+      }
+    }
+
+    for (const education of newEducations) {
+      const newEducation = this.educationRepository.create({
+        profileId: profile.id,
+        entity: 'Universidad Catolica Andres Bello',
+        title: this.getMainTitle(education.Career.name),
+        endDate: education.dateGraduated,
+        isUCAB: true,
+        principal: false,
+      });
+      await this.educationRepository.save(newEducation);
+    }
+
+    return newEducations;
+  }
+
   async findByEmailBanner(email: string) {
     return await this.httpService
       .get(`${envData.API_BANNER_URL}student/email` + '/' + email)
