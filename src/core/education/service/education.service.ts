@@ -13,6 +13,7 @@ import {
   EDUCATION_NOT_FOUND,
   ERROR_EDUCATION_IS_UCAB,
   ERROR_EDUCATION_PRINCIPAL_ALREADY_EXISTS,
+  ERROR_EDUCATION_PRINCIPAL_NOT_UPDATED,
 } from '../message';
 import { Profile } from 'src/core/profiles/entities/profile.entity';
 
@@ -98,6 +99,10 @@ export class EducationService {
           principal: true,
         },
       });
+
+      if (principalEducation.id === id) {
+        throw new BadRequestException(ERROR_EDUCATION_PRINCIPAL_NOT_UPDATED);
+      }
 
       await this.educationRepository.update(
         {
