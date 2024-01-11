@@ -99,9 +99,15 @@ export class EducationService {
         },
       });
 
-      if (principalEducation && principalEducation.id !== id) {
-        throw new BadRequestException(ERROR_EDUCATION_PRINCIPAL_ALREADY_EXISTS);
-      }
+      await this.educationRepository.update(
+        {
+          id: principalEducation.id,
+          profileId: user.id,
+        },
+        {
+          principal: false,
+        },
+      );
 
       education = await this.educationRepository.update(
         {
