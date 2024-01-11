@@ -140,7 +140,7 @@ export class IndexService {
               description: { type: 'text' },
               location: { type: 'text' },
               imagePrincipal: { type: 'text' },
-              image: { type: 'array' },
+              image: { type: 'text' },
               url: { type: 'text' },
               dateEnd: { type: 'date' },
               profile: {
