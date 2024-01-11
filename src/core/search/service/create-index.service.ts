@@ -20,13 +20,6 @@ export class IndexService {
         body: {
           settings: {
             analysis: {
-              char_filter: {
-                remove_special: {
-                  type: 'pattern_replace',
-                  pattern: '[#$%#!]',
-                  replacement: '',
-                },
-              },
               filter: {
                 autocomplete_filter: {
                   type: 'edge_ngram',
@@ -44,7 +37,6 @@ export class IndexService {
                   type: 'custom',
                   tokenizer: 'standard',
                   filter: ['lowercase'],
-                  char_filter: ['remove_special'],
                 },
               },
             },
@@ -147,6 +139,9 @@ export class IndexService {
               title: { type: 'text' },
               description: { type: 'text' },
               location: { type: 'text' },
+              imagePrincipal: { type: 'text' },
+              image: { type: 'array' },
+              url: { type: 'text' },
               dateEnd: { type: 'date' },
               profile: {
                 type: 'nested',
