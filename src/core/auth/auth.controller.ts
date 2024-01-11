@@ -41,7 +41,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
-  ) { }
+  ) {}
 
   @Post('register')
   @ApiOkResponse({
@@ -109,9 +109,13 @@ export class AuthController {
     const verified = await this.authService.verifyEmail(token);
     if (verified) {
       if (envData.EMAIL_LOCAL_TESTING_MODE === 'true') {
-        return response.redirect(`${envData.EMAIL_LOCAL_BASE_URL}/login`);
+        return response.redirect(
+          `${envData.EMAIL_LOCAL_BASE_URL}/successfully-confirm`,
+        );
       } else {
-        return response.redirect(`${envData.FRONTEND_URL}/login`);
+        return response.redirect(
+          `${envData.FRONTEND_URL}/successfully-confirm`,
+        );
       }
     } else {
       return response.status(403).json({
