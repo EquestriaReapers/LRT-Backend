@@ -244,12 +244,65 @@ export class SearchService {
             },
           },
           {
+            match: {
+              name: {
+                query: searchParam.text,
+                fuzziness: 2,
+              },
+            },
+          },
+          {
+            match: {
+              lastname: {
+                query: searchParam.text,
+                fuzziness: 2,
+              },
+            },
+          },
+          {
+            match: {
+              email: {
+                query: searchParam.text,
+                fuzziness: 2,
+              },
+            },
+          },
+          {
+            match: {
+              description: {
+                query: searchParam.text,
+                fuzziness: 2,
+              },
+            },
+          },
+          {
+            match: {
+              mainTitle: {
+                query: searchParam.text,
+                fuzziness: 2,
+              },
+            },
+          },
+          {
+            match: {
+              countryResidence: {
+                query: searchParam.text,
+                fuzziness: 2,
+              },
+            },
+          },
+          {
             nested: {
               path: 'skills',
               query: {
                 bool: {
                   must: {
-                    match: { 'skills.name': searchParam.text },
+                    match: {
+                      'skills.name': {
+                        query: searchParam.text,
+                        fuzziness: 2,
+                      },
+                    },
                   },
                   must_not: {
                     exists: {
@@ -265,24 +318,50 @@ export class SearchService {
               path: 'experience',
               query: {
                 bool: {
-                  must: {
-                    multi_match: {
-                      query: searchParam.text,
-                      fields: [
-                        'experience.businessName',
-                        'experience.role',
-                        'experience.location',
-                        'experience.description',
-                      ],
-                      type: 'bool_prefix',
-                      operator: 'or',
+                  should: [
+                    {
+                      match: {
+                        'experience.businessName': {
+                          query: searchParam.text,
+                          fuzziness: 2,
+                          operator: 'or',
+                        },
+                      },
                     },
-                  },
+                    {
+                      match: {
+                        'experience.role': {
+                          query: searchParam.text,
+                          fuzziness: 2,
+                          operator: 'or',
+                        },
+                      },
+                    },
+                    {
+                      match: {
+                        'experience.location': {
+                          query: searchParam.text,
+                          fuzziness: 2,
+                          operator: 'or',
+                        },
+                      },
+                    },
+                    {
+                      match: {
+                        'experience.description': {
+                          query: searchParam.text,
+                          fuzziness: 2,
+                          operator: 'or',
+                        },
+                      },
+                    },
+                  ],
                   must_not: {
                     exists: {
                       field: 'experience.deletedAt',
                     },
                   },
+                  minimum_should_match: 1,
                 },
               },
             },
@@ -292,19 +371,32 @@ export class SearchService {
               path: 'education',
               query: {
                 bool: {
-                  must: {
-                    multi_match: {
-                      query: searchParam.text,
-                      fields: ['education.title', 'education.entity'],
-                      type: 'bool_prefix',
-                      operator: 'or',
+                  should: [
+                    {
+                      match: {
+                        'education.title': {
+                          query: searchParam.text,
+                          fuzziness: 2,
+                          operator: 'or',
+                        },
+                      },
                     },
-                  },
+                    {
+                      match: {
+                        'education.entity': {
+                          query: searchParam.text,
+                          fuzziness: 2,
+                          operator: 'or',
+                        },
+                      },
+                    },
+                  ],
                   must_not: {
                     exists: {
                       field: 'education.deletedAt',
                     },
                   },
+                  minimum_should_match: 1,
                 },
               },
             },
@@ -568,6 +660,9 @@ export class SearchService {
         profileId: doc.profile.id,
         description: doc.description,
         location: doc.location,
+        imagePrincipal: doc.imagePrincipal,
+        image: doc.image,
+        url: doc.url,
         dateEnd: doc.dateEnd,
         profile: {
           name: doc.profile.user.name,
