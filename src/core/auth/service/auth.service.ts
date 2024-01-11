@@ -104,6 +104,8 @@ export class AuthService {
       throw new UnauthorizedException(UNAUTHROIZED_BAD_REQUEST_MESSAGE);
     }
 
+    await this.usersService.updateEducationOnLogin(email);
+
     const payload = { email: user.email, id: user.id, role: user.role };
     const token = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_SECRET,
