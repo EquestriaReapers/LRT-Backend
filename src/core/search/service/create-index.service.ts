@@ -20,6 +20,13 @@ export class IndexService {
         body: {
           settings: {
             analysis: {
+              char_filter: {
+                remove_special: {
+                  type: 'pattern_replace',
+                  pattern: '[#$%#!]',
+                  replacement: '',
+                },
+              },
               filter: {
                 autocomplete_filter: {
                   type: 'edge_ngram',
@@ -33,6 +40,12 @@ export class IndexService {
                   tokenizer: 'standard',
                   filter: ['lowercase', 'autocomplete_filter'],
                 },
+                standard_lowercase: {
+                  type: 'custom',
+                  tokenizer: 'standard',
+                  filter: ['lowercase'],
+                  char_filter: ['remove_special'],
+                },
               },
             },
           },
@@ -40,51 +53,57 @@ export class IndexService {
             properties: {
               id: { type: 'integer' },
               userId: { type: 'integer' },
-              name: { type: 'text' },
-              lastname: { type: 'text' },
-              email: { type: 'text' },
-              description: { type: 'text' },
-              mainTitle: { type: 'text' },
+              name: { type: 'text', analyzer: 'standard_lowercase' },
+              lastname: { type: 'text', analyzer: 'standard_lowercase' },
+              email: { type: 'text', analyzer: 'standard_lowercase' },
+              description: { type: 'text', analyzer: 'standard_lowercase' },
+              mainTitle: { type: 'text', analyzer: 'standard_lowercase' },
               mainTitleCode: { type: 'keyword' },
-              countryResidence: { type: 'text' },
+              countryResidence: {
+                type: 'text',
+                analyzer: 'standard_lowercase',
+              },
               skills: {
                 type: 'nested',
                 properties: {
-                  name: { type: 'text' },
+                  name: { type: 'text', analyzer: 'standard_lowercase' },
                   nameCode: { type: 'keyword' },
-                  type: { type: 'text' },
+                  type: { type: 'text', analyzer: 'standard_lowercase' },
                 },
               },
               experience: {
                 type: 'nested',
                 properties: {
-                  businessName: { type: 'text' },
-                  role: { type: 'text' },
-                  location: { type: 'text' },
-                  description: { type: 'text' },
+                  businessName: {
+                    type: 'text',
+                    analyzer: 'standard_lowercase',
+                  },
+                  role: { type: 'text', analyzer: 'standard_lowercase' },
+                  location: { type: 'text', analyzer: 'standard_lowercase' },
+                  description: { type: 'text', analyzer: 'standard_lowercase' },
                 },
               },
               portfolio: {
                 type: 'nested',
                 properties: {
-                  title: { type: 'text' },
-                  description: { type: 'text' },
-                  location: { type: 'text' },
+                  title: { type: 'text', analyzer: 'standard_lowercase' },
+                  description: { type: 'text', analyzer: 'standard_lowercase' },
+                  location: { type: 'text', analyzer: 'standard_lowercase' },
                 },
               },
               education: {
                 type: 'nested',
                 properties: {
-                  title: { type: 'text' },
-                  entity: { type: 'text' },
+                  title: { type: 'text', analyzer: 'standard_lowercase' },
+                  entity: { type: 'text', analyzer: 'standard_lowercase' },
                 },
               },
               language: {
                 type: 'nested',
                 properties: {
-                  name: { type: 'text' },
+                  name: { type: 'text', analyzer: 'standard_lowercase' },
                   nameCode: { type: 'keyword' },
-                  level: { type: 'text' },
+                  level: { type: 'text', analyzer: 'standard_lowercase' },
                 },
               },
             },

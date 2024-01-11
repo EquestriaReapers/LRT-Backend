@@ -240,6 +240,7 @@ export class SearchService {
               ],
               type: 'bool_prefix',
               operator: 'or',
+              fuzziness: 2,
             },
           },
           {
@@ -248,7 +249,12 @@ export class SearchService {
               query: {
                 bool: {
                   must: {
-                    match: { 'skills.name': searchParam.text },
+                    match: {
+                      'skills.name': {
+                        query: searchParam.text,
+                        fuzziness: 2,
+                      },
+                    },
                   },
                   must_not: {
                     exists: {
@@ -267,6 +273,7 @@ export class SearchService {
                   must: {
                     multi_match: {
                       query: searchParam.text,
+                      fuzziness: 2,
                       fields: [
                         'experience.businessName',
                         'experience.role',
@@ -294,6 +301,7 @@ export class SearchService {
                   must: {
                     multi_match: {
                       query: searchParam.text,
+                      fuzziness: 2,
                       fields: ['education.title', 'education.entity'],
                       type: 'bool_prefix',
                       operator: 'or',
@@ -316,6 +324,7 @@ export class SearchService {
                   must: {
                     multi_match: {
                       query: searchParam.text,
+                      fuzziness: 2,
                       fields: [
                         'portfolio.title',
                         'portfolio.description',
