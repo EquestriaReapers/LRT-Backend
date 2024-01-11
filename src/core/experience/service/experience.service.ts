@@ -15,13 +15,16 @@ import { ExperienceCreateResponseDTO } from '../dto/create-experience.dto';
 import { EXPERIENCE_NOT_FOUND } from '../messages';
 import { INTERNAL_SERVER_ERROR } from 'src/constants/messages/messagesConst';
 import { YOU_NOT_HAVE_PERMISSION_MESSAGE } from 'src/core/auth/message';
+import { UserProfileCacheUpdater } from 'src/core/search/service/user-profile-cache-updater.class';
 
 @Injectable()
 export class ExperienceService {
   constructor(
     @InjectRepository(Experience)
     private readonly experienceRepository: Repository<Experience>,
-  ) { }
+
+    private readonly userProfileCacheUpdater: UserProfileCacheUpdater,
+  ) {}
 
   async findAll() {
     return await this.experienceRepository.find({
@@ -60,6 +63,8 @@ export class ExperienceService {
     });
     await this.experienceRepository.save(experience);
 
+    await this.userProfileCacheUpdater.updateOneProfile(user.id);
+
     return experience;
   }
 
@@ -76,6 +81,8 @@ export class ExperienceService {
     if (experience.affected === 0) {
       throw new NotFoundException(EXPERIENCE_NOT_FOUND);
     }
+
+    await this.userProfileCacheUpdater.updateOneProfile(user.id);
 
     return;
   }
@@ -95,9 +102,12 @@ export class ExperienceService {
         profileId: user.id,
         id: id,
       });
+
       if (experienceRemoved.affected === 0) {
         throw new InternalServerErrorException(INTERNAL_SERVER_ERROR);
       }
+
+      await this.userProfileCacheUpdater.updateOneProfile(user.id);
     } catch (error) {
       if (error instanceof InternalServerErrorException) throw error;
       throw new InternalServerErrorException(INTERNAL_SERVER_ERROR);

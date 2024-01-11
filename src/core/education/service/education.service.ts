@@ -16,6 +16,7 @@ import {
   ERROR_EDUCATION_PRINCIPAL_NOT_UPDATED,
 } from '../message';
 import { Profile } from 'src/core/profiles/entities/profile.entity';
+import { UserProfileCacheUpdater } from 'src/core/search/service/user-profile-cache-updater.class';
 
 @Injectable()
 export class EducationService {
@@ -25,6 +26,8 @@ export class EducationService {
 
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+
+    private readonly userProfileCacheUpdater: UserProfileCacheUpdater,
   ) {}
 
   async create(
@@ -37,6 +40,8 @@ export class EducationService {
       isUCAB: false,
       isVisible: true,
     });
+
+    await this.userProfileCacheUpdater.updateOneProfile(user.id);
 
     return newEducation;
   }
@@ -152,6 +157,8 @@ export class EducationService {
       throw new NotFoundException(EDUCATION_NOT_FOUND);
     }
 
+    await this.userProfileCacheUpdater.updateOneProfile(user.id);
+
     return;
   }
 
@@ -175,6 +182,8 @@ export class EducationService {
     if (education.affected === 0) {
       throw new NotFoundException(EDUCATION_NOT_FOUND);
     }
+
+    await this.userProfileCacheUpdater.updateOneProfile(user.id);
 
     return;
   }

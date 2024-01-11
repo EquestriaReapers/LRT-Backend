@@ -11,9 +11,10 @@ import { Portfolio } from './entities/portfolio.entity';
 import { Profile } from '../profiles/entities/profile.entity';
 import { CleanBodyMiddleware } from 'src/common/utils/clean-body';
 import { validateImageFile } from 'src/constants';
+import { SearchModule } from '../search/search.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Portfolio, Profile])],
+  imports: [SearchModule, TypeOrmModule.forFeature([Portfolio, Profile])],
   controllers: [PortfolioController],
   providers: [PortfolioService],
 })
