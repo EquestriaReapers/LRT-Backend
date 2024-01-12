@@ -302,14 +302,14 @@ export class ResponseProfileGet {
   contactMethods: MethodContact[];
 
   @ApiProperty({
-    type: [PortfolioData],
-  })
-  portfolio: PortfolioData[];
-
-  @ApiProperty({
     type: [EducationData],
   })
   education: EducationData[];
+
+  @ApiProperty({
+    type: [PortfolioData],
+  })
+  portfolio: PortfolioData[];
 }
 
 export class SwaggerResponsePagination {
