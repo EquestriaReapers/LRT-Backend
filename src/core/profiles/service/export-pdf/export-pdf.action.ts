@@ -68,18 +68,6 @@ export default class ProfileExportPDFAction {
     const profile = await this.profileRepository.findOne({
       where: {
         userId: userId,
-        skillsProfile: {
-          isVisible: true,
-        },
-        languageProfile: {
-          isVisible: true,
-        },
-        experience: {
-          isVisible: true,
-        },
-        education: {
-          isVisible: true,
-        },
       },
       relations: [
         'user',
@@ -106,21 +94,33 @@ export default class ProfileExportPDFAction {
         },
       },
     });
-    const { skillsProfile, languageProfile, ...otherProfileProps } = profile;
+
+    if (!profile) {
+      throw new Error(`No profile found for user id ${userId}`);
+    }
+
+    const { skillsProfile, languageProfile, experience, education, ...otherProfileProps } = profile;
+
+    const visibleSkillsProfile = skillsProfile.filter(sp => sp.isVisible);
+    const visibleLanguageProfile = languageProfile.filter(lp => lp.isVisible);
+    const visibleExperience = experience.filter(e => e.isVisible);
+    const visibleEducation = education.filter(e => e.isVisible);
 
     const mappedProfile = {
       ...otherProfileProps,
-      skills: skillsProfile.map(({ skill, ...sp }) => ({
+      skills: visibleSkillsProfile.map(({ skill, ...sp }) => ({
         id: skill.id,
         name: skill.name,
         type: skill.type,
         skillProfileId: sp.id,
         isVisible: sp.isVisible,
       })),
-      languages: languageProfile.map(({ language, ...lp }) => ({
+      languages: visibleLanguageProfile.map(({ language, ...lp }) => ({
         ...lp,
         name: language.name,
       })),
+      experience: visibleExperience,
+      education: visibleEducation,
     };
 
     return mappedProfile;
