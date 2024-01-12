@@ -67,7 +67,7 @@ export class PortfolioService {
       url: createPortfolioDto.url,
     });
 
-    await this.userProfileCacheUpdater.updateOneProfile(user.id);
+    await this.userProfileCacheUpdater.updatePortfolioOneProfile(user.id);
 
     return newPortfolio;
   }
@@ -143,7 +143,7 @@ export class PortfolioService {
       url: updatePortfolioDto.url,
     });
 
-    await this.userProfileCacheUpdater.updateOneProfile(user.id);
+    await this.userProfileCacheUpdater.updatePortfolioOneProfile(user.id);
 
     return;
   }
@@ -212,7 +212,7 @@ export class PortfolioService {
       image: portfolio.image,
     });
 
-    await this.userProfileCacheUpdater.updateOneProfile(user.id);
+    await this.userProfileCacheUpdater.updatePortfolioOneProfile(user.id);
   }
 
   async remove(id: number, user: UserActiveInterface): Promise<void> {
@@ -245,7 +245,7 @@ export class PortfolioService {
     }
 
     await this.portfolioRepository.delete(id);
-    await this.userProfileCacheUpdater.updateOneProfile(user.id);
+    await this.userProfileCacheUpdater.updatePortfolioOneProfile(user.id);
 
     return;
   }
