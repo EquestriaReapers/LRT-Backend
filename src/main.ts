@@ -7,8 +7,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { SwaggerTheme } from 'swagger-themes';
 import { ConfigService } from '@nestjs/config';
 import * as morgan from 'morgan';
-import { CORS } from './constants';
 import { join } from 'path';
+import { CORS } from './constants';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);

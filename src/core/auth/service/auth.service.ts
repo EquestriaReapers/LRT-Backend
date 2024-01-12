@@ -208,7 +208,7 @@ export class AuthService {
       const mailOptions = {
         from: '"UCAB Profile" <' + process.env.EMAIL_USER + '>',
         to: email,
-        subject: 'Verifica tu correo',
+        subject: 'Confirma tu correo electronico en UCAB Profile!',
         text: 'Verify Email',
         html: htmlToSend,
       };
@@ -304,14 +304,14 @@ export class AuthService {
           user: {
             name: userData.name,
           },
-          resetPasswordLink: `${process.env.EMAIL_LOCAL_BASE_URL}/new-password${tokenModel.token}`,
+          resetPasswordLink: `${process.env.EMAIL_LOCAL_BASE_URL}/new-password/${tokenModel.token}`,
         };
       } else {
         replacements = {
           user: {
             name: userData.name,
           },
-          resetPasswordLink: `${process.env.FRONTEND_URL}/new-password${tokenModel.token}`,
+          resetPasswordLink: `${process.env.FRONTEND_URL}/new-password/${tokenModel.token}`,
         };
       }
       const htmlToSend = template(replacements);

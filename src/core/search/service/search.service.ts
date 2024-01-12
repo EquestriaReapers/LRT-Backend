@@ -38,6 +38,7 @@ export class SearchService {
         'user',
         'skillsProfile',
         'skillsProfile.skill',
+        'education',
         'experience',
         'portfolio',
         'education',
