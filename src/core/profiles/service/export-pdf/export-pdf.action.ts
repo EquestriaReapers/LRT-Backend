@@ -16,6 +16,7 @@ const FILE_CONFIG = {
   format: 'a4',
   printBackground: true,
   margin: { left: '0mm', top: '0mm', right: '0mm', bottom: '10mm' },
+  preferCSSPageSize: true,
 };
 
 @Injectable()
