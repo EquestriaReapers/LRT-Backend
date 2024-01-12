@@ -66,14 +66,10 @@ export class UserProfileCacheUpdater {
   }
 
   async deletePortfolioOneProfile(portfolioId: number) {
-    const portfolio = await this.getPortfolio(portfolioId);
-
-    if (!portfolio) {
-      await this.searchClient.delete({
-        index: envData.INDEX_PORTFOLIO,
-        id: portfolio.id.toString(),
-      });
-    }
+    await this.searchClient.delete({
+      index: envData.INDEX_PORTFOLIO,
+      id: portfolioId.toString(),
+    });
   }
 
   async updateOneProfile(profileId: number) {
