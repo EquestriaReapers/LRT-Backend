@@ -53,16 +53,23 @@ export class UserProfileCacheUpdater {
     return this.userProfilePresenter.format(profile);
   }
 
-  private async getPortfolio(profileId: number) {
+  private async getPortfolio(id: number) {
     const portfolios = await this.portfolioRepository.findOne({
       relations: ['profile', 'profile.user'],
       where: {
         deletedAt: null,
-        profileId,
+        id,
       },
     });
 
     return portfolios;
+  }
+
+  async deletePortfolioOneProfile(portfolioId: number) {
+    await this.searchClient.delete({
+      index: envData.INDEX_PORTFOLIO,
+      id: portfolioId.toString(),
+    });
   }
 
   async updateOneProfile(profileId: number) {
@@ -78,10 +85,10 @@ export class UserProfileCacheUpdater {
     return resp;
   }
 
-  async updatePortfolioOneProfile(profileId: number) {
+  async updatePortfolioOneProfile(portfolioId: number) {
     await this.indexService.createIndexPortfolio();
 
-    const body = await this.parseAndPreparePortfolioDataOneProfile(profileId);
+    const body = await this.parseAndPreparePortfolioDataOneProfile(portfolioId);
 
     const resp = await this.searchClient.bulk({
       index: envData.INDEX_PORTFOLIO,
@@ -118,8 +125,8 @@ export class UserProfileCacheUpdater {
     return body;
   }
 
-  private async parseAndPreparePortfolioDataOneProfile(profileId: number) {
-    const portfolios = await this.getPortfolio(profileId);
+  private async parseAndPreparePortfolioDataOneProfile(portfolioId: number) {
+    const portfolios = await this.getPortfolio(portfolioId);
 
     const body = [portfolios].flatMap((doc) => [
       { index: { _index: envData.INDEX_PORTFOLIO, _id: doc.id } },
