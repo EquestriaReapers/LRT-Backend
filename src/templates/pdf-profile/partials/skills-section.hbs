@@ -1,7 +1,7 @@
 
 {{#if (eq skillSet.type "hard-soft")}}
         <div class="row mt-4">
-            <div class="col-12">
+            <div class="col-12 pls-not-break-class">
                 <h1 class="color-primary">Habilidades</h1>
             </div>
         </div>
@@ -10,7 +10,7 @@
                 <div class="col-6">
                     <div>
                         <h2>Habilidades duras</h1>
-                            <ul class="vertical-list skills-list normal-text">
+                            <ul class="vertical-list skills-list normal-text pls-not-break-class">
                                 {{#each skillSet.hardSkills}}
                                 <li>{{this}}</li>
                                 {{/each}}
@@ -22,7 +22,7 @@
                 <div class="col-6">
                     <div>
                         <h2>Habilidades blandas</h1>
-                                <ul class="vertical-list skills-list normal-text">
+                                <ul class="vertical-list skills-list normal-text pls-not-break-class">
                                     {{#each skillSet.softSkills}}
                                     <li>{{this}}</li>
                                     {{/each}}
@@ -48,6 +48,7 @@
                         skills-list
                         horizontal-list
                         normal-text
+                        pls-not-break-class
                         "
                 >
                     {{#each skillSet.skills}}

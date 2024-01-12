@@ -1,7 +1,7 @@
 <!-- partials/experiencie-item.hbs -->
-<div class="row mt-2">
-    <div class="col-12">
-        <h2 class="mb-1">
+<div class="row mt-2 pls-not-break-class">
+    <div class="col-12 pls-not-break-class">
+        <h2 class="mb-1 pls-not-break-class">
             {{#if (is-not-empty temporality)}}
                 <span>
                     ({{temporality}})
@@ -11,7 +11,7 @@
         </h2>
     </div>
     {{#if (is-not-empty where)}}    
-        <div class="col-12">
+        <div class="col-12 pls-not-break-class">
             <span class="normal-text">
                 {{where}}
             </span>

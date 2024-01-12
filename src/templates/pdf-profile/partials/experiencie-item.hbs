@@ -1,10 +1,10 @@
 <!-- partials/experiencie-item.hbs -->
-<div class="row mt-3">
-    <div class="col-12">
+<div class="row mt-3 pls-not-break-class">
+    <div class="col-12 pls-not-break-class">
         <div>
             <h2>{{company}}</h2>
         </div>
-        <div class="d-flex flex-row justify-content-between">
+        <div class="d-flex flex-row justify-content-between pls-not-break-class">
             <h2>{{role}}</h2>
             <h2>
                 {{#if (is-not-empty location)}}
@@ -16,7 +16,7 @@
         </div>
     </div>
     {{#if (is-not-empty description)}}
-        <div class="col-12 mt-1">
+        <div class="col-12 mt-1 pls-not-break-class">
             <p class="normal-text">
                 {{description}}
             </p>
