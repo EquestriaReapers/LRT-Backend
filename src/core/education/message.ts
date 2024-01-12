@@ -7,3 +7,5 @@ export const ERROR_EDUCATION_PRINCIPAL_ALREADY_EXISTS =
   'Ya existe una educacion principal';
 export const ERROR_EDUCATION_IS_UCAB =
   'No se puede eliminar una educacion UCAB';
+export const ERROR_EDUCATION_PRINCIPAL_NOT_UPDATED =
+  'Educacion principal no se puede cambiar a secundaria';

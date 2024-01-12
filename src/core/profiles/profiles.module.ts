@@ -12,12 +12,16 @@ import { Language } from '../language/entities/language.entity';
 import { LanguageModule } from '../language/language.module';
 import LanguagueProfileService from './service/languague-profile.service';
 import { SkillsProfile } from './entities/skills-profile.entity';
+import { HttpModule } from '@nestjs/axios';
+import { SearchModule } from '../search/search.module';
 
 @Module({
   imports: [
     UsersModule,
     LanguageModule,
+    HttpModule,
     TypeOrmModule.forFeature([Skill, LanguageProfile, Language, SkillsProfile]),
+    SearchModule,
   ],
   controllers: [ProfilesController],
   providers: [
@@ -29,4 +33,4 @@ import { SkillsProfile } from './entities/skills-profile.entity';
   ],
   exports: [ProfilesService],
 })
-export class ProfilesModule { }
+export class ProfilesModule {}

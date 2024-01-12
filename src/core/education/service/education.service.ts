@@ -9,13 +9,25 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Education } from '../entities/education.entity';
 import { Repository } from 'typeorm';
 import { UserActiveInterface } from 'src/common/interface/user-active-interface';
-import { EDUCATION_NOT_FOUND, ERROR_EDUCATION_IS_UCAB } from '../message';
+import {
+  EDUCATION_NOT_FOUND,
+  ERROR_EDUCATION_IS_UCAB,
+  ERROR_EDUCATION_PRINCIPAL_ALREADY_EXISTS,
+  ERROR_EDUCATION_PRINCIPAL_NOT_UPDATED,
+} from '../message';
+import { Profile } from 'src/core/profiles/entities/profile.entity';
+import { UserProfileCacheUpdater } from 'src/core/search/service/user-profile-cache-updater.class';
 
 @Injectable()
 export class EducationService {
   constructor(
     @InjectRepository(Education)
     private educationRepository: Repository<Education>,
+
+    @InjectRepository(Profile)
+    private readonly profileRepository: Repository<Profile>,
+
+    private readonly userProfileCacheUpdater: UserProfileCacheUpdater,
   ) {}
 
   async create(
@@ -26,7 +38,10 @@ export class EducationService {
       ...createEducationDto,
       profileId: user.id,
       isUCAB: false,
+      isVisible: true,
     });
+
+    await this.userProfileCacheUpdater.updateOneProfile(user.id);
 
     return newEducation;
   }
@@ -36,6 +51,10 @@ export class EducationService {
       where: {
         deleteAt: null,
         profileId: idProfile,
+      },
+      order: {
+        principal: 'DESC',
+        isUCAB: 'DESC',
       },
     });
 
@@ -79,6 +98,27 @@ export class EducationService {
       (updateEducationDto.principal === true ||
         updateEducationDto.principal === false)
     ) {
+      const principalEducation = await this.educationRepository.findOne({
+        where: {
+          profileId: user.id,
+          principal: true,
+        },
+      });
+
+      if (principalEducation.id === id) {
+        throw new BadRequestException(ERROR_EDUCATION_PRINCIPAL_NOT_UPDATED);
+      }
+
+      await this.educationRepository.update(
+        {
+          id: principalEducation.id,
+          profileId: user.id,
+        },
+        {
+          principal: false,
+        },
+      );
+
       education = await this.educationRepository.update(
         {
           id,
@@ -86,6 +126,15 @@ export class EducationService {
         },
         {
           principal: updateEducationDto.principal,
+        },
+      );
+
+      await this.profileRepository.update(
+        {
+          id: user.id,
+        },
+        {
+          mainTitle: currentEducation.title,
         },
       );
     }
@@ -98,6 +147,7 @@ export class EducationService {
         },
         {
           ...updateEducationDto,
+          principal: false,
           isUCAB: false,
         },
       );
@@ -106,6 +156,8 @@ export class EducationService {
     if (education.affected === 0) {
       throw new NotFoundException(EDUCATION_NOT_FOUND);
     }
+
+    await this.userProfileCacheUpdater.updateOneProfile(user.id);
 
     return;
   }
@@ -130,6 +182,8 @@ export class EducationService {
     if (education.affected === 0) {
       throw new NotFoundException(EDUCATION_NOT_FOUND);
     }
+
+    await this.userProfileCacheUpdater.updateOneProfile(user.id);
 
     return;
   }

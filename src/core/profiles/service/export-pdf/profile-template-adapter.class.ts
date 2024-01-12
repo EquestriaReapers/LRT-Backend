@@ -9,7 +9,6 @@ const ContactMethodTypeToIcon = {
   [TypeContact.PHONE]: Icon.Call,
   [TypeContact.EMAIL]: Icon.Mail,
   [TypeContact.GLOBE]: Icon.Globe,
-  
 };
 
 @Injectable()
@@ -35,7 +34,6 @@ export default class ProfileTemplateAdaptator {
         name,
         level,
       })),
-
       skillSet: {
         type: SkillSetType.HardSoft,
         hardSkills: profile.skills
@@ -55,8 +53,6 @@ export default class ProfileTemplateAdaptator {
         iconName: Icon.Location,
         text: profile.countryResidence,
       });
-
-
     }
 
     const otherContactMethods = [];
@@ -77,7 +73,11 @@ export default class ProfileTemplateAdaptator {
       });
     }
 
-    return [...countryLocationMethod, ...otherContactMethods, ...globeContactMethod];
+    return [
+      ...countryLocationMethod,
+      ...otherContactMethods,
+      ...globeContactMethod,
+    ];
   }
 
   private getTemporality(startDate: Date, endDate: Date): string {
@@ -94,7 +94,9 @@ export default class ProfileTemplateAdaptator {
     if (mainTitle) {
       mainTitle = mainTitle
         .split('-')
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .map((word, index) =>
+          index !== 1 ? word.charAt(0).toUpperCase() + word.slice(1) : word,
+        )
         .join(' ');
       return mainTitle;
     }

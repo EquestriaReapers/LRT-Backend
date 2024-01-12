@@ -8,6 +8,8 @@ import {
   BadRequestException,
   UnauthorizedException,
   ForbiddenException,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from './service/auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -21,14 +23,25 @@ import {
 } from './dto/responses.dto';
 import { MessageDTO } from 'src/common/dto/response.dto';
 import {
+  ERROR_RESETTING_PASSWORD_MESSAGE,
+  ERROR_SENDING_FORGOT_PASSWORD_EMAIL_MESSAGE,
   INVALID_TOKEN_EMAIL_MESSAGE,
+  SUCCESSFULY_RESET_PASSWORD_MESSAGE,
+  SUCCESSFULY_SEND_FORGOT_PASSWORD_EMAIL_MESSAGE,
   SUCCESSFULY_VERIFIED_EMAIL_MESSAGE,
 } from './message';
 import { ApiInternalServerError } from 'src/common/decorator/internal-server-error-decorator';
+
+import { UsersService } from '../users/service/users.service';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { envData } from 'src/config/datasource';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @Post('register')
   @ApiOkResponse({
@@ -95,13 +108,65 @@ export class AuthController {
   ) {
     const verified = await this.authService.verifyEmail(token);
     if (verified) {
-      return response.status(200).json({
-        message: SUCCESSFULY_VERIFIED_EMAIL_MESSAGE,
-      });
+      if (envData.EMAIL_LOCAL_TESTING_MODE === 'true') {
+        return response.redirect(
+          `${envData.EMAIL_LOCAL_BASE_URL}/successfully-confirm`,
+        );
+      } else {
+        return response.redirect(
+          `${envData.FRONTEND_URL}/successfully-confirm`,
+        );
+      }
     } else {
       return response.status(403).json({
         message: INVALID_TOKEN_EMAIL_MESSAGE,
       });
+    }
+  }
+
+  @Get('email/forgot-password/:email')
+  async sendEmailForgotPassword(
+    @Param('email') email: string,
+  ): Promise<Object> {
+    try {
+      const isEmailSent = await this.authService.sendEmailForgotPassword(email);
+      if (isEmailSent) {
+        return {
+          status: 'success',
+          code: 'RESULT_SUCCESS',
+          message: SUCCESSFULY_SEND_FORGOT_PASSWORD_EMAIL_MESSAGE,
+        };
+      } else {
+        return {
+          status: 'error',
+          code: 'RESULT_FAIL',
+          message: ERROR_SENDING_FORGOT_PASSWORD_EMAIL_MESSAGE,
+        };
+      }
+    } catch (error) {
+      return {
+        status: 'error',
+        code: 'RESULT_FAIL',
+        message: error.message,
+      };
+    }
+  }
+
+  @Post('reset-password/:token')
+  async resetPassword(
+    @Param('token') token: string,
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ) {
+    const { newPassword } = resetPasswordDto;
+    const result = await this.authService.resetPassword(token, newPassword);
+
+    if (result) {
+      return { message: SUCCESSFULY_RESET_PASSWORD_MESSAGE };
+    } else {
+      throw new HttpException(
+        ERROR_RESETTING_PASSWORD_MESSAGE,
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 }

@@ -4,8 +4,12 @@ import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InjectOpensearchClient, OpensearchClient } from 'nestjs-opensearch';
 import { SearchProfileDto } from '../dto/search.profiles.dto';
-import { Career } from '../../career/enum/career.enum';
 import { IndexService } from './create-index.service';
+import { Portfolio } from 'src/core/portfolio/entities/portfolio.entity';
+import { HttpService } from '@nestjs/axios';
+import { envData } from 'src/config/datasource';
+import { Language } from 'src/core/language/entities/language.entity';
+import { UserProfilePresenter } from './user-profile-presenter.class';
 
 @Injectable()
 export class SearchService {
@@ -16,17 +20,29 @@ export class SearchService {
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
 
+    @InjectRepository(Portfolio)
+    private readonly portfolioRepository: Repository<Portfolio>,
+
     private readonly indexService: IndexService,
+
+    private readonly httpService: HttpService,
+    @InjectRepository(Language)
+    private readonly languageRepository: Repository<Language>,
+
+    private readonly userProfilePresenter: UserProfilePresenter,
   ) {}
 
   public async getProfiles() {
     const profiles = await this.profileRepository.find({
       relations: [
         'user',
-        'experience',
         'skillsProfile',
         'skillsProfile.skill',
+        'experience',
         'portfolio',
+        'education',
+        'languageProfile',
+        'languageProfile.language',
       ],
       select: {
         user: {
@@ -40,11 +56,22 @@ export class SearchService {
       },
     });
 
-    return this.UserProfilePresenter(profiles);
+    return this.presentProfiles(profiles);
+  }
+
+  public async getPortfolio() {
+    const portfolio = await this.portfolioRepository.find({
+      relations: ['profile', 'profile.user'],
+      where: {
+        deletedAt: null,
+      },
+    });
+
+    return portfolio;
   }
 
   async indexProfiles() {
-    await this.indexService.createIndex();
+    await this.indexService.createIndexProfile();
 
     const body = await this.parseAndPrepareData();
 
@@ -56,61 +83,140 @@ export class SearchService {
     return resp;
   }
 
+  async indexPortfolio() {
+    await this.indexService.createIndexPortfolio();
+
+    const body = await this.parseAndPreparePortfolioData();
+
+    const resp = await this.searchClient.bulk({
+      index: 'portfolio',
+      body,
+    });
+
+    return resp;
+  }
+
   public async search(
     searchParam: SearchProfileDto,
     page: number,
     limit: number,
     random: number,
-    career: string[],
-    skills: string[],
-    countryResidence: string[],
+    isExclusiveSkills: boolean,
+    isExclusiveLanguages: boolean,
   ) {
     try {
       const from = (page - 1) * limit;
 
-      let filter = [];
+      const filter = [];
+
+      const must = [];
+
+      let { career, skills, countryResidence, language } = searchParam;
 
       if (!random) random = Math.floor(Math.random() * 1000);
 
-      career = this.getValidatedCarreras(career);
+      career = await this.getValidatedCarreras(career);
 
       skills = await this.validateQueryArrayRelation(skills, 'skills');
 
       countryResidence = await this.validateQueryArrayCountry(countryResidence);
 
-      if (career) {
-        career.forEach((mainTitle) => {
-          filter.push({
-            match: {
-              mainTitle,
-            },
-          });
+      language = await this.validateQueryArray(language);
+
+      if (career && career.length > 0) {
+        filter.push({
+          bool: {
+            should: career.map((career) => ({
+              term: {
+                mainTitleCode: career,
+              },
+            })),
+          },
         });
       }
 
-      if (skills && Array.isArray(skills)) {
-        skills.forEach((skill) => {
+      if (skills && Array.isArray(skills) && skills.length > 0) {
+        if (isExclusiveSkills) {
+          skills.forEach((skill) => {
+            filter.push({
+              nested: {
+                path: 'skills',
+                query: {
+                  term: {
+                    'skills.nameCode': skill,
+                  },
+                },
+              },
+            });
+          });
+        } else {
+          const shouldClauses = skills.map((skill) => ({
+            term: {
+              'skills.nameCode': skill,
+            },
+          }));
+
           filter.push({
             nested: {
               path: 'skills',
               query: {
-                match: {
-                  'skills.name': skill,
+                bool: {
+                  should: shouldClauses,
                 },
               },
             },
           });
+        }
+      }
+
+      if (
+        countryResidence &&
+        Array.isArray(countryResidence) &&
+        countryResidence.length > 0
+      ) {
+        filter.push({
+          bool: {
+            should: countryResidence.map((countryResidence) => ({
+              match: {
+                countryResidence,
+              },
+            })),
+          },
         });
       }
 
-      if (countryResidence && Array.isArray(countryResidence)) {
-        countryResidence.forEach((countryResidence) => {
+      if (language && Array.isArray(language) && language.length > 0) {
+        if (isExclusiveLanguages) {
+          language.forEach((language) => {
+            filter.push({
+              nested: {
+                path: 'language',
+                query: {
+                  term: {
+                    'language.nameCode': language,
+                  },
+                },
+              },
+            });
+          });
+        } else {
+          const shouldClauses = language.map((language) => ({
+            term: {
+              'language.nameCode': language,
+            },
+          }));
+
           filter.push({
-            match: {
-              countryResidence,
+            nested: {
+              path: 'language',
+              query: {
+                bool: {
+                  should: shouldClauses,
+                },
+              },
             },
           });
-        });
+        }
       }
 
       let should: any[] = [];
@@ -137,12 +243,65 @@ export class SearchService {
             },
           },
           {
+            match: {
+              name: {
+                query: searchParam.text,
+                fuzziness: 2,
+              },
+            },
+          },
+          {
+            match: {
+              lastname: {
+                query: searchParam.text,
+                fuzziness: 2,
+              },
+            },
+          },
+          {
+            match: {
+              email: {
+                query: searchParam.text,
+                fuzziness: 2,
+              },
+            },
+          },
+          {
+            match: {
+              description: {
+                query: searchParam.text,
+                fuzziness: 2,
+              },
+            },
+          },
+          {
+            match: {
+              mainTitle: {
+                query: searchParam.text,
+                fuzziness: 2,
+              },
+            },
+          },
+          {
+            match: {
+              countryResidence: {
+                query: searchParam.text,
+                fuzziness: 2,
+              },
+            },
+          },
+          {
             nested: {
               path: 'skills',
               query: {
                 bool: {
                   must: {
-                    match: { 'skills.name': searchParam.text },
+                    match: {
+                      'skills.name': {
+                        query: searchParam.text,
+                        fuzziness: 2,
+                      },
+                    },
                   },
                   must_not: {
                     exists: {
@@ -158,24 +317,50 @@ export class SearchService {
               path: 'experience',
               query: {
                 bool: {
-                  must: {
-                    multi_match: {
-                      query: searchParam.text,
-                      fields: [
-                        'experience.businessName',
-                        'experience.role',
-                        'experience.location',
-                        'experience.description',
-                      ],
-                      type: 'bool_prefix',
-                      operator: 'or',
+                  should: [
+                    {
+                      match: {
+                        'experience.businessName': {
+                          query: searchParam.text,
+                          fuzziness: 2,
+                          operator: 'or',
+                        },
+                      },
                     },
-                  },
+                    {
+                      match: {
+                        'experience.role': {
+                          query: searchParam.text,
+                          fuzziness: 2,
+                          operator: 'or',
+                        },
+                      },
+                    },
+                    {
+                      match: {
+                        'experience.location': {
+                          query: searchParam.text,
+                          fuzziness: 2,
+                          operator: 'or',
+                        },
+                      },
+                    },
+                    {
+                      match: {
+                        'experience.description': {
+                          query: searchParam.text,
+                          fuzziness: 2,
+                          operator: 'or',
+                        },
+                      },
+                    },
+                  ],
                   must_not: {
                     exists: {
                       field: 'experience.deletedAt',
                     },
                   },
+                  minimum_should_match: 1,
                 },
               },
             },
@@ -185,19 +370,32 @@ export class SearchService {
               path: 'education',
               query: {
                 bool: {
-                  must: {
-                    multi_match: {
-                      query: searchParam.text,
-                      fields: ['education.title', 'education.entity'],
-                      type: 'bool_prefix',
-                      operator: 'or',
+                  should: [
+                    {
+                      match: {
+                        'education.title': {
+                          query: searchParam.text,
+                          fuzziness: 2,
+                          operator: 'or',
+                        },
+                      },
                     },
-                  },
+                    {
+                      match: {
+                        'education.entity': {
+                          query: searchParam.text,
+                          fuzziness: 2,
+                          operator: 'or',
+                        },
+                      },
+                    },
+                  ],
                   must_not: {
                     exists: {
                       field: 'education.deletedAt',
                     },
                   },
+                  minimum_should_match: 1,
                 },
               },
             },
@@ -286,8 +484,141 @@ export class SearchService {
     }
   }
 
+  async searchPortfolio(
+    searchParam: SearchProfileDto,
+    page: number,
+    limit: number,
+    random: number,
+  ) {
+    try {
+      let should: any[] = [];
+      const from = (page - 1) * limit;
+      if (!random) random = Math.floor(Math.random() * 1000);
+
+      if (
+        searchParam &&
+        searchParam.text &&
+        searchParam.text.trim().length > 0
+      ) {
+        should.push(
+          {
+            multi_match: {
+              query: searchParam.text,
+              fields: ['title', 'description', 'location'],
+              type: 'bool_prefix',
+              operator: 'or',
+            },
+          },
+          {
+            nested: {
+              path: 'profile',
+              query: {
+                bool: {
+                  must: {
+                    multi_match: {
+                      query: searchParam.text,
+                      fields: [
+                        'profile.name',
+                        'profile.lastname',
+                        'profile.mainTitle',
+                      ],
+                      type: 'bool_prefix',
+                      operator: 'or',
+                    },
+                  },
+                  must_not: {
+                    exists: {
+                      field: 'profile.deletedAt',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        );
+      } else {
+        should = [{ match_all: {} }];
+      }
+
+      let query: any = {
+        bool: {
+          should,
+          must_not: {
+            exists: {
+              field: 'deletedAt',
+            },
+          },
+        },
+      };
+
+      query = {
+        function_score: {
+          query,
+          functions: [
+            {
+              random_score: { seed: random },
+            },
+          ],
+        },
+      };
+
+      const { body } = await this.searchClient.search({
+        index: 'portfolio',
+        body: {
+          query,
+          from,
+          size: limit,
+        },
+      });
+
+      const totalCount = body.hits.total.value;
+      const hits = body.hits.hits;
+      const data = hits.map((item: any) => item._source);
+
+      return {
+        pagination: {
+          itemCount: body.length,
+          totalItems: totalCount,
+          itemsPerPage: limit,
+          totalPages: Math.ceil(totalCount / limit),
+          currentPage: page,
+          randomSeed: random,
+        },
+        portfolios: data,
+      };
+    } catch (err) {
+      throw err;
+    }
+  }
+
   async deleteIndex() {
     return await this.indexService.deleteIndex();
+  }
+
+  async deleteIndexPortfolio() {
+    return await this.indexService.deleteIndexPortfolio();
+  }
+
+  private async validateQueryArray(column: string[] | null) {
+    if (column) {
+      column = Array.isArray(column) ? column : [column];
+
+      const validationQuery = await this.languageRepository.find({
+        where: {
+          name: In(column),
+        },
+      });
+
+      if (!validationQuery) {
+        throw new BadRequestException(`Valor invaldo para ${column}`);
+      }
+
+      column = this.slugifyArray(column);
+    } else {
+      column = null;
+    }
+
+    return column;
   }
 
   private async parseAndPrepareData() {
@@ -303,12 +634,40 @@ export class SearchService {
         email: doc.user.email,
         description: doc.description,
         mainTitle: doc.mainTitle,
+        mainTitleCode: this.slugify(doc.mainTitle),
         countryResidence: doc.countryResidence,
         website: doc.website,
         skills: doc.skills,
         experience: doc.experience,
-        education: doc.education,
         portfolio: doc.portfolio,
+        education: doc.education,
+        language: doc.languages,
+      },
+    ]);
+
+    return body;
+  }
+
+  private async parseAndPreparePortfolioData() {
+    const portfolios = await this.getPortfolio();
+
+    const body = portfolios.flatMap((doc) => [
+      { index: { _index: 'portfolio', _id: doc.id } },
+      {
+        id: doc.id,
+        title: doc.title,
+        profileId: doc.profile.id,
+        description: doc.description,
+        location: doc.location,
+        imagePrincipal: doc.imagePrincipal,
+        image: doc.image,
+        url: doc.url,
+        dateEnd: doc.dateEnd,
+        profile: {
+          name: doc.profile.user.name,
+          lastname: doc.profile.user.lastname,
+          mainTitle: doc.profile.mainTitle,
+        },
       },
     ]);
 
@@ -334,6 +693,8 @@ export class SearchService {
       if (!validationQuery) {
         throw new BadRequestException(`Valor invaldo para ${relationName}`);
       }
+
+      relations = this.slugifyArray(relations);
     } else {
       relations = null;
     }
@@ -361,18 +722,13 @@ export class SearchService {
     return column;
   }
 
-  private getValidatedCarreras(_carrerasRaw: any) {
+  private async getValidatedCarreras(_carrerasRaw: any) {
     if (_carrerasRaw) {
       const carrerasRaw = Array.isArray(_carrerasRaw)
         ? _carrerasRaw
         : [_carrerasRaw];
       return carrerasRaw.map((carreraRaw: string) => {
-        const carreraLower = carreraRaw.toLowerCase() as Career;
-        if (!Object.values(Career).includes(carreraLower)) {
-          throw new BadRequestException(
-            `Valor inválido para carrera: ${carreraLower}`,
-          );
-        }
+        const carreraLower = carreraRaw.toLowerCase();
         return carreraLower;
       });
     }
@@ -391,30 +747,32 @@ export class SearchService {
     }));
   }
 
-  private UserProfilePresenter(profiles: Profile[]) {
-    return profiles.map((profile) => {
-      const { skillsProfile, languageProfile, ...otherProfileProps } = profile;
+  private presentProfiles(profiles: Profile[]) {
+    return profiles.map((profile) => this.userProfilePresenter.format(profile));
+  }
 
-      const mappedProfile = {
-        ...otherProfileProps,
-        languages: languageProfile
-          ? languageProfile.map(({ language, ...lp }) => ({
-              ...lp,
-              name: language.name,
-            }))
-          : [],
-        skills: skillsProfile
-          ? skillsProfile.map(({ skill, ...sp }) => ({
-              id: skill.id,
-              name: skill.name,
-              type: skill.type,
-              skillProfileId: sp.id,
-              isVisible: sp.isVisible,
-            }))
-          : [],
-      };
+  private slugify(text: string | null) {
+    if (text) {
+      return text
+        .toString()
+        .toLowerCase()
+        .replace(/\s+/g, '-') // Replace spaces with -
+        .replace(/[^\w-]+/g, '') // Remove all non-word chars
+        .replace(/--+/g, '-') // Replace multiple - with single -
+        .trim();
+    }
+    return null;
+  }
 
-      return mappedProfile;
-    });
+  private slugifyArray(strings: string[]): string[] {
+    return strings.map((text) =>
+      text
+        .toString()
+        .toLowerCase()
+        .replace(/\s+/g, '-') // Replace spaces with -
+        .replace(/[^\w-]+/g, '') // Remove all non-word chars
+        .replace(/--+/g, '-') // Replace multiple - with single -
+        .trim(),
+    );
   }
 }

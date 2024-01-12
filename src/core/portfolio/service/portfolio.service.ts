@@ -11,6 +11,7 @@ import { envData } from 'src/config/datasource';
 import { ERROR_IMAGE_NOT_FOUND, ERROR_PORTFOLIO_NOT_FOUND } from '../message';
 import { URL } from 'url';
 import { deleteFile } from 'src/common/utils/create file-upload-util';
+import { UserProfileCacheUpdater } from 'src/core/search/service/user-profile-cache-updater.class';
 @Injectable()
 export class PortfolioService {
   constructor(
@@ -18,6 +19,8 @@ export class PortfolioService {
     private readonly portfolioRepository: Repository<Portfolio>,
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+
+    private readonly userProfileCacheUpdater: UserProfileCacheUpdater,
   ) {}
 
   async create(
@@ -61,7 +64,10 @@ export class PortfolioService {
       profileId: user.id,
       imagePrincipal: newPathPrincipal,
       image: newPaths,
+      url: createPortfolioDto.url,
     });
+
+    await this.userProfileCacheUpdater.updateOneProfile(user.id);
 
     return newPortfolio;
   }
@@ -98,7 +104,6 @@ export class PortfolioService {
     if (!updatePortfolioDto.hasOwnProperty('imagePrincipal')) {
       newPathPrincipal = portfolio.imagePrincipal;
     }
-
     if (!updatePortfolioDto.hasOwnProperty('image')) {
       newPaths = portfolio.image;
     }
@@ -135,7 +140,10 @@ export class PortfolioService {
       dateEnd: updatePortfolioDto.dateEnd,
       imagePrincipal: newPathPrincipal,
       image: newPaths,
+      url: updatePortfolioDto.url,
     });
+
+    await this.userProfileCacheUpdater.updateOneProfile(user.id);
 
     return;
   }
@@ -203,6 +211,8 @@ export class PortfolioService {
       id,
       image: portfolio.image,
     });
+
+    await this.userProfileCacheUpdater.updateOneProfile(user.id);
   }
 
   async remove(id: number, user: UserActiveInterface): Promise<void> {
@@ -235,6 +245,7 @@ export class PortfolioService {
     }
 
     await this.portfolioRepository.delete(id);
+    await this.userProfileCacheUpdater.updateOneProfile(user.id);
 
     return;
   }

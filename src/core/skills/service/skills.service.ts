@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateSkillDto } from '../dto/create-skill.dto';
 import { UpdateSkillDto } from '../dto/update-skill.dto';
-import { ILike, In, Like, Not, Repository } from 'typeorm';
+import { Raw, Repository } from 'typeorm';
 import { Skill, SkillType } from '../entities/skill.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SKILL_ALREADY_EXISTS, SKILL_NOT_FOUND } from '../messages';
@@ -42,9 +42,9 @@ export class SkillsService {
 
     if (skillFound) {
       if (skillFound.type === SkillType.SOFT) {
-        throw new ConflictException(`${SKILL_ALREADY_EXISTS}` + `blanda`);
+        throw new ConflictException(`${SKILL_ALREADY_EXISTS}` + ` blanda`);
       } else {
-        throw new ConflictException(`${SKILL_ALREADY_EXISTS}` + `dura`);
+        throw new ConflictException(`${SKILL_ALREADY_EXISTS}` + ` dura`);
       }
     }
 
@@ -84,9 +84,30 @@ export class SkillsService {
   ) {
     const queryOptions: any = {};
 
-    if (name) {
+    if (name && exclude) {
+      if (!Array.isArray(exclude)) {
+        exclude = [exclude];
+      }
+
       queryOptions.where = {
-        name: ILike(`%${name}%`),
+        name: Raw(
+          (alias) =>
+            `${alias} ILIKE '%${name}%' AND ${alias} NOT IN ('${exclude.join(
+              "','",
+            )}')`,
+        ),
+      };
+    } else if (name) {
+      queryOptions.where = {
+        name: Raw((alias) => `${alias} ILIKE '%${name}%'`),
+      };
+    } else if (exclude) {
+      if (!Array.isArray(exclude)) {
+        exclude = [exclude];
+      }
+
+      queryOptions.where = {
+        name: Raw((alias) => `${alias} NOT IN ('${exclude.join("','")}')`),
       };
     }
 
@@ -101,14 +122,11 @@ export class SkillsService {
       queryOptions.take = limit;
     }
 
-    if (exclude) {
-      queryOptions.where = {
-        ...queryOptions.where,
-        id: Not(In(exclude)),
-      };
+    try {
+      return await this.skillsRepository.find(queryOptions);
+    } catch (error) {
+      console.log(error);
     }
-
-    return await this.skillsRepository.find(queryOptions);
   }
 
   async findOne(id: number) {
