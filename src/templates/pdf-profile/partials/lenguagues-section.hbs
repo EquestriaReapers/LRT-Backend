@@ -9,7 +9,7 @@
       <ul class='none-style-list horizontal-list normal-text'>
         {{#each languages}}
           {{#if (is-not-empty this.level)}}
-            <li><b>{{this.name}}:</b><span class="mx-2">{{this.level}}</span></li>
+            <li><b>{{this.name}}:</b>{{" "}}<span>{{this.level}}</span></li>
           {{else}}
             <li><b>{{this.name}}</b></li>
           {{/if}}
