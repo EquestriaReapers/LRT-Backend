@@ -54,7 +54,7 @@ export class UserProfileCacheUpdater {
   }
 
   private async getPortfolio(profileId: number) {
-    const portfolios = await this.portfolioRepository.find({
+    const portfolios = await this.portfolioRepository.findOne({
       relations: ['profile', 'profile.user'],
       where: {
         deletedAt: null,
@@ -121,7 +121,7 @@ export class UserProfileCacheUpdater {
   private async parseAndPreparePortfolioDataOneProfile(profileId: number) {
     const portfolios = await this.getPortfolio(profileId);
 
-    const body = portfolios.flatMap((doc) => [
+    const body = [portfolios].flatMap((doc) => [
       { index: { _index: envData.INDEX_PORTFOLIO, _id: doc.id } },
       {
         id: doc.id,
