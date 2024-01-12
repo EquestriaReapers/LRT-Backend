@@ -99,12 +99,15 @@ export default class ProfileExportPDFAction {
       throw new Error(`No profile found for user id ${userId}`);
     }
 
-    const { skillsProfile, languageProfile, experience, education, ...otherProfileProps } = profile;
+    console.log(profile);
 
+    const { skillsProfile, languageProfile, experience, education, ...otherProfileProps } = profile;
     const visibleSkillsProfile = skillsProfile.filter(sp => sp.isVisible);
     const visibleLanguageProfile = languageProfile.filter(lp => lp.isVisible);
     const visibleExperience = experience.filter(e => e.isVisible);
     const visibleEducation = education.filter(e => e.isVisible);
+
+    
 
     const mappedProfile = {
       ...otherProfileProps,
