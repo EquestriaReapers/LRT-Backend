@@ -201,7 +201,7 @@ export class AuthService {
 
     if (repository && repository.emailToken) {
       const mailOptions = {
-        from: '"Company" <' + process.env.EMAIL_USER + '>',
+        from: '"UCAB Profile" <' + process.env.EMAIL_USER + '>',
         to: email,
         subject: 'Verifica tu correo',
         text: 'Verify Email',
@@ -312,7 +312,7 @@ export class AuthService {
       const htmlToSend = template(replacements);
 
       let mailOptions = {
-        from: '"Company" <' + process.env.EMAIL_USER + '>',
+        from: '"UCAB Profile" <' + process.env.EMAIL_USER + '>',
         to: email,
         subject: 'Recupera tu contraseña',
         text: 'Forgot Password',

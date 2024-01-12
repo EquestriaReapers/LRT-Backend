@@ -90,7 +90,9 @@ export default class ProfilesService {
           id: 'ASC',
         },
         education: {
-          id: 'ASC',
+          id: 'DESC',
+          principal: 'DESC',
+          isUCAB: 'DESC',
         },
         portfolio: {
           id: 'ASC',

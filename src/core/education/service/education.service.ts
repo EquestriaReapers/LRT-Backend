@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { UserActiveInterface } from 'src/common/interface/user-active-interface';
 import {
   EDUCATION_NOT_FOUND,
+  ERROR_EDUCATION_FALSE_AGAIN,
   ERROR_EDUCATION_IS_UCAB,
   ERROR_EDUCATION_PRINCIPAL_ALREADY_EXISTS,
   ERROR_EDUCATION_PRINCIPAL_NOT_UPDATED,
@@ -105,19 +106,33 @@ export class EducationService {
         },
       });
 
-      if (principalEducation.id === id) {
+      if (principalEducation && principalEducation.id === id) {
         throw new BadRequestException(ERROR_EDUCATION_PRINCIPAL_NOT_UPDATED);
       }
 
-      await this.educationRepository.update(
-        {
-          id: principalEducation.id,
-          profileId: user.id,
-        },
-        {
-          principal: false,
-        },
-      );
+      if (
+        principalEducation &&
+        principalEducation.id !== id &&
+        updateEducationDto.principal
+      ) {
+        await this.educationRepository.update(
+          {
+            id: principalEducation.id,
+            profileId: user.id,
+          },
+          {
+            principal: false,
+          },
+        );
+      }
+
+      if (
+        currentEducation.isUCAB === true &&
+        !updateEducationDto.principal &&
+        currentEducation.principal === false
+      ) {
+        throw new BadRequestException(ERROR_EDUCATION_FALSE_AGAIN);
+      }
 
       education = await this.educationRepository.update(
         {
@@ -153,7 +168,7 @@ export class EducationService {
       );
     }
 
-    if (education.affected === 0) {
+    if (education && education.affected === 0) {
       throw new NotFoundException(EDUCATION_NOT_FOUND);
     }
 

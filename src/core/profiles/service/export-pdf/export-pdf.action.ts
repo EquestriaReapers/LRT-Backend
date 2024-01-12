@@ -96,6 +96,14 @@ export default class ProfileExportPDFAction {
           email: true,
         },
       },
+      order: {
+        experience: {
+          startDate: 'DESC',
+        },
+        education: {
+          endDate: 'DESC',
+        },
+      },
     });
 
     const { skillsProfile, languageProfile, ...otherProfileProps } = profile;
