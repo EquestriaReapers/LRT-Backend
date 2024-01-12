@@ -54,6 +54,18 @@ export class SearchService {
       },
       where: {
         deletedAt: null,
+        experience: {
+          deletedAt: null,
+        },
+        portfolio: {
+          deletedAt: null,
+        },
+        education: {
+          deleteAt: null,
+        },
+        skillsProfile: {
+          deletedAt: null,
+        },
       },
     });
 
