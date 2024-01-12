@@ -9,3 +9,5 @@ export const ERROR_EDUCATION_IS_UCAB =
   'No se puede eliminar una educacion UCAB';
 export const ERROR_EDUCATION_PRINCIPAL_NOT_UPDATED =
   'Educacion principal no se puede cambiar a secundaria';
+export const ERROR_EDUCATION_FALSE_AGAIN =
+  'Educacion no se puede cambiar a falso si ya es falso';

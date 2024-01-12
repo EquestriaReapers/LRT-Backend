@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { UserActiveInterface } from 'src/common/interface/user-active-interface';
 import {
   EDUCATION_NOT_FOUND,
+  ERROR_EDUCATION_FALSE_AGAIN,
   ERROR_EDUCATION_IS_UCAB,
   ERROR_EDUCATION_PRINCIPAL_ALREADY_EXISTS,
   ERROR_EDUCATION_PRINCIPAL_NOT_UPDATED,
@@ -105,11 +106,7 @@ export class EducationService {
         },
       });
 
-      if (
-        principalEducation &&
-        principalEducation.id === id &&
-        !updateEducationDto.principal
-      ) {
+      if (principalEducation && principalEducation.id === id) {
         throw new BadRequestException(ERROR_EDUCATION_PRINCIPAL_NOT_UPDATED);
       }
 
@@ -127,6 +124,14 @@ export class EducationService {
             principal: false,
           },
         );
+      }
+
+      if (
+        currentEducation.isUCAB === true &&
+        !updateEducationDto.principal &&
+        currentEducation.principal === false
+      ) {
+        throw new BadRequestException(ERROR_EDUCATION_FALSE_AGAIN);
       }
 
       education = await this.educationRepository.update(
