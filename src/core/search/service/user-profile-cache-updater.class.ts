@@ -47,6 +47,18 @@ export class UserProfileCacheUpdater {
       where: {
         deletedAt: null,
         id: profileId,
+        experience: {
+          deletedAt: null,
+        },
+        portfolio: {
+          deletedAt: null,
+        },
+        education: {
+          deleteAt: null,
+        },
+        skillsProfile: {
+          deletedAt: null,
+        },
       },
     });
 
