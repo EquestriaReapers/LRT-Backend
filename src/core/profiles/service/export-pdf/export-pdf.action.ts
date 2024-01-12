@@ -106,7 +106,6 @@ export default class ProfileExportPDFAction {
         },
       },
     });
-
     const { skillsProfile, languageProfile, ...otherProfileProps } = profile;
 
     const mappedProfile = {
