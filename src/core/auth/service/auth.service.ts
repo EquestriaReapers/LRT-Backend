@@ -35,7 +35,6 @@ import {
   USER_NOT_FOUND_BANNER,
 } from '../message';
 import { ForgotPassword } from '../entities/forgotpassword.entity';
-import { UserProfileCacheUpdater } from 'src/core/search/service/user-profile-cache-updater.class';
 
 @Injectable()
 export class AuthService {
@@ -51,9 +50,6 @@ export class AuthService {
 
     @InjectRepository(ForgotPassword)
     private readonly forgotPassword: Repository<ForgotPassword>,
-
-    private readonly userProfileCacheUpdater: UserProfileCacheUpdater,
-
   ) {}
 
   async register({ email, password }: RegisterDto) {
@@ -166,7 +162,6 @@ export class AuthService {
         });
 
         await this.emailVerification.delete({ emailToken: token });
-        await this.userProfileCacheUpdater.updateOneProfile(userFromDb.id);
         return !!userFromDb;
       }
     } else {

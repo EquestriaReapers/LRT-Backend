@@ -8,12 +8,10 @@ import { EmailVerificationEntity } from './entities/emailverification.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtPayloadService } from '../../common/service/jwt.payload.service';
 import { ForgotPassword } from './entities/forgotpassword.entity';
-import { SearchModule } from '../search/search.module';
 
 @Module({
   imports: [
     UsersModule,
-    SearchModule,
     JwtModule.register({
       global: true,
       secret: envData.JWTSECRET,
