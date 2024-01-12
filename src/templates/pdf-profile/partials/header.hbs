@@ -144,5 +144,11 @@
         @page :first {
             margin-top: 0;
         }
+
+        @media print {
+            .pls-not-break-class {
+                break-inside: avoid;
+            }
+        }
     </style>
 </head>
