@@ -58,7 +58,7 @@ export class UserProfileCacheUpdater {
       relations: ['profile', 'profile.user'],
       where: {
         deletedAt: null,
-        id: profileId,
+        profileId,
       },
     });
 
