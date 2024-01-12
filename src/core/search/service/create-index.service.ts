@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectOpensearchClient, OpensearchClient } from 'nestjs-opensearch';
+import { env } from 'process';
 import { map } from 'rxjs';
+import { envData } from 'src/config/datasource';
 
 @Injectable()
 export class IndexService {
@@ -11,12 +13,12 @@ export class IndexService {
 
   async createIndexProfile() {
     const checkIndex = await this.searchClient.indices.exists({
-      index: 'profiles',
+      index: envData.INDEX_PROFILE,
     });
 
     if (checkIndex.statusCode === 404) {
       const index = await this.searchClient.indices.create({
-        index: 'profiles',
+        index: envData.INDEX_PROFILE,
         body: {
           settings: {
             analysis: {
@@ -107,12 +109,12 @@ export class IndexService {
 
   async createIndexPortfolio() {
     const checkIndex = await this.searchClient.indices.exists({
-      index: 'portfolio',
+      index: envData.INDEX_PORTFOLIO,
     });
 
     if (checkIndex.statusCode === 404) {
       const index = await this.searchClient.indices.create({
-        index: 'portfolio',
+        index: envData.INDEX_PORTFOLIO,
         body: {
           settings: {
             analysis: {
@@ -160,7 +162,7 @@ export class IndexService {
 
   async deleteIndex() {
     const resp = await this.searchClient.indices.delete({
-      index: 'profiles',
+      index: envData.INDEX_PROFILE,
     });
 
     return resp;
@@ -168,7 +170,7 @@ export class IndexService {
 
   async deleteIndexPortfolio() {
     const resp = await this.searchClient.indices.delete({
-      index: 'portfolio',
+      index: envData.INDEX_PORTFOLIO,
     });
 
     return resp;

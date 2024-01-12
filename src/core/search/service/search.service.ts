@@ -77,7 +77,7 @@ export class SearchService {
     const body = await this.parseAndPrepareData();
 
     const resp = await this.searchClient.bulk({
-      index: 'profiles',
+      index: envData.INDEX_PROFILE,
       body,
     });
 
@@ -90,7 +90,7 @@ export class SearchService {
     const body = await this.parseAndPreparePortfolioData();
 
     const resp = await this.searchClient.bulk({
-      index: 'portfolio',
+      index: envData.INDEX_PORTFOLIO,
       body,
     });
 
@@ -456,7 +456,7 @@ export class SearchService {
       };
 
       const { body } = await this.searchClient.search({
-        index: 'profiles',
+        index: envData.INDEX_PROFILE,
         body: {
           query,
           from,
@@ -564,7 +564,7 @@ export class SearchService {
       };
 
       const { body } = await this.searchClient.search({
-        index: 'portfolio',
+        index: envData.INDEX_PORTFOLIO,
         body: {
           query,
           from,
@@ -626,7 +626,7 @@ export class SearchService {
     const profiles = await this.getProfiles();
 
     const body = profiles.flatMap((doc) => [
-      { index: { _index: 'profiles', _id: doc.id } },
+      { index: { _index: envData.INDEX_PROFILE, _id: doc.id } },
       {
         id: doc.id,
         userId: doc.userId,
@@ -653,7 +653,7 @@ export class SearchService {
     const portfolios = await this.getPortfolio();
 
     const body = portfolios.flatMap((doc) => [
-      { index: { _index: 'portfolio', _id: doc.id } },
+      { index: { _index: envData.INDEX_PORTFOLIO, _id: doc.id } },
       {
         id: doc.id,
         title: doc.title,

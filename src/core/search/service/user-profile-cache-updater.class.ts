@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { InjectOpensearchClient, OpensearchClient } from 'nestjs-opensearch';
 import { IndexService } from './create-index.service';
 import { UserProfilePresenter } from './user-profile-presenter.class';
+import { envData } from 'src/config/datasource';
 
 @Injectable()
 export class UserProfileCacheUpdater {
@@ -54,7 +55,7 @@ export class UserProfileCacheUpdater {
     const body = await this.parseAndPrepareDataForOneProfile(profileId);
 
     const resp = await this.searchClient.bulk({
-      index: 'profiles',
+      index: envData.INDEX_PROFILE,
       body,
     });
 
@@ -65,7 +66,7 @@ export class UserProfileCacheUpdater {
     const profile = await this.getProfile(profileId);
 
     const body = [profile].flatMap((doc) => [
-      { index: { _index: 'profiles', _id: doc.id } },
+      { index: { _index: envData.INDEX_PROFILE, _id: doc.id } },
       {
         id: doc.id,
         userId: doc.userId,
