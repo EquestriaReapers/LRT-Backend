@@ -13,7 +13,6 @@ import { Repository } from 'typeorm';
 import { ResponseProfileGet } from '../../dto/responses.dto';
 
 const FILE_CONFIG = {
-  preferCSSPageSize: true,
   format: 'a4',
   printBackground: true,
   margin: { left: '0mm', top: '0mm', right: '0mm', bottom: '10mm' },
