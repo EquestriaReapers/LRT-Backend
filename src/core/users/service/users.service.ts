@@ -156,6 +156,7 @@ export class UsersService {
           endDate: studentCareers.dateGraduated,
           isUCAB: true,
           principal: false,
+          isVisible: true,
         });
       }
     }
@@ -271,6 +272,7 @@ export class UsersService {
         endDate: education.dateGraduated,
         isUCAB: true,
         principal: false,
+        isVisible: true,
       });
       await this.educationRepository.save(newEducation);
     }
