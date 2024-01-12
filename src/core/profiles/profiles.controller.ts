@@ -29,8 +29,8 @@ import { AddSkillDto } from './dto/add-skill.dto';
 import { MessageDTO } from 'src/common/dto/response.dto';
 import * as express from 'express';
 import {
-  ERROR_UNKOWN_GENERATING_PDF,
   PROFILE_SUCCESFULLY_DELETED_LANGUAGE,
+  ERROR_UNKOWN_GENERATING_PDF,
   PROFILE_SUCCESFULLY_DELETED_SKILL,
   PROFILE_SUCCESFULLY_DELETE_METHOD_CONTACT,
   PROFILE_SUCCESFULLY_UPDATED,

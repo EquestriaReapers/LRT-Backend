@@ -22,8 +22,9 @@ import {
   SkillProfileData,
   UserProfileData,
 } from '../dto/responses.dto';
-import { LanguageProfile } from './language-profile.entity';
 import { ContactMethod } from './contact-method.entity';
+import { LanguageProfile } from './language-profile.entity';
+import { Career } from 'src/core/career/enum/career.enum';
 import { Portfolio } from 'src/core/portfolio/entities/portfolio.entity';
 import { SkillsProfile } from './skills-profile.entity';
 import { Education } from 'src/core/education/entities/education.entity';
@@ -105,12 +106,13 @@ export class Profile {
   @Column({ type: 'jsonb', nullable: true, default: () => "'[]'" })
   contactMethods: ContactMethod[];
 
-  @ApiProperty({ type: [PortfolioData] })
-  @OneToMany(() => Portfolio, (portfolio) => portfolio.profile)
-  portfolio: Portfolio[];
   @ApiProperty({
     type: [EducationData],
   })
   @OneToMany(() => Education, (education) => education.profile)
   education: Education[];
+
+  @ApiProperty({ type: [PortfolioData] })
+  @OneToMany(() => Portfolio, (portfolio) => portfolio.profile)
+  portfolio: Portfolio[];
 }
