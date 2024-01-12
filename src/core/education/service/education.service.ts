@@ -105,19 +105,29 @@ export class EducationService {
         },
       });
 
-      if (principalEducation.id === id) {
+      if (
+        principalEducation &&
+        principalEducation.id === id &&
+        !updateEducationDto.principal
+      ) {
         throw new BadRequestException(ERROR_EDUCATION_PRINCIPAL_NOT_UPDATED);
       }
 
-      await this.educationRepository.update(
-        {
-          id: principalEducation.id,
-          profileId: user.id,
-        },
-        {
-          principal: false,
-        },
-      );
+      if (
+        principalEducation &&
+        principalEducation.id !== id &&
+        updateEducationDto.principal
+      ) {
+        await this.educationRepository.update(
+          {
+            id: principalEducation.id,
+            profileId: user.id,
+          },
+          {
+            principal: false,
+          },
+        );
+      }
 
       education = await this.educationRepository.update(
         {
@@ -153,7 +163,7 @@ export class EducationService {
       );
     }
 
-    if (education.affected === 0) {
+    if (education && education.affected === 0) {
       throw new NotFoundException(EDUCATION_NOT_FOUND);
     }
 
