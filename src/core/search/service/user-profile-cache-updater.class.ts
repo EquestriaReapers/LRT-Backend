@@ -6,6 +6,7 @@ import { InjectOpensearchClient, OpensearchClient } from 'nestjs-opensearch';
 import { IndexService } from './create-index.service';
 import { UserProfilePresenter } from './user-profile-presenter.class';
 import { envData } from 'src/config/datasource';
+import { Portfolio } from 'src/core/portfolio/entities/portfolio.entity';
 
 @Injectable()
 export class UserProfileCacheUpdater {
@@ -19,6 +20,9 @@ export class UserProfileCacheUpdater {
     private readonly indexService: IndexService,
 
     private readonly userProfilePresenter: UserProfilePresenter,
+
+    @InjectRepository(Portfolio)
+    private readonly portfolioRepository: Repository<Portfolio>,
   ) {}
 
   private async getProfile(profileId: number) {
@@ -49,6 +53,18 @@ export class UserProfileCacheUpdater {
     return this.userProfilePresenter.format(profile);
   }
 
+  private async getPortfolio(profileId: number) {
+    const portfolios = await this.portfolioRepository.find({
+      relations: ['profile', 'profile.user'],
+      where: {
+        deletedAt: null,
+        id: profileId,
+      },
+    });
+
+    return portfolios;
+  }
+
   async updateOneProfile(profileId: number) {
     await this.indexService.createIndexProfile();
 
@@ -56,6 +72,19 @@ export class UserProfileCacheUpdater {
 
     const resp = await this.searchClient.bulk({
       index: envData.INDEX_PROFILE,
+      body,
+    });
+
+    return resp;
+  }
+
+  async updatePortfolioOneProfile(profileId: number) {
+    await this.indexService.createIndexPortfolio();
+
+    const body = await this.parseAndPreparePortfolioDataOneProfile(profileId);
+
+    const resp = await this.searchClient.bulk({
+      index: envData.INDEX_PORTFOLIO,
       body,
     });
 
@@ -83,6 +112,32 @@ export class UserProfileCacheUpdater {
         portfolio: doc.portfolio,
         education: doc.education,
         language: doc.languages,
+      },
+    ]);
+
+    return body;
+  }
+
+  private async parseAndPreparePortfolioDataOneProfile(profileId: number) {
+    const portfolios = await this.getPortfolio(profileId);
+
+    const body = portfolios.flatMap((doc) => [
+      { index: { _index: envData.INDEX_PORTFOLIO, _id: doc.id } },
+      {
+        id: doc.id,
+        title: doc.title,
+        profileId: doc.profile.id,
+        description: doc.description,
+        location: doc.location,
+        imagePrincipal: doc.imagePrincipal,
+        image: doc.image,
+        url: doc.url,
+        dateEnd: doc.dateEnd,
+        profile: {
+          name: doc.profile.user.name,
+          lastname: doc.profile.user.lastname,
+          mainTitle: doc.profile.mainTitle,
+        },
       },
     ]);
 
