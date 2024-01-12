@@ -38,6 +38,8 @@ export const envData = {
   FRONTEND_URL: configService.get('FRONTEND_URL'),
   EMAIL_LOCAL_TESTING_MODE: configService.get('EMAIL_LOCAL_TESTING_MODE'),
   EMAIL_LOCAL_BASE_URL: configService.get('EMAIL_LOCAL_BASE_URL'),
+  INDEX_PROFILE: configService.get('INDEX_PROFILE'),
+  INDEX_PORTFOLIO: configService.get('INDEX_PORTFOLIO'),
 };
 
 export const AppOS = new DataSource(DataSourceConfig);
