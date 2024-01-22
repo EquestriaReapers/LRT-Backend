@@ -4,6 +4,7 @@ import { ContactMethod } from 'src/core/profiles/entities/contact-method.entity'
 import { TypeContact } from 'src/constants';
 import { ResponseProfileGet } from '../../dto/responses.dto';
 import { SkillType } from 'src/core/skills/entities/skill.entity';
+import { envData } from 'src/config/datasource';
 
 const ContactMethodTypeToIcon = {
   [TypeContact.PHONE]: Icon.Call,
@@ -72,6 +73,11 @@ export default class ProfileTemplateAdaptator {
         text: profile.website,
       });
     }
+
+    globeContactMethod.push({
+      IconName: ContactMethodTypeToIcon['globe'],
+      text: `${envData.FRONTEND_URL}/profile/${profile.id}`,
+    });
 
     return [
       ...countryLocationMethod,
