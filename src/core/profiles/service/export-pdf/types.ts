@@ -58,4 +58,5 @@ export interface ProfileTemplate extends Professional {
   educations: Education[];
   languages: Lenguague[];
   skillSet: SkillSet;
+  profileUrl: string;
 }
