@@ -10,7 +10,7 @@ export class UserProfilePresenter {
 
     const mappedProfile = {
       ...otherProfileProps,
-      mainTitleCode: profile.mainTitle,
+      mainTitleCode: this.slugify(profile.mainTitle),
       languages: languageProfile
         ? languageProfile.map(({ language, ...lp }) => ({
             ...lp,

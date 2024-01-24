@@ -123,7 +123,7 @@ export class UserProfileCacheUpdater {
         email: doc.user.email,
         description: doc.description,
         mainTitle: doc.mainTitle,
-        mainTitleCode: doc.mainTitleCode,
+        mainTitleCode: this.slugify(doc.mainTitle),
         countryResidence: doc.countryResidence,
         website: doc.website,
         skills: doc.skills,
@@ -161,5 +161,15 @@ export class UserProfileCacheUpdater {
     ]);
 
     return body;
+  }
+
+  private slugify(text: string) {
+    return text
+      .toString()
+      .toLowerCase()
+      .replace(/\s+/g, '-') // Replace spaces with -
+      .replace(/[^\w-]+/g, '') // Remove all non-word chars
+      .replace(/--+/g, '-') // Replace multiple - with single -
+      .trim();
   }
 }
