@@ -44,6 +44,7 @@ export default class ProfileTemplateAdaptator {
           .filter((skill) => skill.type === SkillType.SOFT)
           .map((skill) => skill.name),
       },
+      profileUrl: `${envData.FRONTEND_URL}/profile/${profile.id}`,
     };
   }
 
@@ -73,11 +74,6 @@ export default class ProfileTemplateAdaptator {
         text: profile.website,
       });
     }
-
-    globeContactMethod.push({
-      IconName: ContactMethodTypeToIcon['globe'],
-      text: `${envData.FRONTEND_URL}/profile/${profile.id}`,
-    });
 
     return [
       ...countryLocationMethod,
